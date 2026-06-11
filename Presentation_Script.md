@@ -18,14 +18,14 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 ## Slide 2 — Listen to the Song (NEW)
 **"Kids Who Exercise" (운동하는 아이들) — by insung20402, made with Suno AI**
 
-> Before we explain the idea behind our project, let's listen to the song itself. This song is called "Kids Who Exercise," written and composed by our team using Suno AI. As you listen, please follow along with the lyrics on the screen. Notice how the song moves from a warning about not exercising to an energetic, positive message about moving every day.
+> Before we explain the idea behind our project, let's listen to the song itself. This song is called "Kids Who Exercise," written and composed by our team using Suno AI. Notice how the song moves from a warning about not exercising to an energetic, positive message about moving every day.
 >
-> *(Click the play button now and let the song play.)*
+> *(Click the play button now and let the song play — the song is about 2 minutes long.)*
 
 **🇰🇷 한국어 해석**
-> 본격적인 설명에 앞서, 먼저 노래를 들어보겠습니다. 이 곡의 제목은 "운동하는 아이들"이며, 저희 팀이 Suno AI를 이용해 직접 작사·작곡했습니다. 노래를 들으면서 화면에 나오는 가사를 함께 따라가 주세요. 노래가 운동을 하지 않는 것에 대한 경고로 시작해서, 매일 움직이자는 활기차고 긍정적인 메시지로 이어지는 것을 느껴보세요.
+> 본격적인 설명에 앞서, 먼저 노래를 들어보겠습니다. 이 곡의 제목은 "운동하는 아이들"이며, 저희 팀이 Suno AI를 이용해 직접 작사·작곡했습니다. 노래가 운동을 하지 않는 것에 대한 경고로 시작해서, 매일 움직이자는 활기차고 긍정적인 메시지로 이어지는 것을 느껴보세요.
 >
-> *(지금 재생 버튼을 눌러 노래를 재생하세요.)*
+> *(지금 재생 버튼을 눌러 노래를 재생하세요 — 노래 길이는 약 2분입니다.)*
 
 **Lyrics shown on screen:**
 - Verse 1 — about skipping breakfast and not moving
@@ -87,21 +87,21 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 ## Slide 6 — Team Members
 
 > Here is our team.
-> - **Lee Minjae** was our team leader — he led the project and organized our main message.
-> - **Lee Yeongu** handled research — collecting information and data about exercise.
-> - **Lee Insung** worked on presentation and planning — preparing this presentation and the script.
-> - **Lee Hayul** created our visual materials and design.
+> - **Lee Minjae** was our script writer — he wrote the full presentation script.
+> - **Lee Yeongu** handled PPT production and led the visual design.
+> - **Lee Insung** was our presenter and also supported the design work.
+> - **Lee Hayul** was our team leader and composed the song using Suno AI.
 >
-> Together, we combined research, music, writing, and design to bring this project to life.
+> Together, we combined writing, design, presentation, and music to bring this project to life.
 
 **🇰🇷 한국어 해석**
 > 저희 팀을 소개하겠습니다.
-> - **이민재**는 팀장으로서 프로젝트를 이끌고 핵심 메시지를 정리했습니다.
-> - **이영우**는 리서치를 담당하여 운동에 관한 정보와 자료를 수집했습니다.
-> - **이인성**은 발표와 기획을 맡아 이 프레젠테이션과 대본을 준비했습니다.
-> - **이하율**은 시각 자료와 디자인을 제작했습니다.
+> - **이민재**는 대본 작성을 담당하여 프레젠테이션 대본 전체를 작성했습니다.
+> - **이영우**는 PPT 제작과 디자인을 주도했습니다.
+> - **이인성**은 발표를 맡았고 디자인 작업도 함께 도왔습니다.
+> - **이하율**은 팀 조장이며 Suno AI로 노래를 작곡했습니다.
 >
-> 이렇게 저희는 리서치, 음악, 글쓰기, 디자인을 결합하여 이 프로젝트를 완성했습니다.
+> 이렇게 저희는 글쓰기, 디자인, 발표, 음악을 결합하여 이 프로젝트를 완성했습니다.
 
 ---
 
@@ -132,8 +132,9 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 ---
 
 ## Timing Tip
-- Slides 1–2: ~1.5 minutes (including playing part or all of the song)
-- Slides 3–5: ~2.5 minutes (content)
+- Slide 1: ~20 seconds
+- Slide 2: ~2 minutes (the song is about 2 minutes long — play it in full)
+- Slides 3–5: ~2 minutes (content)
 - Slide 6: ~30 seconds
 - Slides 7–8: ~1 minute (closing)
-- **Total: ~5–6 minutes**
+- **Total: ~6 minutes**
