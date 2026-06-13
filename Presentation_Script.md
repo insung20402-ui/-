@@ -102,12 +102,12 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ---
 
-## Slide 7 — Our Song's Message (about 25 seconds)
+## Slide 7 — In Conclusion: Our Song's Message (about 25 seconds)
 
-> So here is our song's message: **"Move today for a better tomorrow."** This is the main message of our song. It starts with a warning, but it ends with hope: small steps today can change tomorrow. Listen to our song, and start moving, one step at a time!
+> So, in conclusion, here is our song's message: **"Move today for a better tomorrow."** This is the main message of our song. It starts with a warning, but it ends with hope: small steps today can change tomorrow. Listen to our song, and start moving, one step at a time!
 
 **🇰🇷 한국어 해석**
-> 저희 노래의 메시지는 바로 이것입니다: **"더 나은 내일을 위해 오늘 움직이세요."** 이것이 저희 노래의 핵심 메시지입니다. 경고로 시작하지만, 희망으로 끝납니다: 오늘의 작은 한 걸음이 내일을 바꿀 수 있습니다. 저희 노래를 듣고, 한 걸음씩 움직이기 시작하세요!
+> 마지막으로, 저희 노래의 메시지는 바로 이것입니다: **"더 나은 내일을 위해 오늘 움직이세요."** 이것이 저희 노래의 핵심 메시지입니다. 경고로 시작하지만, 희망으로 끝납니다: 오늘의 작은 한 걸음이 내일을 바꿀 수 있습니다. 저희 노래를 듣고, 한 걸음씩 움직이기 시작하세요!
 
 ---
 
