@@ -1,4 +1,4 @@
-# Presentation Script — "Exercise Motivation Through Strong Warning Messages"
+# Presentation Script — "Introducing Our Song: Kids Who Exercise"
 ### Team: Lee Insung and Friends (Lee Minjae · Lee Yeongu · Lee Insung · Lee Hayul)
 
 Easy English version — total time: about 5 minutes.
@@ -7,12 +7,12 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 ---
 
 ## Slide 1 — Title (about 15 seconds)
-**"Exercise Motivation Through Strong Warning Messages"**
+**"Our Song Project: Introducing Kids Who Exercise"**
 
-> Good morning, everyone! Today, our team will show you our project. It is a song about exercise. The song has a strong warning message. Our team members are Lee Minjae, Lee Yeongu, Lee Insung, and Lee Hayul. Let's start!
+> Good morning, everyone! Today, our team will show you our project. We made a song about exercise, and we want to introduce it to you. Our team members are Lee Minjae, Lee Yeongu, Lee Insung, and Lee Hayul. Let's start!
 
 **🇰🇷 한국어 해석**
-> 안녕하세요, 여러분! 오늘 저희 팀은 프로젝트를 소개하겠습니다. 운동에 관한 노래입니다. 이 노래에는 강한 경고 메시지가 있습니다. 팀원은 이민재, 이영우, 이인성, 이하율입니다. 시작하겠습니다!
+> 안녕하세요, 여러분! 오늘 저희 팀은 프로젝트를 소개하겠습니다. 저희는 운동에 관한 노래를 만들었고, 이 노래를 여러분께 소개하고 싶습니다. 팀원은 이민재, 이영우, 이인성, 이하율입니다. 시작하겠습니다!
 
 ---
 
@@ -24,7 +24,7 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 > *(Play the song now. If you need more time, you can stop after the chorus — about 1 minute.)*
 
 **🇰🇷 한국어 해석**
-> 이제 노래를 들어보겠습니다! 제목은 "운동하는 아이들"입니다. Suno AI로 만들었습니다. 노래는 경고로 시작해서 점점 신나고 즐거워집니다.
+> 이제 저희 노래를 들어보겠습니다! 제목은 "운동하는 아이들"입니다. Suno AI로 만들었습니다. 노래는 경고로 시작해서 점점 신나고 즐거워집니다.
 >
 > *(지금 노래를 재생하세요. 시간이 부족하면 코러스(약 1분)까지만 들으셔도 됩니다.)*
 
@@ -42,46 +42,42 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ---
 
-## Slide 3 — Song Introduction (about 30 seconds)
+## Slide 3 — About Our Song (about 30 seconds)
 
-> What is this song about? It is about exercise. The song gives a strong warning: "If you do not move, tomorrow will be worse." This warning shows why exercise is important. Exercise is good for your body and your mind. We hope this song makes you want to move more!
+> So, what is our song about? We made a song called "Kids Who Exercise." It is about exercise and healthy morning habits. We wrote the lyrics and made the music using Suno AI. The song starts with a warning about skipping breakfast and not moving. Then it becomes a happy, energetic song about exercising every day. We hope it makes you want to move!
 
 **🇰🇷 한국어 해석**
-> 이 노래는 무엇에 관한 것일까요? 운동에 관한 노래입니다. 이 노래는 강한 경고를 줍니다: "움직이지 않으면 내일은 더 나빠진다." 이 경고는 운동이 왜 중요한지를 보여줍니다. 운동은 몸과 마음 모두에 좋습니다. 이 노래를 듣고 여러분이 더 움직이고 싶어지길 바랍니다!
+> 그렇다면 저희 노래는 무엇에 관한 것일까요? 저희는 "운동하는 아이들"이라는 노래를 만들었습니다. 운동과 건강한 아침 습관에 관한 노래입니다. 가사를 직접 쓰고, Suno AI로 음악을 만들었습니다. 노래는 아침을 거르고 움직이지 않는 것에 대한 경고로 시작해서, 매일 운동하자는 신나고 즐거운 노래로 바뀝니다. 이 노래를 듣고 여러분도 움직이고 싶어지길 바랍니다!
 
 ---
 
-## Slide 4 — Meaning and Examples of Strong Warning Messages (about 30 seconds)
+## Slide 4 — What Our Song Says (about 30 seconds)
 
-> Let's look at our warning message again: "If you do not move, tomorrow will be worse." This message is strong. It makes people want to take action. Without exercise, people have low energy and bad health. With exercise, people feel much better. This big difference gives us motivation to move.
+> Let's look at what our song says. Verse 1 talks about a morning with no breakfast and no exercise, which feels hard and tiring. The chorus says: "Let's go take a walk outside, exercise every day, feel the pride!" Verse 2 and the bridge talk about moving your body and eating well to make every day more fun. Our song moves from a warning to an exciting call to action.
 
 **🇰🇷 한국어 해석**
-> 저희의 경고 메시지를 다시 보겠습니다: "움직이지 않으면 내일은 더 나빠진다." 이 메시지는 강합니다. 사람들이 행동하게 만듭니다. 운동을 하지 않으면 에너지가 부족하고 건강이 나빠집니다. 운동을 하면 훨씬 좋아집니다. 이 큰 차이가 우리에게 움직일 동기를 줍니다.
+> 저희 노래의 가사를 살펴보겠습니다. Verse 1은 아침을 거르고 운동을 하지 않으면 하루가 힘들고 피곤하다는 이야기입니다. 코러스에서는 "밖으로 산책하러 가요, 매일 운동하며 자부심을 느껴요!"라고 말합니다. Verse 2와 Bridge는 몸을 움직이고 잘 먹으면 매일이 더 즐거워진다는 이야기입니다. 저희 노래는 경고에서 시작해서 신나는 행동의 메시지로 이어집니다.
 
 ---
 
-## Slide 5 — Negative Effects (about 35 seconds)
+## Slide 5 — The Story in Our Song (about 35 seconds)
 
-> Now, let's talk about problems from not exercising.
+> Now let's look at the story in our song.
 >
-> First: weak muscles and a weak heart. More risk of getting sick.
+> Verse 1 is the problem: a child skips breakfast and doesn't move, and the morning feels hard.
 >
-> Second: bad mental health. More stress and bad sleep.
+> Verse 2 is the change: the child moves every day, eats well, and has fun in the sun.
 >
-> Third: low energy and less fun in daily life.
->
-> Not exercising is really bad for our health and our life!
+> The bridge and chorus repeat our message: small steps, day by day, build healthy habits.
 
 **🇰🇷 한국어 해석**
-> 이제 운동을 하지 않을 때 생기는 문제에 대해 이야기해보겠습니다.
+> 이제 저희 노래 속 이야기를 살펴보겠습니다.
 >
-> 첫째: 근육과 심장이 약해집니다. 병에 걸릴 위험이 커집니다.
+> Verse 1은 문제 상황입니다: 아이가 아침을 거르고 움직이지 않아서 아침이 힘들게 느껴집니다.
 >
-> 둘째: 정신 건강이 나빠집니다. 스트레스가 늘고 잠을 잘 못 잡니다.
+> Verse 2는 변화입니다: 아이가 매일 움직이고, 잘 먹고, 햇살 아래에서 즐겁게 지냅니다.
 >
-> 셋째: 에너지가 부족해지고 일상생활이 덜 즐거워집니다.
->
-> 운동을 하지 않는 것은 우리의 건강과 삶에 정말 안 좋습니다!
+> Bridge와 Chorus는 저희의 메시지를 반복합니다: 매일매일 작은 발걸음이 건강한 습관을 만듭니다.
 
 ---
 
@@ -106,25 +102,21 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ---
 
-## Slide 7 — Key Message Summary (about 25 seconds)
+## Slide 7 — Our Song's Message (about 25 seconds)
 
-> Our key message is: **"Move today for a better tomorrow."**
->
-> If we don't exercise, our health can get worse. But one small step today can change tomorrow. Start moving now! Small steps make a healthy life.
+> So here is our song's message: **"Move today for a better tomorrow."** This is the main message of our song. It starts with a warning, but it ends with hope: small steps today can change tomorrow. Listen to our song, and start moving, one step at a time!
 
 **🇰🇷 한국어 해석**
-> 저희의 핵심 메시지는: **"더 나은 내일을 위해 오늘 움직이세요."**
->
-> 운동을 하지 않으면 건강이 나빠질 수 있습니다. 하지만 오늘의 작은 한 걸음이 내일을 바꿀 수 있습니다. 지금 움직이세요! 작은 행동들이 건강한 삶을 만듭니다.
+> 저희 노래의 메시지는 바로 이것입니다: **"더 나은 내일을 위해 오늘 움직이세요."** 이것이 저희 노래의 핵심 메시지입니다. 경고로 시작하지만, 희망으로 끝납니다: 오늘의 작은 한 걸음이 내일을 바꿀 수 있습니다. 저희 노래를 듣고, 한 걸음씩 움직이기 시작하세요!
 
 ---
 
 ## Slide 8 — The End (about 20 seconds)
 
-> Thank you for listening! Let's move together and make a healthy tomorrow! Our team is Lee Minjae, Lee Yeongu, Lee Insung, and Lee Hayul. Remember: warning is the start, exercise is the change. Thank you!
+> Thank you for listening! Thanks for listening to our song. Let's move together and make a healthy tomorrow! Our team is Lee Minjae, Lee Yeongu, Lee Insung, and Lee Hayul. Thank you!
 
 **🇰🇷 한국어 해석**
-> 들어주셔서 감사합니다! 함께 움직여서 건강한 내일을 만들어요! 저희 팀은 이민재, 이영우, 이인성, 이하율입니다. 기억하세요: 경고는 시작이고, 운동은 변화입니다. 감사합니다!
+> 들어주셔서 감사합니다! 저희 노래를 들어주셔서 감사합니다. 함께 움직여서 건강한 내일을 만들어요! 저희 팀은 이민재, 이영우, 이인성, 이하율입니다. 감사합니다!
 
 ---
 
