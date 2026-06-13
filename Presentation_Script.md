@@ -1,4 +1,4 @@
-# Presentation Script — "English Assessment: Introducing Our Song, Kids Who Exercise"
+# Presentation Script — "Song Introduction: Kids Who Exercise"
 ### Team: Lee Insung and Friends (Lee Minjae · Lee Yeongu · Lee Insung · Lee Hayul)
 
 Easy English version — total time: about 5 minutes.
@@ -7,12 +7,12 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 ---
 
 ## Slide 1 — Title (about 15 seconds)
-**"English Assessment: Introducing Our Song, Kids Who Exercise"**
+**"Song Introduction: Kids Who Exercise"**
 
-> Good morning, everyone! This is our English assessment. Today, we will introduce a song we made about exercise. Our team members are Lee Minjae, Lee Yeongu, Lee Insung, and Lee Hayul. Let's start!
+> Good morning, everyone! Today, we will introduce a song we made about exercise. Our team members are Lee Minjae, Lee Yeongu, Lee Insung, and Lee Hayul. Let's start!
 
 **🇰🇷 한국어 해석**
-> 안녕하세요, 여러분! 이것은 저희의 영어 수행평가입니다. 오늘 저희는 운동에 관해 만든 노래를 소개하겠습니다. 팀원은 이민재, 이영우, 이인성, 이하율입니다. 시작하겠습니다!
+> 안녕하세요, 여러분! 오늘 저희는 운동에 관해 만든 노래를 소개하겠습니다. 팀원은 이민재, 이영우, 이인성, 이하율입니다. 시작하겠습니다!
 
 ---
 
