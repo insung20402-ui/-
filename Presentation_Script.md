@@ -42,42 +42,42 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ---
 
-## Slide 3 — About Our Song (about 30 seconds)
+## Slide 3 — About Our Song (about 25 seconds)
 
-> So, what is our song about? We made a song called "Kids Who Exercise." It is about exercise and healthy morning habits. We wrote the lyrics and made the music using Suno AI. The song starts with a warning about skipping breakfast and not moving. Then it becomes a happy, energetic song about exercising every day. We hope it makes you want to move!
+> We made this song for our English class. It is called "Kids Who Exercise." We wrote the words ourselves, and we used Suno AI to create the music. We wanted to share a message: stay active every day!
 
 **🇰🇷 한국어 해석**
-> 그렇다면 저희 노래는 무엇에 관한 것일까요? 저희는 "운동하는 아이들"이라는 노래를 만들었습니다. 운동과 건강한 아침 습관에 관한 노래입니다. 가사를 직접 쓰고, Suno AI로 음악을 만들었습니다. 노래는 아침을 거르고 움직이지 않는 것에 대한 경고로 시작해서, 매일 운동하자는 신나고 즐거운 노래로 바뀝니다. 이 노래를 듣고 여러분도 움직이고 싶어지길 바랍니다!
+> 저희는 영어 수업을 위해 이 노래를 만들었습니다. 제목은 "운동하는 아이들"입니다. 가사는 직접 썼고, Suno AI로 음악을 만들었습니다. 저희가 전하고 싶은 메시지는 "매일 활기차게 움직이자"입니다!
 
 ---
 
-## Slide 4 — What Our Song Says (about 30 seconds)
+## Slide 4 — What Our Song Says (about 25 seconds)
 
-> Let's look at what our song says. Verse 1 talks about a morning with no breakfast and no exercise, which feels hard and tiring. The chorus says: "Let's go take a walk outside, exercise every day, feel the pride!" Verse 2 and the bridge talk about moving your body and eating well to make every day more fun. Our song moves from a warning to an exciting call to action.
+> The most important part is the chorus. It says: "Let's go take a walk outside, exercise every day, feel the pride!" This line is our main idea. Even a simple walk can make you feel proud and happy.
 
 **🇰🇷 한국어 해석**
-> 저희 노래의 가사를 살펴보겠습니다. Verse 1은 아침을 거르고 운동을 하지 않으면 하루가 힘들고 피곤하다는 이야기입니다. 코러스에서는 "밖으로 산책하러 가요, 매일 운동하며 자부심을 느껴요!"라고 말합니다. Verse 2와 Bridge는 몸을 움직이고 잘 먹으면 매일이 더 즐거워진다는 이야기입니다. 저희 노래는 경고에서 시작해서 신나는 행동의 메시지로 이어집니다.
+> 가장 중요한 부분은 코러스입니다. "밖으로 산책하러 가요, 매일 운동하며 자부심을 느껴요!"라고 말합니다. 이 가사가 저희의 핵심 아이디어입니다. 간단한 산책만으로도 자부심과 행복을 느낄 수 있습니다.
 
 ---
 
-## Slide 5 — The Story in Our Song (about 35 seconds)
+## Slide 5 — The Story in Our Song (about 30 seconds)
 
-> Now let's look at the story in our song.
+> Our song tells a short story.
 >
-> Verse 1 is the problem: a child skips breakfast and doesn't move, and the morning feels hard.
+> At first, the character has no energy and stays inside.
 >
-> Verse 2 is the change: the child moves every day, eats well, and has fun in the sun.
+> Then, the character starts walking, eating breakfast, and playing outside.
 >
-> The bridge and chorus repeat our message: small steps, day by day, build healthy habits.
+> By the end, the character feels much happier — and that change came from small daily habits.
 
 **🇰🇷 한국어 해석**
-> 이제 저희 노래 속 이야기를 살펴보겠습니다.
+> 저희 노래는 짧은 이야기를 담고 있습니다.
 >
-> Verse 1은 문제 상황입니다: 아이가 아침을 거르고 움직이지 않아서 아침이 힘들게 느껴집니다.
+> 처음에는 주인공이 에너지가 없고 집에만 있습니다.
 >
-> Verse 2는 변화입니다: 아이가 매일 움직이고, 잘 먹고, 햇살 아래에서 즐겁게 지냅니다.
+> 그러다 산책을 하고, 아침을 먹고, 밖에서 놀기 시작합니다.
 >
-> Bridge와 Chorus는 저희의 메시지를 반복합니다: 매일매일 작은 발걸음이 건강한 습관을 만듭니다.
+> 결국 주인공은 훨씬 행복해지는데, 그 변화는 작은 매일의 습관에서 시작됩니다.
 
 ---
 
@@ -90,31 +90,31 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ---
 
-## Slide 7 — In Conclusion: Our Song's Message (about 25 seconds)
+## Slide 7 — In Conclusion: Our Song's Message (about 20 seconds)
 
-> So, in conclusion, here is our song's message: **"Move today for a better tomorrow."** This is the main message of our song. It starts with a warning, but it ends with hope: small steps today can change tomorrow. Listen to our song, and start moving, one step at a time!
+> To finish, here is our main idea: **"Move today for a better tomorrow."** Even one small action, like a short walk, can make tomorrow better. We hope this song gives you a reason to get up and try it!
 
 **🇰🇷 한국어 해석**
-> 마지막으로, 저희 노래의 메시지는 바로 이것입니다: **"더 나은 내일을 위해 오늘 움직이세요."** 이것이 저희 노래의 핵심 메시지입니다. 경고로 시작하지만, 희망으로 끝납니다: 오늘의 작은 한 걸음이 내일을 바꿀 수 있습니다. 저희 노래를 듣고, 한 걸음씩 움직이기 시작하세요!
+> 마지막으로, 저희가 전하고 싶은 핵심 메시지는: **"더 나은 내일을 위해 오늘 움직이세요."** 짧은 산책 같은 작은 행동 하나가 내일을 더 좋게 만들 수 있습니다. 이 노래가 여러분이 일어나서 움직여 볼 이유가 되었으면 좋겠습니다!
 
 ---
 
-## Slide 8 — The End (about 20 seconds)
+## Slide 8 — The End (about 15 seconds)
 
-> Thank you for listening! Thanks for listening to our song. Let's move together and make a healthy tomorrow! Our team is Lee Minjae, Lee Yeongu, Lee Insung, and Lee Hayul. Thank you!
+> Thank you for listening to our presentation. We hope you enjoyed our song. Let's all try to move a little more every day. Goodbye!
 
 **🇰🇷 한국어 해석**
-> 들어주셔서 감사합니다! 저희 노래를 들어주셔서 감사합니다. 함께 움직여서 건강한 내일을 만들어요! 저희 팀은 이민재, 이영우, 이인성, 이하율입니다. 감사합니다!
+> 발표를 들어주셔서 감사합니다. 저희 노래가 즐거우셨길 바랍니다. 우리 모두 매일 조금 더 움직여 봅시다. 감사합니다!
 
 ---
 
-## Timing Tip (Total: about 5 minutes)
+## Timing Tip (Total: about 4 minutes)
 - Slide 1: ~15 seconds
 - Slide 2: ~60 seconds (you may stop the song after the chorus)
-- Slide 3: ~30 seconds
-- Slide 4: ~30 seconds
-- Slide 5: ~35 seconds
+- Slide 3: ~25 seconds
+- Slide 4: ~25 seconds
+- Slide 5: ~30 seconds
 - Slide 6: ~15 seconds
-- Slide 7: ~25 seconds
-- Slide 8: ~20 seconds
-- **Total: ~4 minutes 30 seconds** (a little extra time to spare)
+- Slide 7: ~20 seconds
+- Slide 8: ~15 seconds
+- **Total: ~3 minutes 25 seconds** (plenty of extra time to spare, within the 5-minute limit)
