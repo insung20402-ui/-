@@ -81,24 +81,12 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ---
 
-## Slide 6 — Team Members (about 25 seconds)
+## Slide 6 — Team Members (about 15 seconds)
 
-> Here is our team!
-> - **Lee Minjae** wrote our script.
-> - **Lee Yeongu** made the slides and the design.
-> - **Lee Insung** gave the presentation and helped with the design.
-> - **Lee Hayul** was our team leader and made the song.
->
-> We all worked together to make this project!
+> Here is our team: Lee Minjae wrote the script, Lee Yeongu made the design, Lee Insung was our presenter, and Lee Hayul, our team leader, made the song. Let's keep going!
 
 **🇰🇷 한국어 해석**
-> 저희 팀을 소개합니다!
-> - **이민재**는 대본을 작성했습니다.
-> - **이영우**는 슬라이드와 디자인을 만들었습니다.
-> - **이인성**은 발표를 했고 디자인도 도왔습니다.
-> - **이하율**은 팀장이었고 노래를 만들었습니다.
->
-> 우리는 모두 함께 이 프로젝트를 만들었습니다!
+> 저희 팀입니다: 이민재는 대본, 이영우는 디자인, 이인성은 발표, 그리고 팀장 이하율은 노래를 만들었습니다. 계속하겠습니다!
 
 ---
 
@@ -126,7 +114,7 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 - Slide 3: ~30 seconds
 - Slide 4: ~30 seconds
 - Slide 5: ~35 seconds
-- Slide 6: ~25 seconds
+- Slide 6: ~15 seconds
 - Slide 7: ~25 seconds
 - Slide 8: ~20 seconds
-- **Total: ~4 minutes 40 seconds** (a little extra time to spare)
+- **Total: ~4 minutes 30 seconds** (a little extra time to spare)
