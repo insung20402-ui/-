@@ -32,19 +32,19 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ## Slide 3 — About Our Song (about 25 seconds)
 
-> We made this song for our English class. It is called "Kids Who Exercise." It is about exercise and good morning habits. We wrote the words, and we used Suno AI for the music. First, the song gives a warning about skipping breakfast. Then it becomes a happy song about exercising every day. We hope it makes you want to move!
+> We made this song for our English class. It is called "Kids Who Exercise." We wrote the words ourselves, and we used Suno AI for the music. We wanted to share a simple message about exercise in a fun way.
 
 **🇰🇷 한국어 해석**
-> 저희는 영어 수업을 위해 이 노래를 만들었습니다. 제목은 "운동하는 아이들"입니다. 운동과 좋은 아침 습관에 관한 노래입니다. 가사는 직접 썼고, 음악은 Suno AI로 만들었습니다. 먼저 아침을 거르는 것에 대한 경고로 시작하고, 그 다음 매일 운동하는 즐거운 노래로 바뀝니다. 이 노래가 여러분이 움직이고 싶어지게 만들었으면 좋겠습니다!
+> 저희는 영어 수업을 위해 이 노래를 만들었습니다. 제목은 "운동하는 아이들"입니다. 가사는 직접 썼고, 음악은 Suno AI로 만들었습니다. 운동에 대한 간단한 메시지를 재미있게 전하고 싶었습니다.
 
 ---
 
 ## Slide 4 — What Our Song Says (about 25 seconds)
 
-> The most important part is the chorus: "Let's go take a walk outside, exercise every day, feel the pride!" First, our song gives a warning. Then it tells us to take action. Small daily habits, like a morning walk and a good breakfast, can make us healthier and happier.
+> The chorus is the heart of our song: "Let's go take a walk outside, exercise every day, feel the pride!" This is our main message. Even a short walk can make you feel good about yourself.
 
 **🇰🇷 한국어 해석**
-> 가장 중요한 부분은 코러스입니다: "밖으로 산책하러 가요, 매일 운동하며 자부심을 느껴요!" 먼저 경고로 시작하고, 그 다음 우리에게 움직이라고 말합니다. 아침 산책이나 좋은 아침 식사 같은 작은 매일의 습관이 우리를 더 건강하고 행복하게 만들어 줍니다.
+> 저희 노래의 핵심은 코러스입니다: "밖으로 산책하러 가요, 매일 운동하며 자부심을 느껴요!" 이것이 저희의 핵심 메시지입니다. 짧은 산책만으로도 스스로에게 좋은 기분을 느낄 수 있습니다.
 
 ---
 
@@ -59,10 +59,10 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ## Slide 6 — In Conclusion: Our Song's Message (about 20 seconds)
 
-> To finish, here is our main idea: **"Move today for a better tomorrow."** Our song starts with a warning, but ends with hope — one small step today can change tomorrow. We hope our song gives you a reason to get up and move!
+> So, what is the big idea of our song? **"Move today for a better tomorrow."** One small action, like a short walk, can change how you feel. We hope this song gives you a reason to get up and try it!
 
 **🇰🇷 한국어 해석**
-> 마지막으로, 저희가 전하고 싶은 핵심 메시지는: **"더 나은 내일을 위해 오늘 움직이세요."** 저희 노래는 경고로 시작하지만 희망으로 끝납니다 — 오늘의 작은 한 걸음이 내일을 바꿀 수 있습니다. 이 노래가 여러분이 일어나서 움직여 볼 이유가 되었으면 좋겠습니다!
+> 그래서, 저희 노래의 핵심 아이디어는 무엇일까요? **"더 나은 내일을 위해 오늘 움직이세요."** 짧은 산책 같은 작은 행동 하나가 기분을 바꿀 수 있습니다. 이 노래가 여러분이 일어나서 한번 해볼 이유가 되었으면 좋겠습니다!
 
 ---
 
