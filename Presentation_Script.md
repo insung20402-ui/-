@@ -30,12 +30,12 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ---
 
-## Slide 3 — About Our Song (about 25 seconds)
+## Slide 3 — About Our Song (about 10 seconds)
 
-> We made this song for our English class. It is called "Kids Who Exercise." We wrote the words ourselves, and we used Suno AI for the music. We wanted to share a simple message about exercise in a fun way.
+> We wanted to share a simple message about exercise in a fun way.
 
 **🇰🇷 한국어 해석**
-> 저희는 영어 수업을 위해 이 노래를 만들었습니다. 제목은 "운동하는 아이들"입니다. 가사는 직접 썼고, 음악은 Suno AI로 만들었습니다. 운동에 대한 간단한 메시지를 재미있게 전하고 싶었습니다.
+> 저희는 운동에 대한 간단한 메시지를 재미있게 전달하고 싶었습니다.
 
 ---
 
@@ -84,13 +84,13 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ---
 
-## Timing Tip (Total: about 4 minutes 50 seconds)
+## Timing Tip (Total: about 4 minutes 35 seconds)
 - Slide 1: ~15 seconds
 - Slide 2: ~2 minutes 20 seconds (includes the full ~2:05 song)
-- Slide 3: ~25 seconds
+- Slide 3: ~10 seconds
 - Slide 4: ~25 seconds
 - Slide 5: ~30 seconds
 - Slide 6: ~20 seconds
 - Slide 7: ~15 seconds
 - Slide 8: ~15 seconds
-- **Total: ~4 minutes 50 seconds** (within the 5-minute limit, with the full song included)
+- **Total: ~4 minutes 35 seconds** (within the 5-minute limit, with the full song included)
