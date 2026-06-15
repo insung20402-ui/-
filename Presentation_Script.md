@@ -9,7 +9,7 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 ## Slide 1 — Title (about 15 seconds)
 **"Song Introduction: Kids Who Exercise"**
 
-> Good morning, everyone! Today, we will introduce a song we made about exercise. Our team members are Lee Minjae, Lee Yeongu, Lee Insung, and Lee Hayul. Let's start!
+> Good morning, everyone! Today, we will talk about a song we made about exercise. Our team is Lee Minjae, Lee Yeongu, Lee Insung, and Lee Hayul. Let's start!
 
 **🇰🇷 한국어 해석**
 > 안녕하세요, 여러분! 오늘 저희는 운동에 관해 만든 노래를 소개하겠습니다. 팀원은 이민재, 이영우, 이인성, 이하율입니다. 시작하겠습니다!
@@ -19,12 +19,12 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 ## Slide 2 — Listen to the Song (about 2 minutes 20 seconds)
 **"Kids Who Exercise" — Music & Lyrics by insung, made with Suno AI**
 
-> Now, let's listen to our whole song! It is called "Kids Who Exercise." We wrote the words ourselves and made the music with Suno AI. You can read the lyrics on the screen as you listen. The song starts with a warning, and then it becomes happy and exciting. Let's play the full song now — it is about two minutes.
+> Now, let's listen to our whole song! It is called "Kids Who Exercise." We wrote the words, and we made the music with Suno AI. You can read the words on the screen. First, the song gives a warning. Then it becomes happy and fun. Let's play the whole song now — it is about two minutes.
 >
 > *(Click play now and listen to the whole song, about 2 minutes 5 seconds.)*
 
 **🇰🇷 한국어 해석**
-> 이제 저희 노래 전체를 들어보겠습니다! 제목은 "운동하는 아이들"입니다. 가사는 저희가 직접 썼고, 음악은 Suno AI로 만들었습니다. 화면에 나오는 가사를 보면서 들으셔도 됩니다. 노래는 경고로 시작해서 점점 신나고 즐거워집니다. 이제 노래 전체를 재생하겠습니다 — 약 2분 정도입니다.
+> 이제 저희 노래 전체를 들어보겠습니다! 제목은 "운동하는 아이들"입니다. 가사는 저희가 직접 썼고, 음악은 Suno AI로 만들었습니다. 화면에 나오는 가사를 보면서 들으셔도 됩니다. 노래는 먼저 경고로 시작하고, 그 다음에 신나고 즐거워집니다. 이제 노래 전체를 재생하겠습니다 — 약 2분 정도입니다.
 >
 > *(지금 재생 버튼을 눌러서 노래 전체(약 2분 5초)를 들어보세요.)*
 
@@ -32,19 +32,19 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ## Slide 3 — About Our Song (about 25 seconds)
 
-> We made this song for our English class. It is called "Kids Who Exercise." It is about exercise and healthy morning habits. We wrote the lyrics, and we used Suno AI for the music. The song starts with a warning about skipping breakfast, and then becomes a happy, energetic song about exercising every day. We hope it makes you want to move!
+> We made this song for our English class. It is called "Kids Who Exercise." It is about exercise and good morning habits. We wrote the words, and we used Suno AI for the music. First, the song gives a warning about skipping breakfast. Then it becomes a happy song about exercising every day. We hope it makes you want to move!
 
 **🇰🇷 한국어 해석**
-> 저희는 영어 수업을 위해 이 노래를 만들었습니다. 제목은 "운동하는 아이들"입니다. 운동과 건강한 아침 습관에 관한 노래입니다. 가사는 직접 썼고, 음악은 Suno AI로 만들었습니다. 노래는 아침을 거르는 것에 대한 경고로 시작해서, 매일 운동하는 즐겁고 활기찬 노래로 바뀝니다. 이 노래가 여러분이 움직이고 싶어지게 만들었으면 좋겠습니다!
+> 저희는 영어 수업을 위해 이 노래를 만들었습니다. 제목은 "운동하는 아이들"입니다. 운동과 좋은 아침 습관에 관한 노래입니다. 가사는 직접 썼고, 음악은 Suno AI로 만들었습니다. 먼저 아침을 거르는 것에 대한 경고로 시작하고, 그 다음 매일 운동하는 즐거운 노래로 바뀝니다. 이 노래가 여러분이 움직이고 싶어지게 만들었으면 좋겠습니다!
 
 ---
 
 ## Slide 4 — What Our Song Says (about 25 seconds)
 
-> The most important part is the chorus: "Let's go take a walk outside, exercise every day, feel the pride!" Our song moves from a warning to an exciting call to action. Small daily habits, like a morning walk and a good breakfast, can make us healthier and happier.
+> The most important part is the chorus: "Let's go take a walk outside, exercise every day, feel the pride!" First, our song gives a warning. Then it tells us to take action. Small daily habits, like a morning walk and a good breakfast, can make us healthier and happier.
 
 **🇰🇷 한국어 해석**
-> 가장 중요한 부분은 코러스입니다: "밖으로 산책하러 가요, 매일 운동하며 자부심을 느껴요!" 저희 노래는 경고에서 시작해 신나는 행동 촉구로 이어집니다. 아침 산책이나 좋은 아침 식사 같은 작은 매일의 습관이 우리를 더 건강하고 행복하게 만들어 줍니다.
+> 가장 중요한 부분은 코러스입니다: "밖으로 산책하러 가요, 매일 운동하며 자부심을 느껴요!" 먼저 경고로 시작하고, 그 다음 우리에게 움직이라고 말합니다. 아침 산책이나 좋은 아침 식사 같은 작은 매일의 습관이 우리를 더 건강하고 행복하게 만들어 줍니다.
 
 ---
 
@@ -68,10 +68,10 @@ All speaker notes below are also embedded directly in the PPTX (View → Notes P
 
 ## Slide 7 — Team Members (about 15 seconds)
 
-> Here is our team: Lee Minjae wrote the script, Lee Yeongu led the design, Lee Insung was our presenter, and Lee Hayul, our team leader, composed the song with Suno AI.
+> Here is our team: Lee Minjae wrote the script, Lee Yeongu made the design, Lee Insung was our speaker, and Lee Hayul, our team leader, made the song with Suno AI.
 
 **🇰🇷 한국어 해석**
-> 저희 팀입니다: 이민재는 대본을 썼고, 이영우는 디자인을 이끌었고, 이인성은 발표를 했고, 팀장 이하율은 Suno AI로 노래를 작곡했습니다.
+> 저희 팀입니다: 이민재는 대본을 썼고, 이영우는 디자인을 만들었고, 이인성은 발표를 했고, 팀장 이하율은 Suno AI로 노래를 만들었습니다.
 
 ---
 
