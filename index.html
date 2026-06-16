@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>방구석 심야식당</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Landing Screen -->
+    <section id="screen-landing" class="screen active">
+      <div class="landing-content">
+        <div class="neon-sign">
+          <h1 class="title-main flicker">🍜 방구석 심야식당</h1>
+          <p class="title-sub">오늘 밤 당신의 야식 큐레이터</p>
+        </div>
+        <div class="diner-decoration">
+          <span class="deco-item">🏮</span>
+          <span class="deco-item">✨</span>
+          <span class="deco-item">🏮</span>
+        </div>
+        <p class="landing-desc">지금 기분이 어때요?<br/>딱 맞는 야식을 추천해 드릴게요 🌙</p>
+        <button class="btn-primary" id="btn-start">시작하기 →</button>
+      </div>
+    </section>
+
+    <!-- Step 1: Stress Level -->
+    <section id="screen-step1" class="screen">
+      <div class="step-content">
+        <div class="step-header">
+          <span class="step-badge">1 / 3</span>
+          <h2 class="step-title">지금 스트레스 레벨은?</h2>
+          <p class="step-desc">솔직하게 말해줘요 🫂</p>
+        </div>
+        <div class="slider-container">
+          <div class="stress-emoji-display" id="stress-emoji">😐</div>
+          <div class="stress-level-display" id="stress-level-text">보통이에요</div>
+          <input type="range" id="stress-slider" min="1" max="10" value="5" class="stress-slider" />
+          <div class="slider-labels">
+            <span>1</span>
+            <span>5</span>
+            <span>10</span>
+          </div>
+          <div class="stress-labels">
+            <span>평온함 😌</span>
+            <span>폭발직전 💥</span>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn-step1-next">다음 →</button>
+      </div>
+    </section>
+
+    <!-- Step 2: Mood Selection -->
+    <section id="screen-step2" class="screen">
+      <div class="step-content">
+        <div class="step-header">
+          <span class="step-badge">2 / 3</span>
+          <h2 class="step-title">지금 기분은?</h2>
+          <p class="step-desc">여러 개 골라도 돼요!</p>
+        </div>
+        <div class="mood-grid" id="mood-grid">
+          <div class="mood-card" data-mood="우울함">
+            <span class="mood-emoji">😔</span>
+            <span class="mood-label">우울함</span>
+          </div>
+          <div class="mood-card" data-mood="분노">
+            <span class="mood-emoji">🔥</span>
+            <span class="mood-label">분노</span>
+          </div>
+          <div class="mood-card" data-mood="뿌듯함">
+            <span class="mood-emoji">✨</span>
+            <span class="mood-label">뿌듯함</span>
+          </div>
+          <div class="mood-card" data-mood="피곤함">
+            <span class="mood-emoji">😴</span>
+            <span class="mood-label">피곤함</span>
+          </div>
+          <div class="mood-card" data-mood="설렘">
+            <span class="mood-emoji">💕</span>
+            <span class="mood-label">설렘</span>
+          </div>
+          <div class="mood-card" data-mood="심심함">
+            <span class="mood-emoji">🥱</span>
+            <span class="mood-label">심심함</span>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn-step2-next">다음 →</button>
+      </div>
+    </section>
+
+    <!-- Step 3: Craving Type -->
+    <section id="screen-step3" class="screen">
+      <div class="step-content">
+        <div class="step-header">
+          <span class="step-badge">3 / 3</span>
+          <h2 class="step-title">뭐가 당겨요?</h2>
+          <p class="step-desc">솔직한 욕망을 말해봐요 😋</p>
+        </div>
+        <div class="craving-options">
+          <div class="craving-card" data-craving="snack">
+            <span class="craving-emoji">🍜</span>
+            <span class="craving-label">야식이 당겨요</span>
+            <span class="craving-sub">뭔가 든든한 게 먹고 싶어</span>
+          </div>
+          <div class="craving-card" data-craving="drink">
+            <span class="craving-emoji">🧋</span>
+            <span class="craving-label">음료수가 당겨요</span>
+            <span class="craving-sub">목이 마르거나 마시고 싶어</span>
+          </div>
+          <div class="craving-card" data-craving="both">
+            <span class="craving-emoji">🍿</span>
+            <span class="craving-label">둘 다!</span>
+            <span class="craving-sub">야식 + 음료 풀코스</span>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn-get-result">추천받기 ✨</button>
+      </div>
+    </section>
+
+    <!-- Results Screen -->
+    <section id="screen-result" class="screen">
+      <div class="result-content">
+        <div class="result-header">
+          <h2 class="result-title">오늘 밤 추천 메뉴 🌙</h2>
+          <p class="result-subtitle" id="result-subtitle"></p>
+        </div>
+        <div class="result-cards" id="result-cards"></div>
+        <div class="music-vibe" id="music-vibe"></div>
+        <button class="btn-secondary" id="btn-reset">🔄 다시 추천받기</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
