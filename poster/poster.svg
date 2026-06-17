@@ -73,7 +73,7 @@
   <circle cx="1050" cy="450" r="200" fill="url(#nebulaPurple)" opacity="0.3"/>
 
   <!-- Earth (kept clear of the title text below), with soft atmosphere glow -->
-  <circle cx="950" cy="250" r="320" fill="url(#earthGlow)"/>
+  <circle cx="950" cy="250" r="320" fill="url(#sun)"/>
   <circle cx="950" cy="250" r="230" fill="url(#earthSphere)"/>
   <g clip-path="url(#earthClip)">
     <path d="M790 130 C830 110 880 120 900 150 C920 135 950 145 945 170 C975 165 1000 190 985 215 C1010 230 1000 265 970 260 C975 290 945 305 920 290 C900 315 860 305 855 280 C825 285 805 260 815 235 C790 230 775 200 790 175 Z" fill="#3fae6b" opacity="0.92"/>
@@ -176,7 +176,7 @@
   </g>
 
   <!-- trajectory: from Incheon landmarks up to the globe, "Incheon to the world" -->
-  <path d="M665 1180 Q 240 1000 120 760 Q 90 480 170 300" stroke="#ffe9a8" stroke-width="2" stroke-dasharray="3 12" fill="none" opacity="0.45"/>
+  <path d="M665 1180 Q 240 1000 120 760 Q 70 420 190 160" stroke="#ffe9a8" stroke-width="2" stroke-dasharray="3 12" fill="none" opacity="0.45"/>
 
   <!-- rocket with flame trail -->
   <g transform="translate(245,580) rotate(-25)">
@@ -203,7 +203,7 @@
   </g>
 
   <!-- small spaceship flying toward Earth (the sun-glow above stands in for the destination) -->
-  <g transform="translate(170,260) rotate(-18)" opacity="0.95">
+  <g transform="translate(190,120) rotate(-18)" opacity="0.95">
     <path d="M-46 6 C-20 -2 20 -2 46 6 C20 14 -20 14 -46 6 Z" fill="#dfe7ee" stroke="#9fb3c8" stroke-width="2"/>
     <path d="M-18 6 C-18 -16 18 -16 18 6 Z" fill="#bfe3ff" fill-opacity="0.85" stroke="#9fb3c8" stroke-width="2"/>
     <circle cx="0" cy="-4" r="7" fill="#36e2c9"/>
