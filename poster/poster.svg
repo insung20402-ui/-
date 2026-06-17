@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="257mm" height="364mm" viewBox="0 0 1285 1820" font-family="Noto Sans CJK KR, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1b0f3a"/>
+      <stop offset="45%" stop-color="#5a1d6b"/>
+      <stop offset="75%" stop-color="#c4452f"/>
+      <stop offset="100%" stop-color="#f6a93b"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe9a8"/>
+      <stop offset="60%" stop-color="#ffb347" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#ffb347" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.04"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1285" height="1820" fill="url(#bg)"/>
+
+  <circle cx="950" cy="430" r="430" fill="url(#sun)"/>
+  <circle cx="950" cy="430" r="190" fill="none" stroke="#ffe9a8" stroke-width="2" opacity="0.5"/>
+  <circle cx="950" cy="430" r="260" fill="none" stroke="#ffe9a8" stroke-width="1.5" opacity="0.35"/>
+
+  <g opacity="0.9">
+    <circle cx="120" cy="140" r="3" fill="#ffffff"/>
+    <circle cx="220" cy="260" r="2" fill="#ffffff"/>
+    <circle cx="80" cy="340" r="2.5" fill="#ffffff"/>
+    <circle cx="300" cy="120" r="2" fill="#ffffff"/>
+    <circle cx="1120" cy="180" r="2" fill="#ffffff"/>
+    <circle cx="1190" cy="300" r="3" fill="#ffffff"/>
+    <circle cx="60" cy="600" r="2" fill="#ffffff"/>
+    <circle cx="1200" cy="620" r="2.5" fill="#ffffff"/>
+    <circle cx="40" cy="900" r="2" fill="#ffffff"/>
+    <circle cx="1230" cy="950" r="2" fill="#ffffff"/>
+  </g>
+
+  <!-- abstract mountains / city silhouette representing Incheon skyline rising into science motifs -->
+  <path d="M0 1180 L150 1020 L260 1110 L380 950 L520 1080 L650 960 L800 1100 L930 990 L1060 1090 L1180 1000 L1285 1100 L1285 1820 L0 1820 Z" fill="#2a1140" opacity="0.85"/>
+  <path d="M0 1280 L180 1160 L340 1240 L500 1120 L680 1230 L860 1130 L1040 1230 L1285 1140 L1285 1820 L0 1820 Z" fill="#190a2c"/>
+
+  <!-- orbit / atom motif (science) -->
+  <g transform="translate(950,430)" opacity="0.9">
+    <ellipse rx="300" ry="110" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.55" transform="rotate(20)"/>
+    <ellipse rx="300" ry="110" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.4" transform="rotate(-35)"/>
+    <circle r="14" fill="#ffe9a8"/>
+    <circle cx="260" cy="20" r="8" fill="#ffe9a8"/>
+    <circle cx="-230" cy="-55" r="7" fill="#ffe9a8"/>
+  </g>
+
+  <!-- rocket -->
+  <g transform="translate(260,560) rotate(-25)">
+    <path d="M0 -60 C28 -30 28 30 0 60 C-28 30 -28 -30 0 -60 Z" fill="#ffe9a8"/>
+    <path d="M-12 30 L-40 70 L-8 55 Z" fill="#f6a93b"/>
+    <path d="M12 30 L40 70 L8 55 Z" fill="#f6a93b"/>
+    <circle cx="0" cy="-15" r="10" fill="#5a1d6b"/>
+  </g>
+
+  <!-- title block -->
+  <text x="642" y="700" text-anchor="middle" fill="#ffe9a8" font-size="34" letter-spacing="4">THE 28th INCHEON SCIENCE FESTIVAL</text>
+
+  <text x="642" y="790" text-anchor="middle" fill="#ffffff" font-size="92" font-weight="700">제28회 인천과학대제전</text>
+
+  <rect x="292" y="850" width="700" height="86" rx="10" fill="url(#panel)" stroke="#ffe9a8" stroke-width="1.5"/>
+  <text x="642" y="905" text-anchor="middle" fill="#ffe9a8" font-size="40" font-weight="700">인천을 넘어 세계로, 과학이 여는 미래</text>
+
+  <!-- info panel -->
+  <rect x="180" y="1430" width="925" height="290" rx="22" fill="#120726" opacity="0.78" stroke="#ffe9a8" stroke-width="1"/>
+
+  <g fill="#ffffff" font-size="32">
+    <text x="230" y="1500"><tspan fill="#ffe9a8" font-weight="700">기간 </tspan>2026.10.23.(금) ~ 10.24.(토)</text>
+    <text x="230" y="1555"><tspan fill="#ffe9a8" font-weight="700">장소 </tspan>인천아시아드주경기장</text>
+    <text x="230" y="1610"><tspan fill="#ffe9a8" font-weight="700">홈페이지 </tspan>인천과학사랑.kr</text>
+    <text x="230" y="1665"><tspan fill="#ffe9a8" font-weight="700">주최·주관 </tspan>인천광역시교육청</text>
+  </g>
+
+  <text x="1075" y="1760" text-anchor="end" fill="#ffffff" font-size="26" opacity="0.85">The 28th Incheon Science Festival</text>
+</svg>
