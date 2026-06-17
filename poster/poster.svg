@@ -13,6 +13,20 @@
       <stop offset="75%" stop-color="#ff8a3d" stop-opacity="0.55"/>
       <stop offset="100%" stop-color="#ff8a3d" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="earthGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#bfe9ff" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#5fc4ff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#5fc4ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="earthSphere" cx="38%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#bfeeff"/>
+      <stop offset="35%" stop-color="#3fa9e0"/>
+      <stop offset="75%" stop-color="#1f6fb0"/>
+      <stop offset="100%" stop-color="#123f6e"/>
+    </radialGradient>
+    <clipPath id="earthClip">
+      <circle cx="950" cy="250" r="230"/>
+    </clipPath>
     <radialGradient id="nebulaPink" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#ff4fa3" stop-opacity="0.55"/>
       <stop offset="100%" stop-color="#ff4fa3" stop-opacity="0"/>
@@ -58,8 +72,22 @@
   <circle cx="300" cy="750" r="220" fill="url(#nebulaPink)" opacity="0.25"/>
   <circle cx="1050" cy="450" r="200" fill="url(#nebulaPurple)" opacity="0.3"/>
 
-  <!-- sun / atom core glow (kept clear of the title text below) -->
-  <circle cx="950" cy="250" r="320" fill="url(#sun)"/>
+  <!-- Earth (kept clear of the title text below), with soft atmosphere glow -->
+  <circle cx="950" cy="250" r="320" fill="url(#earthGlow)"/>
+  <circle cx="950" cy="250" r="230" fill="url(#earthSphere)"/>
+  <g clip-path="url(#earthClip)">
+    <path d="M790 130 C830 110 880 120 900 150 C920 135 950 145 945 170 C975 165 1000 190 985 215 C1010 230 1000 265 970 260 C975 290 945 305 920 290 C900 315 860 305 855 280 C825 285 805 260 815 235 C790 230 775 200 790 175 Z" fill="#3fae6b" opacity="0.92"/>
+    <path d="M1040 290 C1070 280 1100 295 1095 320 C1115 330 1110 360 1085 360 C1080 380 1045 380 1040 360 C1015 355 1015 320 1040 290 Z" fill="#3fae6b" opacity="0.85"/>
+    <path d="M870 330 C895 320 920 335 915 355 C930 370 910 390 885 385 C865 400 840 380 850 360 C835 345 850 330 870 330 Z" fill="#2f8f57" opacity="0.7"/>
+    <g fill="#ffffff" opacity="0.55">
+      <ellipse cx="870" cy="180" rx="60" ry="14" transform="rotate(-10 870 180)"/>
+      <ellipse cx="1030" cy="220" rx="50" ry="12" transform="rotate(8 1030 220)"/>
+      <ellipse cx="900" cy="340" rx="55" ry="13" transform="rotate(-6 900 340)"/>
+      <ellipse cx="1050" cy="120" rx="40" ry="10" transform="rotate(15 1050 120)"/>
+    </g>
+  </g>
+  <circle cx="950" cy="250" r="230" fill="none" stroke="#bfeeff" stroke-width="3" opacity="0.5"/>
+  <circle cx="880" cy="180" r="60" fill="#ffffff" opacity="0.18"/>
 
   <!-- multi-layer star field -->
   <g fill="#ffffff">
@@ -148,7 +176,7 @@
   </g>
 
   <!-- trajectory: from Incheon landmarks up to the globe, "Incheon to the world" -->
-  <path d="M665 1180 Q 420 850 200 290" stroke="#ffe9a8" stroke-width="2" stroke-dasharray="3 12" fill="none" opacity="0.45"/>
+  <path d="M665 1180 Q 240 1000 120 760 Q 90 480 170 300" stroke="#ffe9a8" stroke-width="2" stroke-dasharray="3 12" fill="none" opacity="0.45"/>
 
   <!-- rocket with flame trail -->
   <g transform="translate(245,580) rotate(-25)">
