@@ -107,7 +107,6 @@
     <circle r="14" fill="#fff6d8" filter="url(#glow)"/>
     <circle cx="217" cy="17" r="8" fill="#ffe9a8" filter="url(#glow)"/>
     <circle cx="-195" cy="-46" r="7" fill="#ffe9a8" filter="url(#glow)"/>
-    <circle cx="45" cy="235" r="6" fill="#36e2c9" filter="url(#glow)"/>
   </g>
 
   <!-- rocket with flame trail -->
