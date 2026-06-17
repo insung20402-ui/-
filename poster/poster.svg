@@ -54,6 +54,9 @@
   <circle cx="1150" cy="1250" r="380" fill="url(#nebulaTeal)"/>
   <circle cx="1000" cy="1500" r="350" fill="url(#nebulaPurple)"/>
   <circle cx="100" cy="300" r="300" fill="url(#nebulaPurple)" opacity="0.6"/>
+  <circle cx="600" cy="550" r="260" fill="url(#nebulaTeal)" opacity="0.3"/>
+  <circle cx="300" cy="750" r="220" fill="url(#nebulaPink)" opacity="0.25"/>
+  <circle cx="1050" cy="450" r="200" fill="url(#nebulaPurple)" opacity="0.3"/>
 
   <!-- sun / atom core glow (kept clear of the title text below) -->
   <circle cx="950" cy="250" r="320" fill="url(#sun)"/>
@@ -71,6 +74,14 @@
   <g fill="#ffe9a8" filter="url(#glow)">
     <circle cx="200" cy="180" r="3.5"/><circle cx="1100" cy="240" r="3.5"/>
     <circle cx="60" cy="520" r="3"/><circle cx="1220" cy="500" r="3.5"/>
+  </g>
+
+  <!-- hidden detail: a faint circuit/gear constellation among the stars -->
+  <g stroke="#ffe9a8" stroke-width="1.2" opacity="0.35" fill="none">
+    <path d="M520 160 h40 M560 160 v30 M560 190 h30 M620 190 v-25 M620 165 h35"/>
+    <circle cx="520" cy="160" r="3"/><circle cx="620" cy="165" r="3"/><circle cx="655" cy="165" r="3"/>
+    <circle cx="780" cy="320" r="16"/>
+    <path d="M780 304 v6 M780 330 v6 M764 320 h6 M790 320 h6 M768.7 308.7 l4.2 4.2 M787.1 327.1 l4.2 4.2 M768.7 331.3 l4.2 -4.2 M787.1 312.9 l4.2 -4.2"/>
   </g>
 
   <!-- shooting stars / comets -->
@@ -110,6 +121,8 @@
     <line x1="430" y1="985" x2="560" y2="1180"/><line x1="430" y1="1015" x2="520" y2="1180"/><line x1="430" y1="1045" x2="480" y2="1180"/>
     <line x1="900" y1="985" x2="770" y2="1180"/><line x1="900" y1="1015" x2="810" y2="1180"/><line x1="900" y1="1045" x2="850" y2="1180"/>
     <line x1="900" y1="985" x2="1030" y2="1180"/><line x1="900" y1="1015" x2="990" y2="1180"/><line x1="900" y1="1045" x2="950" y2="1180"/>
+    <line x1="430" y1="1000" x2="430" y2="1180"/><line x1="900" y1="1000" x2="900" y2="1180"/>
+    <line x1="430" y1="1075" x2="320" y2="1180"/><line x1="900" y1="1075" x2="1010" y2="1180"/>
   </g>
   <path d="M150 1180 Q665 1230 1180 1180" stroke="#ffe9a8" stroke-width="6" fill="none" opacity="0.85"/>
 
@@ -134,10 +147,17 @@
     <circle cx="-195" cy="-46" r="7" fill="#ffe9a8" filter="url(#glow)"/>
   </g>
 
+  <!-- trajectory: from Incheon landmarks up to the globe, "Incheon to the world" -->
+  <path d="M665 1180 Q 420 850 200 290" stroke="#ffe9a8" stroke-width="2" stroke-dasharray="3 12" fill="none" opacity="0.45"/>
+
   <!-- rocket with flame trail -->
   <g transform="translate(245,580) rotate(-25)">
     <path d="M0 60 C-30 130 -10 190 0 230" stroke="#ffce5c" stroke-width="14" fill="none" opacity="0.6" stroke-linecap="round" filter="url(#glow)"/>
     <path d="M0 60 C-15 110 -5 150 0 175" stroke="#fff6d8" stroke-width="7" fill="none" opacity="0.8" stroke-linecap="round"/>
+    <g fill="#36e2c9" font-size="11" font-family="monospace" opacity="0.8">
+      <text x="-6" y="95">1</text><text x="4" y="115">0</text><text x="-8" y="138">0</text>
+      <text x="3" y="158">1</text><text x="-4" y="180">1</text><text x="2" y="200">0</text>
+    </g>
     <path d="M0 -65 C30 -32 30 32 0 65 C-30 32 -30 -32 0 -65 Z" fill="#fff6d8"/>
     <path d="M-13 32 L-44 75 L-9 58 Z" fill="#ffce5c"/>
     <path d="M13 32 L44 75 L9 58 Z" fill="#ffce5c"/>
@@ -179,12 +199,6 @@
     <path d="M-22 0 h44" opacity="0.7"/>
     <circle cx="-6" cy="20" r="3.5" fill="#ffe9a8" stroke="none"/>
   </g>
-  <g transform="translate(1050,897) scale(0.55)" stroke="#36e2c9" stroke-width="4" fill="none" opacity="0.95">
-    <path d="M-16 -45 C16 -22 -16 0 16 22 C-16 44 16 66 -16 88"/>
-    <path d="M16 -45 C-16 -22 16 0 -16 22 C16 44 -16 66 16 88"/>
-    <circle cx="-16" cy="-45" r="3" fill="#36e2c9" stroke="none"/><circle cx="16" cy="22" r="3" fill="#ffe9a8" stroke="none"/>
-    <circle cx="-16" cy="88" r="3" fill="#36e2c9" stroke="none"/>
-  </g>
 
   <!-- connector line from title group down to the info-icon strip -->
   <line x1="642" y1="950" x2="642" y2="1372" stroke="#ffe9a8" stroke-width="1.5" stroke-dasharray="2 10" opacity="0.5"/>
@@ -193,6 +207,12 @@
   <g transform="translate(0,1372)">
     <path d="M330 -50 L490 -50 L650 -50 L810 -50 L970 -50 M330 -50 L330 0 M490 -50 L490 0 M650 -50 L650 0 M810 -50 L810 0 M970 -50 L970 0"
           stroke="#36e2c9" stroke-width="1.5" stroke-dasharray="2 8" opacity="0.5" fill="none"/>
+    <path d="M330 -50 Q410 -78 490 -50 Q570 -22 650 -50 Q730 -78 810 -50 Q890 -22 970 -50"
+          stroke="#36e2c9" stroke-width="1.2" stroke-dasharray="1 7" opacity="0.35" fill="none"/>
+    <path d="M330 0 Q410 26 490 0 Q570 -26 650 0 Q730 26 810 0 Q890 -26 970 0"
+          stroke="#ffe9a8" stroke-width="1.2" stroke-dasharray="1 7" opacity="0.3" fill="none"/>
+    <circle cx="410" cy="-66" r="2" fill="#ffe9a8" opacity="0.7"/><circle cx="570" cy="-66" r="2" fill="#ffe9a8" opacity="0.7"/>
+    <circle cx="730" cy="-66" r="2" fill="#ffe9a8" opacity="0.7"/><circle cx="890" cy="-66" r="2" fill="#ffe9a8" opacity="0.7"/>
     <circle cx="330" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/><circle cx="490" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/>
     <circle cx="650" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/><circle cx="810" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/>
     <circle cx="970" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/>
@@ -269,12 +289,17 @@
   <text x="642" y="795" text-anchor="middle" fill="#ffffff" font-size="98" font-weight="700" filter="url(#glow)">제28회 인천과학대제전</text>
 
   <rect x="262" y="852" width="700" height="90" rx="14" fill="url(#panel)" stroke="url(#goldText)" stroke-width="2"/>
-  <text x="612" y="910" text-anchor="middle" fill="url(#goldText)" font-size="42" font-weight="700">인천을 넘어 세계로, 과학이 여는 미래</text>
+  <text x="612" y="910" text-anchor="middle" fill="url(#goldText)" font-size="42" font-weight="700" stroke="url(#goldText)" stroke-width="0.6">인천을 넘어 세계로, 과학이 여는 미래</text>
 
   <!-- free-admission detail badge, restyled to match the warm gold/glass palette of the ribbon -->
   <rect x="978" y="852" width="118" height="90" rx="14" fill="url(#panel)" stroke="url(#goldText)" stroke-width="2"/>
-  <text x="1037" y="890" text-anchor="middle" fill="url(#goldText)" font-size="24" font-weight="700">무료</text>
+  <text x="1037" y="890" text-anchor="middle" fill="url(#goldText)" font-size="24" font-weight="700" stroke="url(#goldText)" stroke-width="0.5">무료</text>
   <text x="1037" y="918" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">입장</text>
+  <g transform="translate(1083,862) scale(0.34)" stroke="url(#goldText)" stroke-width="3.5" fill="none" opacity="0.85" stroke-linecap="round">
+    <path d="M-14 6 a14 14 0 0 1 28 0 a14 18 0 0 1 -6 16"/>
+    <path d="M-9 6 a9 9 0 0 1 18 0 a9 13 0 0 1 -4 11"/>
+    <path d="M-4 6 a4 4 0 0 1 8 0 v6"/>
+  </g>
 
   <!-- info panel -->
   <rect x="160" y="1410" width="965" height="350" rx="26" fill="#120726" opacity="0.8" stroke="url(#goldText)" stroke-width="2"/>
