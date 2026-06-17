@@ -80,23 +80,48 @@
     <line x1="1050" y1="700" x2="1150" y2="745" stroke-width="2.5"/>
   </g>
 
-  <!-- abstract skyline rising into horizon -->
-  <path d="M0 1180 L150 1020 L260 1110 L380 950 L520 1080 L650 960 L800 1100 L930 990 L1060 1090 L1180 1000 L1285 1100 L1285 1820 L0 1820 Z" fill="#2a1140" opacity="0.85"/>
-  <path d="M0 1280 L180 1160 L340 1240 L500 1120 L680 1230 L860 1130 L1040 1230 L1285 1140 L1285 1820 L0 1820 Z" fill="#190a2c"/>
-  <!-- antenna spires -->
-  <g stroke="#190a2c" stroke-width="4">
-    <line x1="380" y1="950" x2="380" y2="900"/><circle cx="380" cy="896" r="4" fill="#ffe9a8" stroke="none"/>
-    <line x1="930" y1="990" x2="930" y2="945"/><circle cx="930" cy="941" r="4" fill="#ffe9a8" stroke="none"/>
+  <!-- Incheon landmark skyline: cable-stayed bridge (Incheon Bridge) + stadium dome (Asiad Main Stadium) + Songdo towers -->
+  <path d="M0 1180 L1285 1180 L1285 1820 L0 1820 Z" fill="#2a1140" opacity="0.85"/>
+  <path d="M0 1280 L1285 1280 L1285 1820 L0 1820 Z" fill="#190a2c"/>
+
+  <!-- Songdo tower cluster (left) -->
+  <g fill="#22103d">
+    <rect x="40" y="1020" width="46" height="260"/>
+    <rect x="96" y="1080" width="38" height="200"/>
+    <rect x="144" y="940" width="52" height="340"/>
+    <rect x="206" y="1060" width="34" height="220"/>
   </g>
-  <!-- skyline window lights -->
-  <g fill="#ffe9a8" opacity="0.7">
-    <rect x="160" y="1080" width="6" height="10"/><rect x="180" y="1100" width="6" height="10"/>
-    <rect x="400" y="1010" width="6" height="10"/><rect x="700" y="1020" width="6" height="10"/>
-    <rect x="950" y="1050" width="6" height="10"/><rect x="1100" y="1060" width="6" height="10"/>
-    <rect x="240" y="1130" width="6" height="10"/><rect x="460" y="1060" width="6" height="10"/>
-    <rect x="600" y="1010" width="6" height="10"/><rect x="820" y="1130" width="6" height="10"/>
-    <rect x="1020" y="1080" width="6" height="10"/><rect x="1200" y="1040" width="6" height="10"/>
+  <g fill="#ffe9a8" opacity="0.65">
+    <rect x="50" y="1050" width="6" height="9"/><rect x="68" y="1080" width="6" height="9"/><rect x="50" y="1110" width="6" height="9"/>
+    <rect x="106" y="1110" width="6" height="9"/><rect x="120" y="1140" width="6" height="9"/>
+    <rect x="156" y="980" width="6" height="9"/><rect x="174" y="1010" width="6" height="9"/><rect x="156" y="1040" width="6" height="9"/><rect x="174" y="1070" width="6" height="9"/>
+    <rect x="214" y="1100" width="6" height="9"/><rect x="226" y="1130" width="6" height="9"/>
   </g>
+
+  <!-- Incheon Bridge (cable-stayed) spanning the centre -->
+  <g stroke="#190a2c" stroke-width="5">
+    <line x1="430" y1="1180" x2="430" y2="980"/>
+    <line x1="900" y1="1180" x2="900" y2="980"/>
+  </g>
+  <circle cx="430" cy="975" r="6" fill="#ffe9a8"/>
+  <circle cx="900" cy="975" r="6" fill="#ffe9a8"/>
+  <g stroke="#ffe9a8" stroke-width="1.5" opacity="0.6">
+    <line x1="430" y1="985" x2="300" y2="1180"/><line x1="430" y1="1015" x2="340" y2="1180"/><line x1="430" y1="1045" x2="380" y2="1180"/>
+    <line x1="430" y1="985" x2="560" y2="1180"/><line x1="430" y1="1015" x2="520" y2="1180"/><line x1="430" y1="1045" x2="480" y2="1180"/>
+    <line x1="900" y1="985" x2="770" y2="1180"/><line x1="900" y1="1015" x2="810" y2="1180"/><line x1="900" y1="1045" x2="850" y2="1180"/>
+    <line x1="900" y1="985" x2="1030" y2="1180"/><line x1="900" y1="1015" x2="990" y2="1180"/><line x1="900" y1="1045" x2="950" y2="1180"/>
+  </g>
+  <path d="M150 1180 Q665 1230 1180 1180" stroke="#ffe9a8" stroke-width="6" fill="none" opacity="0.85"/>
+
+  <!-- Incheon Asiad Main Stadium dome (event venue) -->
+  <g transform="translate(1080,1180)">
+    <path d="M-150 0 A150 95 0 0 1 150 0 Z" fill="#22103d"/>
+    <path d="M-150 0 A150 95 0 0 1 150 0" fill="none" stroke="#ffe9a8" stroke-width="3" opacity="0.7"/>
+    <path d="M-150 0 L-150 -8 M-100 -75 L-100 -83 M-50 -92 L-50 -100 M0 -95 L0 -103 M50 -92 L50 -100 M100 -75 L100 -83 M150 0 L150 -8" stroke="#ffe9a8" stroke-width="2.5" opacity="0.6"/>
+  </g>
+
+  <!-- gentle hill silhouette finishing the horizon -->
+  <path d="M0 1280 L180 1230 L340 1260 L500 1210 L680 1250 L860 1220 L1040 1255 L1285 1210 L1285 1820 L0 1820 Z" fill="#190a2c"/>
 
   <!-- orbit / atom motif -->
   <g transform="translate(950,250)">
@@ -129,10 +154,23 @@
     <circle cx="0" cy="32" r="3" fill="#36e2c9" stroke="none"/>
   </g>
 
-  <!-- ringed planet (sky decoration) -->
-  <g transform="translate(170,260)" opacity="0.9">
-    <circle r="26" fill="#8a4dff" opacity="0.85"/>
-    <ellipse rx="46" ry="12" fill="none" stroke="#ffe9a8" stroke-width="3" transform="rotate(-18)"/>
+  <!-- ringed planet (sky decoration), reimagined as an eco-tech globe: leaf + circuit lines on the sphere -->
+  <g transform="translate(170,260)" opacity="0.95">
+    <circle r="30" fill="#2fae6b"/>
+    <path d="M-30 0 C-30 -16 30 -16 30 0 C30 16 -30 16 -30 0 Z" fill="none" stroke="#1d6b41" stroke-width="2" opacity="0.6"/>
+    <path d="M0 -30 C-14 -18 -14 18 0 30" fill="none" stroke="#1d6b41" stroke-width="2" opacity="0.6"/>
+    <path d="M-6 8 C-6 -4 4 -10 12 -16 C8 -8 10 -2 16 4 C8 6 0 12 -6 8 Z" fill="#bdf2a0"/>
+    <circle cx="10" cy="-6" r="2" fill="#36e2c9"/><circle cx="-12" cy="10" r="1.6" fill="#36e2c9"/>
+    <ellipse rx="50" ry="13" fill="none" stroke="#ffe9a8" stroke-width="3" transform="rotate(-18)"/>
+  </g>
+
+  <!-- STEAM / eco-tech badge: gear interlocked with a sprout, sitting beside the rocket -->
+  <g transform="translate(340,640)" opacity="0.95">
+    <g fill="none" stroke="#ffe9a8" stroke-width="3.5">
+      <circle r="26"/>
+      <path d="M0 -26 v8 M0 18 v8 M-26 0 h8 M18 0 h8 M-18.4 -18.4 l5.6 5.6 M12.8 12.8 l5.6 5.6 M-18.4 18.4 l5.6 -5.6 M12.8 -12.8 l5.6 -5.6"/>
+    </g>
+    <path d="M-3 12 C-3 0 4 -6 10 -12 C7 -4 9 2 14 7 C7 9 0 14 -3 12 Z" fill="#bdf2a0" stroke="#2fae6b" stroke-width="1.5"/>
   </g>
 
   <!-- subtitle ribbon bookend icons: flask (left) + DNA (right), tied directly to the ribbon -->
@@ -151,9 +189,14 @@
   <!-- connector line from title group down to the info-icon strip -->
   <line x1="642" y1="950" x2="642" y2="1372" stroke="#ffe9a8" stroke-width="1.5" stroke-dasharray="2 10" opacity="0.5"/>
 
-  <!-- icon strip bridging illustration and the info panel -->
+  <!-- icon strip bridging illustration and the info panel: drawn as a connected network of nodes -->
   <g transform="translate(0,1372)">
-    <line x1="270" y1="0" x2="1015" y2="0" stroke="#ffe9a8" stroke-width="1.5" stroke-dasharray="2 8" opacity="0.55"/>
+    <path d="M330 -50 L490 -50 L650 -50 L810 -50 L970 -50 M330 -50 L330 0 M490 -50 L490 0 M650 -50 L650 0 M810 -50 L810 0 M970 -50 L970 0"
+          stroke="#36e2c9" stroke-width="1.5" stroke-dasharray="2 8" opacity="0.5" fill="none"/>
+    <circle cx="330" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/><circle cx="490" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/>
+    <circle cx="650" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/><circle cx="810" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/>
+    <circle cx="970" cy="-50" r="3" fill="#36e2c9" opacity="0.8"/>
+    <line x1="270" y1="0" x2="1015" y2="0" stroke="#ffe9a8" stroke-width="1.5" stroke-dasharray="2 8" opacity="0.4"/>
     <g transform="translate(330,0)">
       <circle r="34" fill="#120726" stroke="url(#goldText)" stroke-width="2"/>
       <g stroke="#ff4fa3" stroke-width="3" fill="none">
@@ -228,10 +271,10 @@
   <rect x="262" y="852" width="700" height="90" rx="14" fill="url(#panel)" stroke="url(#goldText)" stroke-width="2"/>
   <text x="612" y="910" text-anchor="middle" fill="url(#goldText)" font-size="42" font-weight="700">인천을 넘어 세계로, 과학이 여는 미래</text>
 
-  <!-- free-admission detail badge tucked beside the subtitle ribbon -->
-  <rect x="978" y="858" width="118" height="78" rx="14" fill="#1f0e3a" stroke="#36e2c9" stroke-width="2"/>
-  <text x="1037" y="896" text-anchor="middle" fill="#36e2c9" font-size="24" font-weight="700">무료</text>
-  <text x="1037" y="922" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">입장</text>
+  <!-- free-admission detail badge, aligned flush with the subtitle ribbon -->
+  <rect x="978" y="852" width="118" height="90" rx="14" fill="#1f0e3a" stroke="#36e2c9" stroke-width="2"/>
+  <text x="1037" y="890" text-anchor="middle" fill="#36e2c9" font-size="24" font-weight="700">무료</text>
+  <text x="1037" y="918" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">입장</text>
 
   <!-- info panel -->
   <rect x="160" y="1410" width="965" height="350" rx="26" fill="#120726" opacity="0.8" stroke="url(#goldText)" stroke-width="2"/>
