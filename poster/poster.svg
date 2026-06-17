@@ -271,9 +271,9 @@
   <rect x="262" y="852" width="700" height="90" rx="14" fill="url(#panel)" stroke="url(#goldText)" stroke-width="2"/>
   <text x="612" y="910" text-anchor="middle" fill="url(#goldText)" font-size="42" font-weight="700">인천을 넘어 세계로, 과학이 여는 미래</text>
 
-  <!-- free-admission detail badge, aligned flush with the subtitle ribbon -->
-  <rect x="978" y="852" width="118" height="90" rx="14" fill="#1f0e3a" stroke="#36e2c9" stroke-width="2"/>
-  <text x="1037" y="890" text-anchor="middle" fill="#36e2c9" font-size="24" font-weight="700">무료</text>
+  <!-- free-admission detail badge, restyled to match the warm gold/glass palette of the ribbon -->
+  <rect x="978" y="852" width="118" height="90" rx="14" fill="url(#panel)" stroke="url(#goldText)" stroke-width="2"/>
+  <text x="1037" y="890" text-anchor="middle" fill="url(#goldText)" font-size="24" font-weight="700">무료</text>
   <text x="1037" y="918" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">입장</text>
 
   <!-- info panel -->
