@@ -9,157 +9,294 @@
   body {
     width: 257mm; height: 364mm;
     font-family: "Pretendard", "Malgun Gothic", sans-serif;
-    background: radial-gradient(circle at 30% 20%, #0b3d91 0%, #04122e 70%);
+    background: linear-gradient(180deg, #cfeeea 0%, #7fd0c2 18%, #2f9e8f 38%, #18786f 55%, #0f5d57 75%, #0a4a45 100%);
     color: #fff;
     position: relative;
     overflow: hidden;
   }
-  .stars {
+  .grid-overlay {
     position: absolute; inset: 0;
     background-image:
-      radial-gradient(2px 2px at 20px 30px, white, transparent),
-      radial-gradient(2px 2px at 140px 90px, white, transparent),
-      radial-gradient(1.5px 1.5px at 90px 200px, white, transparent),
-      radial-gradient(2px 2px at 200px 260px, white, transparent),
-      radial-gradient(1.5px 1.5px at 60px 340px, white, transparent),
-      radial-gradient(2px 2px at 230px 400px, white, transparent);
-    background-repeat: repeat;
-    opacity: 0.6;
+      linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.5;
   }
-  .glow {
+  .corner {
+    position: absolute; width: 34px; height: 34px;
+    border: 3px solid #ffd54f;
+  }
+  .corner.tl { top: 18px; left: 18px; border-right: none; border-bottom: none; }
+  .corner.tr { top: 18px; right: 18px; border-left: none; border-bottom: none; }
+  .cloud {
     position: absolute;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(255,193,7,0.35), transparent 70%);
-    top: -120px; right: -120px;
-    border-radius: 50%;
+    background: rgba(255,255,255,0.55);
+    border-radius: 50px;
+    filter: blur(0.5px);
   }
-  .content {
+  .cloud:before, .cloud:after {
+    content: ""; position: absolute; background: inherit; border-radius: 50%;
+  }
+  .c1 { width: 90px; height: 26px; top: 150px; left: 40px; }
+  .c1:before { width: 46px; height: 46px; top: -24px; left: 10px; }
+  .c2 { width: 70px; height: 20px; top: 200px; left: 150px; }
+  .c2:before { width: 34px; height: 34px; top: -18px; left: 8px; }
+  .star {
+    position: absolute; color: #ffd54f; font-size: 18px;
+  }
+  .header {
     position: relative; z-index: 2;
-    padding: 50px 40px 40px;
-    display: flex; flex-direction: column;
-    height: 100%;
+    padding: 36px 36px 0;
   }
-  .event-name {
-    font-size: 22px; letter-spacing: 4px;
-    color: #ffd54f; font-weight: 600;
-    text-align: center;
-  }
-  .event-name-en {
-    text-align: center; font-size: 14px; color: #bcd2ff;
-    margin-top: 4px; letter-spacing: 1px;
-  }
-  .theme {
-    text-align: center;
-    margin-top: 70px;
-    font-size: 46px;
-    font-weight: 800;
-    line-height: 1.4;
-    text-shadow: 0 0 30px rgba(255,213,79,0.6);
-  }
-  .theme .accent { color: #ffd54f; }
-  .subline {
-    text-align: center;
-    margin-top: 24px;
-    font-size: 18px;
-    color: #d7e3ff;
-    line-height: 1.7;
-  }
-  .visual {
-    flex: 1;
-    margin: 50px auto;
-    width: 80%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .orbit {
-    position: relative;
-    width: 320px; height: 320px;
-  }
-  .orbit-ring {
-    position: absolute; inset: 0;
-    border: 1.5px dashed rgba(255,255,255,0.35);
-    border-radius: 50%;
-  }
-  .orbit-ring.r2 { inset: 40px; }
-  .orbit-ring.r3 { inset: 80px; }
-  .core {
-    position: absolute; top: 50%; left: 50%;
-    width: 110px; height: 110px;
-    transform: translate(-50%,-50%);
-    background: radial-gradient(circle, #ffe082, #ff8f00);
-    border-radius: 50%;
-    box-shadow: 0 0 60px 10px rgba(255,179,0,0.6);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 40px;
-  }
-  .dot {
-    position: absolute; width: 16px; height: 16px; border-radius: 50%;
-    background: #80d8ff; box-shadow: 0 0 12px #80d8ff;
-  }
-  .dot.d1 { top: -8px; left: 50%; }
-  .dot.d2 { top: 50%; left: -8px; }
-  .dot.d3 { bottom: 20px; right: 10px; background:#b9f6ca; box-shadow:0 0 12px #b9f6ca; }
-  .info-box {
-    margin-top: auto;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 16px;
-    padding: 28px 32px;
-    backdrop-filter: blur(4px);
-  }
-  .info-row {
-    display: flex;
-    font-size: 16px;
-    margin-bottom: 10px;
-    line-height: 1.5;
-  }
-  .info-row:last-child { margin-bottom: 0; }
-  .info-label {
-    width: 90px;
+  .en-title {
+    font-size: 14px; letter-spacing: 3px; font-weight: 700;
     color: #ffd54f;
-    font-weight: 700;
-    flex-shrink: 0;
   }
-  .footer {
+  .kr-title {
+    font-size: 40px; font-weight: 800; line-height: 1.25; margin-top: 10px;
+    color: #ffffff;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .theme-line {
+    margin-top: 16px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 15px; font-weight: 600;
+  }
+  .earth {
+    position: absolute; top: 30px; right: 30px;
+    width: 150px; height: 150px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #6fd6ff, #1e6fa8 60%, #134a73);
+    box-shadow: 0 0 40px rgba(120,200,255,0.5);
+    overflow: hidden;
+  }
+  .earth .land {
+    position: absolute; background: #4caf50; border-radius: 40%;
+  }
+  .earth .land1 { width: 70px; height: 50px; top: 30px; left: 10px; transform: rotate(-10deg); }
+  .earth .land2 { width: 40px; height: 30px; bottom: 20px; right: 20px; transform: rotate(15deg); }
+  .bulb {
+    position: absolute; top: 14px; right: 100px; font-size: 22px;
+  }
+
+  .scene {
+    position: relative; z-index: 2;
+    margin-top: 30px;
+    height: 230px;
+  }
+  .skyline { position: absolute; bottom: 0; left: 30px; display: flex; align-items: flex-end; gap: 6px; }
+  .skyline .bldg { width: 22px; background: #0a3b3f; }
+  .skyline .bldg.b1 { height: 70px; }
+  .skyline .bldg.b2 { height: 100px; background:#0d4448; }
+  .skyline .bldg.b2 .win { background:#ffe082; width:6px;height:6px; position:relative; top:14px; left:7px; }
+  .skyline .bldg.b3 { height: 55px; }
+
+  .bridge {
+    position: absolute; bottom: 0; left: 130px;
+  }
+  .tower { width: 8px; height: 150px; background: #ffd54f; position: relative; }
+  .tower:before {
+    content: ""; position: absolute; top: 0; left: -16px;
+    width: 40px; height: 18px; border: 4px solid #ffd54f; border-bottom: none;
+    border-radius: 20px 20px 0 0;
+  }
+  .bridge-wrap { display: flex; align-items: flex-end; gap: 70px; position: relative; }
+  .deck {
+    position: absolute; bottom: 0; left: -40px; width: 250px; height: 3px; background: #ffd54f;
+  }
+  .cable {
+    position: absolute; bottom: 0; width: 2px; background: #ffd54f; opacity: 0.85;
+  }
+
+  .sail {
+    position: absolute; bottom: 0; right: 60px;
+    width: 0; height: 0;
+  }
+  .sail-shape {
+    width: 0; height: 0;
+    border-left: 90px solid transparent;
+    border-bottom: 180px solid #f5f5f0;
+    opacity: 0.95;
+  }
+  .windmill { position: absolute; bottom: 10px; }
+  .windmill .pole { width: 3px; height: 50px; background: #cfd8dc; margin: 0 auto; }
+  .windmill .blade { position:absolute; top:-6px; left:-9px; width:24px; height:24px; }
+  .windmill .blade:before, .windmill .blade:after {
+    content:""; position:absolute; width:2px; height:14px; background:#e0f2f1; top:0; left:11px; transform-origin: top center;
+  }
+  .windmill .blade:before { transform: rotate(60deg); }
+  .windmill .blade:after { transform: rotate(-60deg); }
+
+  .caption {
+    position: absolute; bottom: -22px; font-size: 11px; color: #d4f1ec; text-align: center;
+  }
+  .caption.bridge-cap { left: 110px; width: 260px; }
+  .caption.sail-cap { right: 30px; width: 200px; }
+
+  .free-badge {
+    position: absolute; top: 0; right: 36px;
+    background: #ffd54f; color: #0a4a45; font-weight: 800;
+    font-size: 14px; padding: 8px 16px; border-radius: 20px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .nature {
+    position: relative; z-index: 2;
+    margin-top: 70px;
+    height: 90px;
+  }
+  .tree { position: absolute; bottom: 0; font-size: 30px; }
+  .icon-float { position: absolute; font-size: 18px; opacity: 0.85; }
+
+  .hashtags {
+    position: relative; z-index: 2;
     text-align: center;
-    margin-top: 24px;
-    font-size: 13px;
-    color: #9fb3d9;
+    font-size: 12px; color: #cdeee7;
+    letter-spacing: 0.5px;
+    margin-top: 6px;
+  }
+
+  .stadium {
+    position: relative; z-index: 2;
+    margin-top: 26px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .stadium-arc {
+    width: 260px; height: 90px;
+    border: 4px solid #ffd54f;
+    border-bottom: none;
+    border-radius: 180px 180px 0 0;
+    position: relative;
+  }
+  .stadium-arc .light {
+    position: absolute; width: 6px; height: 6px; background: #ffe082; border-radius: 50%;
+    top: -3px;
+  }
+  .stadium-cap { margin-top: 10px; font-size: 12px; color: #d4f1ec; }
+
+  .info-bar {
+    position: relative; z-index: 2;
+    margin: 28px 36px 0;
+    background: rgba(4,30,28,0.55);
+    border: 1px solid rgba(255,213,79,0.4);
+    border-radius: 18px;
+    padding: 24px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+  .info-rows { flex: 1; }
+  .info-row { display: flex; align-items: center; gap: 10px; font-size: 14px; margin-bottom: 9px; }
+  .info-row:last-child { margin-bottom: 0; }
+  .info-icon {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #ffd54f; color: #0a4a45; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .info-label { color: #ffd54f; font-weight: 700; width: 70px; flex-shrink: 0; }
+  .qr-box { text-align: center; }
+  .qr-box .qr {
+    width: 92px; height: 92px; background: #fff; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #555;
+  }
+  .qr-box .qr-cap { font-size: 11px; margin-top: 6px; color: #d4f1ec; }
+
+  .footer {
+    position: relative; z-index: 2;
+    text-align: center;
+    font-size: 11px; color: #9fd9cf;
+    margin-top: 18px;
     letter-spacing: 1px;
   }
 </style>
 </head>
 <body>
-  <div class="stars"></div>
-  <div class="glow"></div>
-  <div class="content">
-    <div class="event-name">제28회 인천과학대제전</div>
-    <div class="event-name-en">THE 28th INCHEON SCIENCE FESTIVAL</div>
+  <div class="grid-overlay"></div>
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="star" style="top:40px; left:330px;">✦</div>
+  <div class="star" style="top:90px; left:300px;">✦</div>
 
-    <div class="theme">인천을 넘어 <span class="accent">세계로</span><br>과학이 여는 <span class="accent">미래</span></div>
-    <div class="subline">과학교육 · STEAM · 발명교육 · 환경·생태교육이 하나 되는<br>융합과 소통의 과학축제</div>
-
-    <div class="visual">
-      <div class="orbit">
-        <div class="orbit-ring"></div>
-        <div class="orbit-ring r2"></div>
-        <div class="orbit-ring r3"></div>
-        <div class="dot d1"></div>
-        <div class="dot d2"></div>
-        <div class="dot d3"></div>
-        <div class="core">🔬</div>
-      </div>
+  <div class="header">
+    <div class="bulb">💡</div>
+    <div class="earth">
+      <div class="land land1"></div>
+      <div class="land land2"></div>
     </div>
-
-    <div class="info-box">
-      <div class="info-row"><span class="info-label">일시</span><span>2026. 10. 23.(금) ~ 10. 24.(토)</span></div>
-      <div class="info-row"><span class="info-label">장소</span><span>인천아시아드주경기장</span></div>
-      <div class="info-row"><span class="info-label">홈페이지</span><span>인천과학사랑.kr</span></div>
-      <div class="info-row"><span class="info-label">주최·주관</span><span>인천광역시교육청</span></div>
-    </div>
-
-    <div class="footer">INCHEON METROPOLITAN OFFICE OF EDUCATION</div>
+    <div class="en-title">THE 28th INCHEON SCIENCE FESTIVAL</div>
+    <div class="kr-title">제28회<br>인천과학대제전</div>
+    <div class="theme-line">🧭 인천을 넘어 세계로, 과학이 여는 미래</div>
   </div>
+
+  <div class="scene">
+    <div class="free-badge">⚡ 무료 입장</div>
+
+    <div class="skyline">
+      <div class="bldg b1"></div>
+      <div class="bldg b2"></div>
+      <div class="bldg b3"></div>
+    </div>
+
+    <div class="bridge">
+      <div class="bridge-wrap">
+        <div class="tower"></div>
+        <div class="tower"></div>
+        <div class="deck"></div>
+      </div>
+      <div class="caption bridge-cap">인천대교 Incheon Bridge</div>
+    </div>
+
+    <div class="sail">
+      <div class="sail-shape"></div>
+      <div class="windmill" style="left:110px;"><div class="blade"></div><div class="pole"></div></div>
+      <div class="windmill" style="left:140px;"><div class="blade"></div><div class="pole"></div></div>
+      <div class="caption sail-cap">인천아시아드주경기장</div>
+    </div>
+  </div>
+
+  <div class="nature">
+    <div class="tree" style="left:20px;">🌳</div>
+    <div class="tree" style="left:70px;">🌳</div>
+    <div class="tree" style="right:90px;">🌳</div>
+    <div class="tree" style="right:30px;">🌳</div>
+    <div class="icon-float" style="left:150px; top:20px;">🍃</div>
+    <div class="icon-float" style="left:200px; top:35px;">⚙️</div>
+    <div class="icon-float" style="left:280px; top:10px;">☁️</div>
+  </div>
+
+  <div class="hashtags">#인천과학대제전 &nbsp; #STEAM &nbsp; #제28회 &nbsp; #THE28thINCHEONSCIENCEFESTIVAL</div>
+
+  <div class="stadium">
+    <div class="stadium-arc">
+      <div class="light" style="left:10px; top:30px;"></div>
+      <div class="light" style="left:60px; top:5px;"></div>
+      <div class="light" style="left:120px; top:-3px;"></div>
+      <div class="light" style="left:180px; top:5px;"></div>
+      <div class="light" style="left:230px; top:30px;"></div>
+    </div>
+    <div class="stadium-cap">인천아시아드주경기장</div>
+  </div>
+
+  <div class="info-bar">
+    <div class="info-rows">
+      <div class="info-row"><span class="info-icon">📅</span><span class="info-label">기간</span><span>2026.10.23.(금) ~ 10.24.(토)</span></div>
+      <div class="info-row"><span class="info-icon">⏰</span><span class="info-label">운영시간</span><span>10:00 ~ 17:00</span></div>
+      <div class="info-row"><span class="info-icon">📍</span><span class="info-label">장소</span><span>인천아시아드주경기장</span></div>
+      <div class="info-row"><span class="info-icon">🌐</span><span class="info-label">홈페이지</span><span>인천과학사랑.kr</span></div>
+      <div class="info-row"><span class="info-icon">🏛</span><span class="info-label">주최·주관</span><span>인천광역시교육청</span></div>
+    </div>
+    <div class="qr-box">
+      <div class="qr">QR</div>
+      <div class="qr-cap">홈페이지 바로가기</div>
+    </div>
+  </div>
+
+  <div class="footer">INCHEON METROPOLITAN OFFICE OF EDUCATION</div>
 </body>
 </html>
