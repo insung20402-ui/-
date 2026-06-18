@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>제28회 인천과학대제전 포스터</title>
+<style>
+  @page { size: 257mm 364mm; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 257mm; height: 364mm;
+    font-family: "Pretendard", "Malgun Gothic", sans-serif;
+    background: radial-gradient(circle at 30% 20%, #0b3d91 0%, #04122e 70%);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(2px 2px at 20px 30px, white, transparent),
+      radial-gradient(2px 2px at 140px 90px, white, transparent),
+      radial-gradient(1.5px 1.5px at 90px 200px, white, transparent),
+      radial-gradient(2px 2px at 200px 260px, white, transparent),
+      radial-gradient(1.5px 1.5px at 60px 340px, white, transparent),
+      radial-gradient(2px 2px at 230px 400px, white, transparent);
+    background-repeat: repeat;
+    opacity: 0.6;
+  }
+  .glow {
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,193,7,0.35), transparent 70%);
+    top: -120px; right: -120px;
+    border-radius: 50%;
+  }
+  .content {
+    position: relative; z-index: 2;
+    padding: 50px 40px 40px;
+    display: flex; flex-direction: column;
+    height: 100%;
+  }
+  .event-name {
+    font-size: 22px; letter-spacing: 4px;
+    color: #ffd54f; font-weight: 600;
+    text-align: center;
+  }
+  .event-name-en {
+    text-align: center; font-size: 14px; color: #bcd2ff;
+    margin-top: 4px; letter-spacing: 1px;
+  }
+  .theme {
+    text-align: center;
+    margin-top: 70px;
+    font-size: 46px;
+    font-weight: 800;
+    line-height: 1.4;
+    text-shadow: 0 0 30px rgba(255,213,79,0.6);
+  }
+  .theme .accent { color: #ffd54f; }
+  .subline {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 18px;
+    color: #d7e3ff;
+    line-height: 1.7;
+  }
+  .visual {
+    flex: 1;
+    margin: 50px auto;
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .orbit {
+    position: relative;
+    width: 320px; height: 320px;
+  }
+  .orbit-ring {
+    position: absolute; inset: 0;
+    border: 1.5px dashed rgba(255,255,255,0.35);
+    border-radius: 50%;
+  }
+  .orbit-ring.r2 { inset: 40px; }
+  .orbit-ring.r3 { inset: 80px; }
+  .core {
+    position: absolute; top: 50%; left: 50%;
+    width: 110px; height: 110px;
+    transform: translate(-50%,-50%);
+    background: radial-gradient(circle, #ffe082, #ff8f00);
+    border-radius: 50%;
+    box-shadow: 0 0 60px 10px rgba(255,179,0,0.6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+  }
+  .dot {
+    position: absolute; width: 16px; height: 16px; border-radius: 50%;
+    background: #80d8ff; box-shadow: 0 0 12px #80d8ff;
+  }
+  .dot.d1 { top: -8px; left: 50%; }
+  .dot.d2 { top: 50%; left: -8px; }
+  .dot.d3 { bottom: 20px; right: 10px; background:#b9f6ca; box-shadow:0 0 12px #b9f6ca; }
+  .info-box {
+    margin-top: auto;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 16px;
+    padding: 28px 32px;
+    backdrop-filter: blur(4px);
+  }
+  .info-row {
+    display: flex;
+    font-size: 16px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .info-row:last-child { margin-bottom: 0; }
+  .info-label {
+    width: 90px;
+    color: #ffd54f;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: #9fb3d9;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="glow"></div>
+  <div class="content">
+    <div class="event-name">제28회 인천과학대제전</div>
+    <div class="event-name-en">THE 28th INCHEON SCIENCE FESTIVAL</div>
+
+    <div class="theme">인천을 넘어 <span class="accent">세계로</span><br>과학이 여는 <span class="accent">미래</span></div>
+    <div class="subline">과학교육 · STEAM · 발명교육 · 환경·생태교육이 하나 되는<br>융합과 소통의 과학축제</div>
+
+    <div class="visual">
+      <div class="orbit">
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring r2"></div>
+        <div class="orbit-ring r3"></div>
+        <div class="dot d1"></div>
+        <div class="dot d2"></div>
+        <div class="dot d3"></div>
+        <div class="core">🔬</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <div class="info-row"><span class="info-label">일시</span><span>2026. 10. 23.(금) ~ 10. 24.(토)</span></div>
+      <div class="info-row"><span class="info-label">장소</span><span>인천아시아드주경기장</span></div>
+      <div class="info-row"><span class="info-label">홈페이지</span><span>인천과학사랑.kr</span></div>
+      <div class="info-row"><span class="info-label">주최·주관</span><span>인천광역시교육청</span></div>
+    </div>
+
+    <div class="footer">INCHEON METROPOLITAN OFFICE OF EDUCATION</div>
+  </div>
+</body>
+</html>
