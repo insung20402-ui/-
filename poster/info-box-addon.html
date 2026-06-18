@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>인천과학대제전 정보 상자 추가 디테일</title>
+<style>
+  body {
+    margin: 0;
+    padding: 40px;
+    background: linear-gradient(160deg, #2a1255, #6a1b6e);
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+  .card {
+    width: 520px;
+    background: rgba(20, 8, 45, 0.85);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 24px 28px;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  .highlight {
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #ffd966;
+    margin-bottom: 14px;
+  }
+  .free-badge {
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .free-badge .tag {
+    display: inline-block;
+    background: #ff5da2;
+    color: #fff;
+    font-weight: bold;
+    padding: 6px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+  }
+  .free-sub {
+    text-align: center;
+    font-size: 11px;
+    color: #d9c9f0;
+    margin-bottom: 18px;
+  }
+  .row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .row .icon {
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .row .label {
+    font-weight: bold;
+    margin-right: 6px;
+  }
+  .qr-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .qr-row img {
+    width: 70px;
+    height: 70px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 4px;
+  }
+  .qr-row .qr-text {
+    font-size: 12px;
+    color: #d9c9f0;
+  }
+  .hashtags {
+    text-align: center;
+    font-size: 11px;
+    color: #b9a3d8;
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="highlight">🤖 로봇 체험 · 코딩 캠프 · 드론 레이싱</div>
+
+    <div class="free-badge"><span class="tag">무료입장</span></div>
+    <div class="free-sub">사전 등록 불필요 · 현장 등록 가능</div>
+
+    <div class="row"><div class="icon">📅</div><div><span class="label">기간</span>2026.10.23.(금) ~ 10.24.(토)</div></div>
+    <div class="row"><div class="icon">⏰</div><div><span class="label">운영시간</span>10:00 ~ 17:00</div></div>
+    <div class="row"><div class="icon">📍</div><div><span class="label">장소</span>인천아시아드주경기장</div></div>
+    <div class="row qr-row">
+      <div class="icon">🌐</div>
+      <div>
+        <div><span class="label">홈페이지</span>인천과학사랑.kr</div>
+        <div class="qr-text">QR 코드를 스캔하면 바로 접속됩니다</div>
+      </div>
+      <img src="qrcode.png" alt="QR Code">
+    </div>
+    <div class="row"><div class="icon">🏛️</div><div><span class="label">주최·주관</span>인천광역시교육청</div></div>
+
+    <div class="hashtags">#인천과학대제전 #STEAM #제28회 #THEINCHEONSCIENCEFESTIVAL</div>
+  </div>
+</body>
+</html>
