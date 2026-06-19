@@ -3,35 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>만수중학교 네비게이션</title>
+<title>만수-온(ON) | 만수중학교 공간 안내</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="hero">
-    <img src="assets/images/logo.png" alt="만수중학교 로고" class="logo">
-    <img src="assets/images/mascot.png" alt="만수중학교 마스코트 만돌이" class="mascot">
-    <p class="mascot-name">수호 독수리 만돌이 (Mandori)</p>
-    <h1>만수중학교 네비게이션</h1>
-    <p>새롭게 생각하고 바르게 행동하자</p>
+  <header class="app-header">
+    <div class="brand">
+      <img src="assets/images/logo.png" alt="만수중학교 로고" class="logo">
+      <h1>만수-온 (Mansu-ON)</h1>
+    </div>
+    <p class="tagline">학생이 직접 소개하는 만수중학교 공간 안내 앱</p>
   </header>
 
-  <section class="building">
-    <img src="assets/images/building.jpg" alt="만수중학교 건물" class="building-img">
-  </section>
+  <nav class="top-nav" id="top-nav"></nav>
 
-  <nav class="menu">
-    <a href="pages/map.html" class="menu-card">
-      <h2>실내 길찾기</h2>
-      <p>건물 평면도에서 목적지까지 경로를 안내합니다.</p>
-    </a>
-    <a href="pages/facilities.html" class="menu-card">
-      <h2>시설 소개</h2>
-      <p>헬스장 등 학교 시설을 사진과 설명으로 소개합니다.</p>
-    </a>
-  </nav>
+  <main>
+    <section class="hero">
+      <img src="assets/images/mascot.png" alt="만수중학교 마스코트 만돌이" class="mascot">
+      <p class="mascot-name">수호 독수리 만돌이와 함께 학교를 둘러볼까요?</p>
+    </section>
 
-  <footer>
-    <p>&copy; 만수중학교</p>
-  </footer>
+    <div class="menu-grid">
+      <a href="pages/exterior.html" class="menu-card">
+        <span class="emoji">🏫</span>
+        <h2>학교 외관</h2>
+        <p>정문에서 보이는 학교 건물 모습을 소개합니다.</p>
+      </a>
+      <a href="pages/spaces.html" class="menu-card">
+        <span class="emoji">🗂️</span>
+        <h2>공간 둘러보기</h2>
+        <p>카드로 학교의 다양한 공간을 한눈에 살펴보세요.</p>
+      </a>
+      <a href="pages/route.html" class="menu-card">
+        <span class="emoji">🧭</span>
+        <h2>정문에서 길찾기</h2>
+        <p>정문부터 목적지까지 단계별 경로를 안내합니다.</p>
+      </a>
+      <a href="pages/courses.html" class="menu-card">
+        <span class="emoji">⭐</span>
+        <h2>추천 방문 코스</h2>
+        <p>관심사에 맞춘 추천 코스를 따라가 보세요.</p>
+      </a>
+      <a href="pages/qna.html" class="menu-card">
+        <span class="emoji">💬</span>
+        <h2>도슨트 Q&A</h2>
+        <p>자주 묻는 질문을 눌러 답변을 확인해보세요.</p>
+      </a>
+      <a href="pages/quiz.html" class="menu-card">
+        <span class="emoji">🎯</span>
+        <h2>공간 퀴즈</h2>
+        <p>학교 공간에 대해 얼마나 알고 있는지 테스트해보세요.</p>
+      </a>
+    </div>
+  </main>
+
+  <footer>&copy; 만수중학교 · 만수-온</footer>
+
+  <script src="js/nav.js"></script>
+  <script>renderTopNav("home", "");</script>
 </body>
 </html>

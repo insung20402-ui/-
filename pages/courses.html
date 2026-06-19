@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>추천 방문 코스 | 만수-온</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img src="../assets/images/logo.png" alt="만수중학교 로고" class="logo">
+      <h1>만수-온 (Mansu-ON)</h1>
+    </div>
+  </header>
+  <nav class="top-nav" id="top-nav"></nav>
+
+  <main>
+    <h2 class="section-title">추천 방문 코스</h2>
+    <p class="section-sub">관심사에 맞는 코스를 골라 학교 공간을 둘러보세요.</p>
+    <div id="course-list"></div>
+  </main>
+
+  <footer>&copy; 만수중학교 · 만수-온</footer>
+
+  <script src="../js/nav.js"></script>
+  <script src="../js/data.js"></script>
+  <script>
+    const list = document.getElementById("course-list");
+    list.innerHTML = COURSES.map(c => `
+      <div class="course-card">
+        <h3>${c.title}</h3>
+        <p>${c.desc}</p>
+        <div class="course-stops">
+          ${c.stops.map(id => {
+            const s = SPACES.find(sp => sp.id === id);
+            return `<span>${s.name}</span>`;
+          }).join("")}
+        </div>
+      </div>
+    `).join("");
+    renderTopNav("courses", "../");
+  </script>
+</body>
+</html>

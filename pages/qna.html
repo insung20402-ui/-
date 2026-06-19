@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>도슨트 Q&A | 만수-온</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img src="../assets/images/logo.png" alt="만수중학교 로고" class="logo">
+      <h1>만수-온 (Mansu-ON)</h1>
+    </div>
+  </header>
+  <nav class="top-nav" id="top-nav"></nav>
+
+  <main>
+    <h2 class="section-title">도슨트 Q&A</h2>
+    <p class="section-sub">자주 묻는 질문을 눌러 답변을 확인해보세요.</p>
+    <div id="qna-list"></div>
+  </main>
+
+  <footer>&copy; 만수중학교 · 만수-온</footer>
+
+  <script src="../js/nav.js"></script>
+  <script src="../js/data.js"></script>
+  <script>
+    const list = document.getElementById("qna-list");
+    list.innerHTML = QNA.map((item, i) => `
+      <div class="qna-item" id="qna-${i}">
+        <button class="q-btn">Q. ${item.q}</button>
+        <div class="a-text">A. ${item.a}</div>
+      </div>
+    `).join("");
+    list.addEventListener("click", (e) => {
+      const btn = e.target.closest(".q-btn");
+      if (!btn) return;
+      btn.closest(".qna-item").classList.toggle("open");
+    });
+    renderTopNav("qna", "../");
+  </script>
+</body>
+</html>

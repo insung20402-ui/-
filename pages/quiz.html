@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공간 퀴즈 | 만수-온</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img src="../assets/images/logo.png" alt="만수중학교 로고" class="logo">
+      <h1>만수-온 (Mansu-ON)</h1>
+    </div>
+  </header>
+  <nav class="top-nav" id="top-nav"></nav>
+
+  <main>
+    <h2 class="section-title">공간 퀴즈</h2>
+    <p class="section-sub">학교 공간에 대해 얼마나 알고 있는지 테스트해보세요!</p>
+    <div id="quiz-root"></div>
+  </main>
+
+  <footer>&copy; 만수중학교 · 만수-온</footer>
+
+  <script src="../js/nav.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/quiz.js"></script>
+  <script>renderTopNav("quiz", "../");</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공간 상세 안내 | 만수-온</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <img src="../assets/images/logo.png" alt="만수중학교 로고" class="logo">
+      <h1>만수-온 (Mansu-ON)</h1>
+    </div>
+  </header>
+  <nav class="top-nav" id="top-nav"></nav>
+
+  <main>
+    <a href="spaces.html" class="back-link" style="margin:0 0 12px;display:inline-block;">&larr; 공간 둘러보기로</a>
+    <div id="detail-root"></div>
+  </main>
+
+  <footer>&copy; 만수중학교 · 만수-온</footer>
+
+  <script src="../js/nav.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/detail.js"></script>
+  <script>renderTopNav("spaces", "../");</script>
+</body>
+</html>
