@@ -1,3 +1,13 @@
+document.addEventListener("error", (e) => {
+  const img = e.target;
+  if (!img || img.tagName !== "IMG" || img.dataset.fallbackApplied) return;
+  img.dataset.fallbackApplied = "1";
+  const placeholder = document.createElement("div");
+  placeholder.className = img.className ? img.className + " img-placeholder" : "img-placeholder";
+  placeholder.textContent = "📷 " + (img.alt || "사진 준비중");
+  img.replaceWith(placeholder);
+}, true);
+
 function renderTopNav(activeId, basePath) {
   const items = [
     { id: "home", label: "홈", href: basePath + "index.html" },
