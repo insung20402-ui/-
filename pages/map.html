@@ -10,7 +10,23 @@
   <div class="map-page">
     <a href="../index.html" class="back-link">&larr; 홈으로</a>
     <h1>실내 길찾기</h1>
-    <p>건물 평면도와 위치 정보를 받으면 이 페이지에 층별 지도와 경로 안내 기능을 추가할 예정입니다.</p>
+
+    <div class="route-form">
+      <label>출발지
+        <select id="from"></select>
+      </label>
+      <label>목적지
+        <select id="to"></select>
+      </label>
+      <button id="find-route">길찾기</button>
+    </div>
+
+    <div id="result" class="route-result"></div>
+
+    <h2>전체 시설 목록</h2>
+    <ul id="place-list" class="place-list"></ul>
   </div>
+
+  <script src="../js/map.js"></script>
 </body>
 </html>
