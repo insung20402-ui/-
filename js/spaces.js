@@ -9,7 +9,7 @@ function renderSpaceCards(filterTag) {
   const list = filterTag ? SPACES.filter(s => s.tags.includes(filterTag)) : SPACES;
   grid.innerHTML = list.map(s => `
     <div class="space-card">
-      <img src="../assets/images/${s.photos[0]}" alt="${s.name}">
+      <img src="../assets/images/${s.photos[0]}" alt="${s.name}" data-icon="${s.icon}">
       <div class="body">
         <h3>${s.name}</h3>
         <p class="summary">${s.summary}</p>

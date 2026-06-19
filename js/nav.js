@@ -4,7 +4,8 @@ document.addEventListener("error", (e) => {
   img.dataset.fallbackApplied = "1";
   const placeholder = document.createElement("div");
   placeholder.className = img.className ? img.className + " img-placeholder" : "img-placeholder";
-  placeholder.textContent = "📷 " + (img.alt || "사진 준비중");
+  const icon = img.dataset.icon || "📷";
+  placeholder.innerHTML = `<span class="ph-icon">${icon}</span><span class="ph-label">${img.alt || "사진 준비중"}</span>`;
   img.replaceWith(placeholder);
 }, true);
 

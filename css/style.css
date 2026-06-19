@@ -452,17 +452,21 @@ main {
 
 .img-placeholder {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   text-align: center;
-  background: #dde3f5;
-  color: #5a6bb0;
+  background: linear-gradient(135deg, #6b85e8, #1b2a6b);
+  color: #fff;
   font-size: 0.82rem;
   font-weight: 600;
   border-radius: 12px;
   padding: 10px;
   min-height: 160px;
 }
+.img-placeholder .ph-icon { font-size: 2.4rem; line-height: 1; }
+.img-placeholder .ph-label { opacity: 0.95; }
 .space-card .img-placeholder { height: 160px; border-radius: 0; }
 .detail-gallery .img-placeholder { width: 220px; height: 150px; flex-shrink: 0; }
 .exterior-photo.img-placeholder { width: 100%; height: 220px; }
@@ -470,9 +474,12 @@ main {
   min-height: 0;
   width: auto;
   display: inline-flex;
+  flex-direction: row;
   border-radius: 50%;
   padding: 8px 12px;
 }
+.hero .mascot.img-placeholder .ph-icon, .logo.img-placeholder .ph-icon { font-size: 1.3rem; }
+.hero .mascot.img-placeholder .ph-label, .logo.img-placeholder .ph-label { display: none; }
 
 footer {
   text-align: center;

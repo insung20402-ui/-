@@ -11,7 +11,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   root.innerHTML = `
     <div class="detail-gallery">
-      ${space.photos.map(p => `<img src="../assets/images/${p}" alt="${space.name}">`).join("")}
+      ${space.photos.map(p => `<img src="../assets/images/${p}" alt="${space.name}" data-icon="${space.icon}">`).join("")}
     </div>
     <div class="detail-card">
       <span class="floor-badge">${space.floor}</span>
