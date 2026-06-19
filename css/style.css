@@ -1,0 +1,120 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  background: #f4f6fb;
+  color: #1a1f3d;
+}
+.hero {
+  background: linear-gradient(135deg, #1b2a6b, #2e4bb8);
+  color: #fff;
+  text-align: center;
+  padding: 32px 16px 24px;
+  position: relative;
+}
+.hero .logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 50%;
+  padding: 6px;
+}
+.hero .mascot {
+  width: 90px;
+  margin-top: 8px;
+}
+.hero h1 {
+  margin-top: 12px;
+  font-size: 1.6rem;
+}
+.hero p {
+  opacity: 0.85;
+  margin-top: 4px;
+}
+.building {
+  width: 100%;
+  max-height: 280px;
+  overflow: hidden;
+}
+.building-img {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+}
+.menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 24px 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.menu-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  text-decoration: none;
+  color: #1a1f3d;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  transition: transform 0.15s ease;
+}
+.menu-card:hover {
+  transform: translateY(-4px);
+}
+.menu-card h2 {
+  margin-bottom: 8px;
+  color: #1b2a6b;
+}
+@media (max-width: 600px) {
+  .menu { grid-template-columns: 1fr; }
+}
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+  font-size: 0.85rem;
+}
+.facility-page, .map-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.back-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #1b2a6b;
+  text-decoration: none;
+  font-weight: bold;
+}
+.facility-block {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+.facility-block img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.facility-block h2 {
+  color: #1b2a6b;
+  margin-bottom: 8px;
+}
+.facility-block ul {
+  margin: 10px 0 0 18px;
+}
+.equipment-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.equipment-list span {
+  background: #eef1fb;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  text-align: center;
+}
