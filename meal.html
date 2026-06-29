@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>급식 - 만수중학교</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo">🏫 만수중학교</div>
+  <nav class="site-nav">
+    <a href="index.html">홈</a>
+    <a href="about.html">학교소개</a>
+    <a href="facilities.html">시설안내</a>
+    <a href="meal.html" class="active">급식</a>
+  </nav>
+</header>
+
+<main>
+  <section class="school-banner">
+    <h1>급식 안내</h1>
+    <div id="today-meal-summary"></div>
+  </section>
+
+  <section class="card">
+    <div class="month-nav">
+      <button id="prev-month">◀ 이전달</button>
+      <span id="month-label"></span>
+      <button id="next-month">다음달 ▶</button>
+    </div>
+    <div class="calendar" id="calendar"></div>
+  </section>
+</main>
+
+<footer>© 2026 만수중학교</footer>
+
+<script src="data/meals.js"></script>
+<script>
+  const today = new Date();
+  let viewYear = today.getFullYear();
+  let viewMonth = today.getMonth() + 1; // 1-12
+
+  const todayStr = today.toISOString().slice(0, 10);
+  const summaryBox = document.getElementById("today-meal-summary");
+  const todayMenu = getMealsForDate(todayStr);
+  summaryBox.innerHTML = todayMenu
+    ? `<strong>오늘(${todayStr}) 급식:</strong> ${todayMenu.join(", ")}`
+    : `<strong>오늘(${todayStr})</strong> 급식 정보가 없습니다.`;
+
+  const DOW = ["일", "월", "화", "수", "목", "금", "토"];
+
+  function render() {
+    document.getElementById("month-label").textContent = `${viewYear}년 ${viewMonth}월`;
+    const cal = document.getElementById("calendar");
+    cal.innerHTML = "";
+
+    DOW.forEach((d) => {
+      const el = document.createElement("div");
+      el.className = "dow";
+      el.textContent = d;
+      cal.appendChild(el);
+    });
+
+    const firstDay = new Date(viewYear, viewMonth - 1, 1);
+    const startOffset = firstDay.getDay();
+    const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
+
+    for (let i = 0; i < startOffset; i++) {
+      const empty = document.createElement("div");
+      empty.className = "day empty";
+      cal.appendChild(empty);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${viewYear}-${String(viewMonth).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      const dayEl = document.createElement("div");
+      dayEl.className = "day";
+      if (dateStr === todayStr) dayEl.classList.add("today");
+
+      const menu = getMealsForDate(dateStr);
+      dayEl.innerHTML =
+        `<div class="date-num">${d}</div>` +
+        (menu ? `<div class="menu-line">${menu.slice(0, 3).join(", ")}${menu.length > 3 ? " ..." : ""}</div>` : "");
+      cal.appendChild(dayEl);
+    }
+  }
+
+  document.getElementById("prev-month").addEventListener("click", () => {
+    viewMonth -= 1;
+    if (viewMonth < 1) { viewMonth = 12; viewYear -= 1; }
+    render();
+  });
+  document.getElementById("next-month").addEventListener("click", () => {
+    viewMonth += 1;
+    if (viewMonth > 12) { viewMonth = 1; viewYear += 1; }
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

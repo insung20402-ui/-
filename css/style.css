@@ -1,0 +1,249 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  background: #f2f4f7;
+  color: #222;
+  line-height: 1.5;
+}
+
+header.site-header {
+  background: #1d4f91;
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+header.site-header .logo {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+nav.site-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+nav.site-nav a {
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.12);
+}
+
+nav.site-nav a.active,
+nav.site-nav a:hover {
+  background: #fff;
+  color: #1d4f91;
+}
+
+main {
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.school-banner {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.school-banner h1 {
+  font-size: 26px;
+  color: #1d4f91;
+  margin-bottom: 12px;
+}
+
+.school-banner .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 6px 24px;
+  font-size: 14px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+  font-size: 16px;
+  color: #1d4f91;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #1d4f91;
+  padding-bottom: 8px;
+}
+
+.today-meal-date {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1d4f91;
+}
+
+.meal-list {
+  list-style: none;
+  font-size: 14px;
+}
+
+.meal-list li {
+  padding: 3px 0;
+}
+
+.meal-empty {
+  color: #888;
+  font-size: 14px;
+}
+
+/* 시설 안내 */
+.facility-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.facility-btn {
+  background: #fff;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 18px 10px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: 0.15s;
+}
+
+.facility-btn .icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.facility-btn:hover,
+.facility-btn.active {
+  border-color: #1d4f91;
+  background: #eaf1fc;
+}
+
+.facility-detail {
+  background: #fff;
+  border-radius: 10px;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  min-height: 120px;
+}
+
+.facility-detail h3 {
+  color: #1d4f91;
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.facility-detail .location {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.facility-detail p {
+  font-size: 15px;
+}
+
+.facility-placeholder {
+  color: #888;
+}
+
+/* 급식 캘린더 */
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.month-nav button {
+  background: #1d4f91;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.month-nav span {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1d4f91;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendar .dow {
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: #555;
+  padding-bottom: 4px;
+}
+
+.calendar .day {
+  background: #fff;
+  border-radius: 6px;
+  min-height: 90px;
+  padding: 6px;
+  font-size: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.calendar .day.empty {
+  background: transparent;
+  box-shadow: none;
+}
+
+.calendar .day .date-num {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.calendar .day.today {
+  border: 2px solid #1d4f91;
+  background: #eaf1fc;
+}
+
+.calendar .day .menu-line {
+  color: #444;
+  font-size: 11px;
+}
+
+footer {
+  text-align: center;
+  padding: 24px;
+  color: #888;
+  font-size: 13px;
+}

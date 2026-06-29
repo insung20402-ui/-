@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시설안내 - 만수중학교</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="logo">🏫 만수중학교</div>
+  <nav class="site-nav">
+    <a href="index.html">홈</a>
+    <a href="about.html">학교소개</a>
+    <a href="facilities.html" class="active">시설안내</a>
+    <a href="meal.html">급식</a>
+  </nav>
+</header>
+
+<main>
+  <section class="school-banner">
+    <h1>시설안내</h1>
+    <p>아래 시설 버튼을 클릭하면 위치와 설명을 확인할 수 있습니다.</p>
+  </section>
+
+  <div class="facility-grid" id="facility-grid"></div>
+
+  <div class="facility-detail" id="facility-detail">
+    <p class="facility-placeholder">시설을 선택해주세요.</p>
+  </div>
+</main>
+
+<footer>© 2026 만수중학교</footer>
+
+<script src="data/facilities.js"></script>
+<script>
+  const grid = document.getElementById("facility-grid");
+  const detail = document.getElementById("facility-detail");
+
+  FACILITIES.forEach((f) => {
+    const btn = document.createElement("button");
+    btn.className = "facility-btn";
+    btn.id = `btn-${f.id}`;
+    btn.innerHTML = `<span class="icon">${f.icon}</span>${f.name}`;
+    btn.addEventListener("click", () => showFacility(f.id));
+    grid.appendChild(btn);
+  });
+
+  function showFacility(id) {
+    document.querySelectorAll(".facility-btn").forEach((b) => b.classList.remove("active"));
+    document.getElementById(`btn-${id}`).classList.add("active");
+
+    const f = FACILITIES.find((x) => x.id === id);
+    detail.innerHTML = `
+      <h3>${f.icon} ${f.name}</h3>
+      <div class="location">위치: ${f.location}</div>
+      <p>${f.description}</p>
+    `;
+  }
+</script>
+</body>
+</html>
