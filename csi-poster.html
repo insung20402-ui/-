@@ -7,21 +7,21 @@
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Oswald:wght@400;500;600&display=swap');
 
   :root{
-    --neon: #d4f24a;
-    --neon-glow: rgba(212, 242, 74, 0.65);
-    --purple-deep: #120a1f;
-    --purple-mid: #241537;
-    --panel: rgba(157, 92, 255, 0.08);
-    --panel-border: rgba(184, 148, 255, 0.35);
-    --text-dim: #a99fc2;
-    --text-bright: #f2eefc;
+    --neon: #6ea100;
+    --neon-glow: rgba(139, 196, 0, 0.45);
+    --purple-deep: #ffffff;
+    --purple-mid: #f4f1fb;
+    --panel: rgba(124, 77, 255, 0.05);
+    --panel-border: rgba(124, 77, 255, 0.22);
+    --text-dim: #6b6280;
+    --text-bright: #251c38;
   }
 
   *{ box-sizing: border-box; margin:0; padding:0; }
 
   body{
     font-family: 'Noto Sans KR', sans-serif;
-    background: radial-gradient(circle at 50% 15%, #2a1745 0%, #180d29 45%, #0c0714 100%);
+    background: radial-gradient(circle at 50% 15%, #f7f5ff 0%, #eceafb 45%, #e3e0f7 100%);
     display:flex;
     justify-content:center;
     padding: 40px 16px;
@@ -31,12 +31,13 @@
     position: relative;
     width: 860px;
     max-width: 100%;
-    background: radial-gradient(circle at 50% 20%, #2c1a48 0%, #180e29 55%, #0a0512 100%);
-    border: 1px solid rgba(184,148,255,0.25);
+    background: radial-gradient(circle at 50% 20%, #ffffff 0%, #f8f6ff 55%, #f1eefc 100%);
+    border: 1px solid rgba(124,77,255,0.18);
     border-radius: 6px;
     overflow: hidden;
     color: var(--text-bright);
     padding: 28px 44px 40px;
+    box-shadow: 0 20px 60px rgba(124,77,255,0.12);
   }
 
   .poster::before, .poster::after{
@@ -44,9 +45,9 @@
     position:absolute;
     width: 340px; height: 340px;
     border-radius: 50%;
-    border: 1px solid rgba(184,148,255,0.15);
-    box-shadow: 0 0 0 40px rgba(184,148,255,0.04) inset;
-    opacity: 0.5;
+    border: 1px solid rgba(124,77,255,0.12);
+    box-shadow: 0 0 0 40px rgba(124,77,255,0.03) inset;
+    opacity: 0.6;
   }
   .poster::before{ top:-120px; left:-140px; }
   .poster::after{ bottom:60px; right:-160px; }
@@ -60,7 +61,7 @@
     letter-spacing: 1.5px;
     color: var(--text-dim);
     padding-bottom: 14px;
-    border-bottom: 1px solid rgba(184,148,255,0.25);
+    border-bottom: 1px solid rgba(124,77,255,0.2);
   }
   header .case-file{ color: var(--neon); display:flex; align-items:center; gap:6px; }
   header .case-file::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--neon); box-shadow:0 0 8px var(--neon-glow); }
@@ -75,7 +76,7 @@
     font-family:'Oswald', sans-serif;
     letter-spacing: 6px;
     font-size: 14px;
-    color: #d9c8ff;
+    color: #7c4dff;
     margin-bottom: 14px;
   }
   h1{
@@ -83,13 +84,13 @@
     line-height: 1.15;
     font-weight: 900;
     color: var(--neon);
-    text-shadow: 0 0 12px var(--neon-glow), 0 0 40px rgba(212,242,74,0.35);
+    text-shadow: 0 0 18px rgba(139,196,0,0.3);
   }
   .sub{
     font-family:'Oswald', sans-serif;
     letter-spacing: 5px;
     font-size: 14px;
-    color: #cdbdf0;
+    color: #7c4dff;
     margin-top: 16px;
   }
   .tagline{
@@ -123,11 +124,11 @@
     transform: translate(-50%,-50%);
     width: 300px; height: 300px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(212,242,74,0.18) 0%, rgba(120,60,200,0.12) 55%, transparent 75%);
+    background: radial-gradient(circle, rgba(139,196,0,0.12) 0%, rgba(124,77,255,0.08) 55%, transparent 75%);
     display:flex; align-items:center; justify-content:center;
   }
   .fingerprint-wrap svg{
-    filter: drop-shadow(0 0 10px var(--neon-glow)) drop-shadow(0 0 26px rgba(212,242,74,0.4));
+    filter: drop-shadow(0 0 6px rgba(139,196,0,0.35)) drop-shadow(0 0 16px rgba(139,196,0,0.2));
   }
 
   .steps{
@@ -137,10 +138,11 @@
     margin-top: 26px;
   }
   .step{
-    background: var(--panel);
+    background: #ffffff;
     border: 1px solid var(--panel-border);
     border-radius: 8px;
     padding: 16px 18px;
+    box-shadow: 0 6px 18px rgba(124,77,255,0.06);
   }
   .step .num{
     display:inline-flex;
@@ -148,7 +150,7 @@
     justify-content:center;
     width: 22px; height: 22px;
     border-radius: 50%;
-    background: rgba(212,242,74,0.15);
+    background: rgba(139,196,0,0.12);
     border: 1px solid var(--neon);
     color: var(--neon);
     font-family:'Oswald', sans-serif;
@@ -163,15 +165,16 @@
   .step p{
     font-size: 13px;
     line-height: 1.55;
-    color: #eae6f5; /* brightened from dim purple-gray for readability */
+    color: #4a4160; /* darkened for readability on light background */
   }
 
   .event-info{
     margin-top: 22px;
-    background: rgba(157,92,255,0.06);
+    background: #ffffff;
     border: 1px solid var(--panel-border);
     border-radius: 10px;
     padding: 20px 26px;
+    box-shadow: 0 6px 18px rgba(124,77,255,0.06);
   }
   .event-info .badge{
     display:inline-block;
@@ -193,7 +196,7 @@
     font-family:'Oswald', sans-serif;
     font-size: 12px;
     letter-spacing: 1px;
-    color: #b9a6ff;
+    color: #7c4dff;
     margin-bottom: 6px;
   }
   .event-info .item .label span{ color: var(--neon); margin-right:4px; }
@@ -238,7 +241,7 @@
       <div class="tag tr">SAMPLE 01 ◥</div>
       <div class="fingerprint-wrap">
         <svg width="220" height="220" viewBox="0 0 220 220" fill="none">
-          <g stroke="#d4f24a" stroke-width="3" fill="none" stroke-linecap="round">
+          <g stroke="#6ea100" stroke-width="3" fill="none" stroke-linecap="round">
             <path d="M110 30 C60 30 30 70 30 115 C30 165 65 195 110 195" />
             <path d="M110 45 C72 45 48 78 48 115 C48 155 76 182 112 182" />
             <path d="M112 60 C82 60 64 86 64 116 C64 148 86 168 114 168" />
