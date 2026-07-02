@@ -7,17 +7,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-0:#07040f;
-    --bg-1:#0c0620;
-    --uv-violet:#8b2fe0;
-    --uv-violet-2:#5b1aa8;
-    --glow-lime:#d4ff3f;
-    --glow-lime-2:#a6e600;
-    --cyan:#4be3ff;
-    --ink:#e9e4ff;
-    --ink-dim:#a89bd6;
-    --card-bg:rgba(139,47,224,0.10);
-    --card-bd:rgba(212,255,63,0.35);
+    --bg-0:#fbfaff;
+    --bg-1:#f3efff;
+    --purple:#7c3aed;
+    --purple-deep:#4c1d95;
+    --purple-soft:#efe6ff;
+    --lime:#b6e825;
+    --lime-deep:#7ba300;
+    --teal:#00c2a8;
+    --pink:#ff6fa5;
+    --ink:#211a3d;
+    --ink-dim:#726a94;
+    --card-bg:#ffffff;
+    --card-bd:#e7defc;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html,body{
@@ -29,93 +31,93 @@
     position:relative;
     width:1500px; min-height:2121px;
     background:
-      radial-gradient(ellipse 1100px 900px at 50% 34%, rgba(139,47,224,0.45), rgba(139,47,224,0) 70%),
-      radial-gradient(ellipse 900px 700px at 82% 10%, rgba(75,227,255,0.18), rgba(75,227,255,0) 65%),
-      radial-gradient(ellipse 1000px 800px at 12% 92%, rgba(166,230,0,0.10), rgba(166,230,0,0) 65%),
-      linear-gradient(180deg, var(--bg-0) 0%, #0a0416 45%, #0d0620 75%, #070310 100%);
+      radial-gradient(ellipse 800px 600px at 88% 6%, rgba(182,232,37,0.22), rgba(182,232,37,0) 65%),
+      radial-gradient(ellipse 900px 700px at 6% 18%, rgba(124,58,237,0.14), rgba(124,58,237,0) 65%),
+      radial-gradient(ellipse 900px 750px at 14% 96%, rgba(0,194,168,0.14), rgba(0,194,168,0) 65%),
+      radial-gradient(ellipse 800px 650px at 94% 80%, rgba(255,111,165,0.14), rgba(255,111,165,0) 65%),
+      linear-gradient(180deg, #ffffff 0%, var(--bg-0) 30%, var(--bg-1) 100%);
     color:var(--ink);
+    overflow:hidden;
   }
 
-  /* fine scan grid overlay */
-  .grid-overlay{
+  .dot-overlay{
     position:absolute; inset:0;
-    background-image:
-      linear-gradient(rgba(139,47,224,0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(139,47,224,0.06) 1px, transparent 1px);
-    background-size: 40px 40px;
-    mix-blend-mode:screen;
-    pointer-events:none;
-  }
-  .noise-vignette{
-    position:absolute; inset:0;
-    box-shadow: inset 0 0 260px 90px rgba(0,0,0,0.75);
+    background-image: radial-gradient(rgba(124,58,237,0.14) 2.5px, transparent 2.5px);
+    background-size: 34px 34px;
+    mask-image: radial-gradient(ellipse 1200px 1600px at 50% 40%, black 0%, transparent 75%);
     pointer-events:none;
   }
 
-  /* top evidence strip */
+  /* top strip */
   .evidence-strip{
     position:relative;
     display:flex; justify-content:space-between; align-items:center;
-    padding:34px 60px;
+    padding:32px 60px;
     font-family:'Space Mono', monospace;
-    font-size:20px;
+    font-size:19px;
     letter-spacing:2px;
-    color:var(--glow-lime);
-    border-bottom:1px solid rgba(212,255,63,0.25);
-    background:linear-gradient(90deg, rgba(139,47,224,0.18), rgba(139,47,224,0) 60%);
+    color:var(--purple-deep);
+    border-bottom:2px solid var(--card-bd);
+    background:linear-gradient(90deg, rgba(182,232,37,0.16), rgba(182,232,37,0) 55%);
   }
   .evidence-strip .tag{
     color:var(--ink-dim);
     letter-spacing:3px;
+    font-weight:700;
   }
   .blink-dot{
-    display:inline-block; width:10px; height:10px; border-radius:50%;
-    background:var(--glow-lime); box-shadow:0 0 12px 4px rgba(212,255,63,0.8);
-    margin-right:10px; vertical-align:middle;
+    display:inline-block; width:11px; height:11px; border-radius:50%;
+    background:var(--lime-deep); box-shadow:0 0 0 5px rgba(182,232,37,0.35);
+    margin-right:12px; vertical-align:middle;
   }
 
   /* header */
   .header{
     text-align:center;
-    padding:70px 60px 10px;
+    padding:76px 60px 10px;
     position:relative;
   }
   .eyebrow{
+    display:inline-block;
     font-family:'Space Mono',monospace;
-    font-size:26px;
-    letter-spacing:14px;
-    color:var(--cyan);
-    text-shadow:0 0 18px rgba(75,227,255,0.85);
-    margin-bottom:26px;
+    font-size:24px;
+    letter-spacing:12px;
+    color:#fff;
+    background:linear-gradient(135deg, var(--purple), var(--pink));
+    padding:10px 30px;
+    border-radius:999px;
+    box-shadow:0 10px 24px rgba(124,58,237,0.30);
+    margin-bottom:34px;
   }
   .title{
     font-family:'Black Han Sans', sans-serif;
-    font-size:168px;
-    line-height:1.02;
-    color:#f4ffd6;
+    font-size:170px;
+    line-height:1.03;
+    color:var(--purple-deep);
     letter-spacing:2px;
     text-shadow:
-      0 0 12px rgba(244,255,214,0.9),
-      0 0 34px rgba(212,255,63,0.85),
-      0 0 70px rgba(166,230,0,0.65),
-      0 0 130px rgba(139,47,224,0.55);
+      6px 6px 0 var(--lime),
+      12px 12px 0 rgba(76,29,149,0.12);
   }
   .subtitle{
-    margin-top:22px;
+    margin-top:30px;
     font-family:'Space Mono',monospace;
-    font-size:30px;
-    letter-spacing:12px;
+    font-size:29px;
+    letter-spacing:11px;
     color:var(--ink-dim);
+    font-weight:700;
   }
   .tagline{
-    margin-top:34px;
-    font-size:34px;
+    margin-top:38px;
+    font-size:35px;
     font-weight:700;
     color:var(--ink);
   }
   .tagline span{
-    color:var(--glow-lime);
-    text-shadow:0 0 16px rgba(212,255,63,0.7);
+    color:var(--purple-deep);
+    background:linear-gradient(180deg, transparent 62%, var(--lime) 62%);
+    padding:0 6px;
+    font-weight:900;
   }
 
   /* fingerprint stage */
@@ -123,28 +125,28 @@
     position:relative;
     height:700px;
     display:flex; align-items:center; justify-content:center;
-    margin-top:10px;
+    margin-top:14px;
   }
   .fp-glow-bg{
     position:absolute;
-    width:640px; height:640px;
+    width:620px; height:620px;
     border-radius:50%;
-    background:radial-gradient(circle, rgba(212,255,63,0.20), rgba(139,47,224,0.28) 45%, rgba(139,47,224,0) 72%);
-    filter:blur(2px);
+    background:radial-gradient(circle, rgba(182,232,37,0.30), rgba(124,58,237,0.16) 45%, rgba(124,58,237,0) 72%);
   }
   .fp-ring{
     position:absolute;
     width:560px; height:560px;
     border-radius:50%;
-    border:1px dashed rgba(212,255,63,0.30);
+    border:2px dashed rgba(124,58,237,0.20);
   }
-  .fp-ring.r2{ width:700px; height:700px; border-color:rgba(75,227,255,0.18); }
+  .fp-ring.r2{ width:700px; height:700px; border-color:rgba(0,194,168,0.20); }
   .fp-corner{
     position:absolute;
     font-family:'Space Mono',monospace;
     font-size:18px;
     letter-spacing:3px;
-    color:rgba(233,228,255,0.55);
+    color:var(--ink-dim);
+    font-weight:700;
   }
   .fp-corner.tl{ top:60px; left:calc(50% - 330px); }
   .fp-corner.tr{ top:60px; right:calc(50% - 330px); text-align:right; }
@@ -154,7 +156,7 @@
   svg.fingerprint{
     position:relative;
     width:420px; height:520px;
-    filter: drop-shadow(0 0 6px rgba(212,255,63,0.95)) drop-shadow(0 0 26px rgba(166,230,0,0.75)) drop-shadow(0 0 60px rgba(139,47,224,0.6));
+    filter: drop-shadow(0 18px 26px rgba(76,29,149,0.28)) drop-shadow(0 4px 8px rgba(76,29,149,0.18));
   }
 
   /* steps */
@@ -166,35 +168,33 @@
   .step-card{
     flex:1;
     background:var(--card-bg);
-    border:1px solid var(--card-bd);
-    border-radius:18px;
+    border:2px solid var(--card-bd);
+    border-radius:22px;
     padding:38px 34px 42px;
     position:relative;
-    backdrop-filter:blur(2px);
+    box-shadow:0 16px 34px rgba(76,29,149,0.08);
   }
-  .step-card::before{
-    content:"";
-    position:absolute; inset:0;
-    border-radius:18px;
-    box-shadow:0 0 40px rgba(139,47,224,0.25) inset;
-    pointer-events:none;
-  }
+  .step-card:nth-child(1){ border-top:8px solid var(--purple); }
+  .step-card:nth-child(2){ border-top:8px solid var(--teal); }
+  .step-card:nth-child(3){ border-top:8px solid var(--pink); }
   .step-num{
     display:inline-flex; align-items:center; justify-content:center;
-    width:56px; height:56px;
+    width:58px; height:58px;
     border-radius:50%;
-    background:linear-gradient(135deg, var(--glow-lime), var(--cyan));
-    color:#150a2b;
+    background:linear-gradient(135deg, var(--purple), var(--pink));
+    color:#fff;
     font-family:'Space Mono',monospace;
     font-weight:700;
     font-size:26px;
-    box-shadow:0 0 22px rgba(212,255,63,0.7);
+    box-shadow:0 10px 18px rgba(124,58,237,0.35);
     margin-bottom:22px;
   }
+  .step-card:nth-child(2) .step-num{ background:linear-gradient(135deg, var(--teal), var(--lime-deep)); box-shadow:0 10px 18px rgba(0,194,168,0.35); }
+  .step-card:nth-child(3) .step-num{ background:linear-gradient(135deg, var(--pink), var(--purple)); box-shadow:0 10px 18px rgba(255,111,165,0.35); }
   .step-title{
     font-size:34px;
     font-weight:900;
-    color:#f4ffd6;
+    color:var(--ink);
     margin-bottom:14px;
     letter-spacing:-0.5px;
   }
@@ -208,32 +208,34 @@
   /* info panel */
   .info-panel{
     margin:64px 90px 0;
-    border:1px solid rgba(212,255,63,0.35);
-    border-radius:22px;
-    background:linear-gradient(135deg, rgba(139,47,224,0.16), rgba(75,227,255,0.06));
+    border:2px solid var(--card-bd);
+    border-radius:26px;
+    background:linear-gradient(135deg, rgba(124,58,237,0.06), rgba(0,194,168,0.05));
     padding:44px 56px;
     display:grid;
     grid-template-columns:repeat(4, 1fr);
     gap:28px;
     position:relative;
+    box-shadow:0 16px 34px rgba(76,29,149,0.06);
   }
   .info-panel .stamp{
     position:absolute;
     top:-26px; left:56px;
-    background:#0a0416;
-    padding:6px 22px;
+    background:linear-gradient(135deg, var(--purple), var(--pink));
+    color:#fff;
+    padding:8px 26px;
     font-family:'Space Mono',monospace;
     letter-spacing:6px;
-    font-size:20px;
-    color:var(--glow-lime);
-    border:1px solid rgba(212,255,63,0.5);
+    font-size:19px;
     border-radius:20px;
+    box-shadow:0 8px 18px rgba(124,58,237,0.30);
   }
   .info-item .label{
     font-family:'Space Mono',monospace;
     font-size:19px;
     letter-spacing:3px;
-    color:var(--cyan);
+    color:var(--teal);
+    font-weight:700;
     margin-bottom:10px;
   }
   .info-item .value{
@@ -242,7 +244,7 @@
     color:var(--ink);
   }
   .info-item .value.placeholder{
-    color:rgba(233,228,255,0.45);
+    color:#b3a8d6;
     font-weight:500;
     font-style:normal;
   }
@@ -257,7 +259,7 @@
   }
   .footer .note{
     font-size:19px;
-    color:rgba(233,228,255,0.4);
+    color:var(--ink-dim);
     max-width:820px;
     line-height:1.6;
   }
@@ -266,22 +268,20 @@
     opacity:0.85;
   }
   .barcode i{
-    display:block; width:4px; background:var(--glow-lime);
-    box-shadow:0 0 8px rgba(212,255,63,0.6);
+    display:block; width:4px; background:var(--purple);
   }
 
   /* scattered watermark fingerprints */
   .wm{
     position:absolute;
-    opacity:0.07;
-    filter:blur(0.3px);
+    opacity:0.10;
     pointer-events:none;
   }
 </style>
 </head>
 <body>
   <div class="poster" id="poster">
-    <div class="grid-overlay"></div>
+    <div class="dot-overlay"></div>
 
     <div class="evidence-strip">
       <span><span class="blink-dot"></span>CASE FILE // UV-FLUORESCENT LATENT PRINT</span>
@@ -303,17 +303,19 @@
       <div class="fp-corner tr">SAMPLE 01 ◥</div>
       <svg class="fingerprint" id="fpSvg" viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <radialGradient id="ringGradCore" cx="0.44" cy="0.40" r="0.050" gradientUnits="objectBoundingBox" spreadMethod="repeat">
+          <radialGradient id="ringGradCore" cx="132" cy="152" r="16" gradientUnits="userSpaceOnUse" spreadMethod="repeat">
             <stop offset="0" stop-color="black"/>
             <stop offset="0.34" stop-color="black"/>
             <stop offset="0.42" stop-color="white"/>
             <stop offset="1" stop-color="white"/>
           </radialGradient>
           <rect id="ringCoreRect" x="0" y="0" width="300" height="380" fill="url(#ringGradCore)"/>
-          <radialGradient id="deltaFade" cx="0.56" cy="0.86" r="0.30" gradientUnits="objectBoundingBox">
-            <stop offset="0" stop-color="white" stop-opacity="1"/>
-            <stop offset="1" stop-color="white" stop-opacity="0"/>
-          </radialGradient>
+          <linearGradient id="fpFill" x1="0.12" y1="0.02" x2="0.82" y2="0.92">
+            <stop offset="0" stop-color="#7c3aed"/>
+            <stop offset="0.38" stop-color="#7c3aed"/>
+            <stop offset="0.72" stop-color="#00c2a8"/>
+            <stop offset="1" stop-color="#b6e825"/>
+          </linearGradient>
           <filter id="fpFilter" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
             <feTurbulence type="fractalNoise" baseFrequency="0.010 0.013" numOctaves="3" seed="17" stitchTiles="stitch" result="warp"/>
             <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="4" result="microWarp"/>
@@ -326,17 +328,20 @@
               <feFuncB type="linear" slope="1.7" intercept="-0.32"/>
             </feComponentTransfer>
             <feColorMatrix in="ridgeContrast" type="matrix"
-              values="0 0 0 0 0.831
+              values="0 0 0 0 1
                       0 0 0 0 1
-                      0 0 0 0 0.247
+                      0 0 0 0 1
                       -1 -1 -1 0 1"/>
           </filter>
           <clipPath id="fpClip">
             <ellipse cx="150" cy="168" rx="110" ry="150"/>
           </clipPath>
+          <mask id="fpMask">
+            <rect x="0" y="0" width="300" height="380" filter="url(#fpFilter)"/>
+          </mask>
         </defs>
         <g clip-path="url(#fpClip)">
-          <rect x="0" y="0" width="300" height="380" filter="url(#fpFilter)"/>
+          <rect x="0" y="0" width="300" height="380" fill="url(#fpFill)" mask="url(#fpMask)"/>
         </g>
       </svg>
       <div class="fp-corner bl">◣ ANALYZE</div>
@@ -400,14 +405,14 @@
     });
   })();
 
-  // scattered watermark fingerprints (simple concentric arcs, reused shape)
+  // scattered watermark fingerprints (simple concentric rings, low opacity)
   (function(){
     const poster = document.getElementById('poster');
     const positions = [
-      {top:120, left:-60, size:260, rot:-12},
-      {top:900, left:1340, size:320, rot:18},
-      {top:1750, left:-80, size:300, rot:8},
-      {top:60, left:1200, size:200, rot:-20}
+      {top:120, left:-60, size:260, rot:-12, color:'#7c3aed'},
+      {top:900, left:1340, size:320, rot:18, color:'#00c2a8'},
+      {top:1750, left:-80, size:300, rot:8, color:'#ff6fa5'},
+      {top:60, left:1200, size:200, rot:-20, color:'#b6e825'}
     ];
     positions.forEach(pos=>{
       const div = document.createElement('div');
@@ -417,7 +422,7 @@
       div.style.width = pos.size+'px';
       div.style.transform = `rotate(${pos.rot}deg)`;
       div.innerHTML = `<svg viewBox="0 0 200 260" width="${pos.size}" xmlns="http://www.w3.org/2000/svg">
-        <g fill="none" stroke="#d4ff3f" stroke-width="3" stroke-linecap="round">
+        <g fill="none" stroke="${pos.color}" stroke-width="3" stroke-linecap="round">
           ${Array.from({length:9}).map((_,i)=>{
             const rx = 10 + i*10;
             const ry = rx*1.18;
