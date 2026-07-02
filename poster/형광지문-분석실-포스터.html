@@ -301,8 +301,43 @@
       <div class="fp-ring"></div>
       <div class="fp-corner tl">◤ LATENT PRINT</div>
       <div class="fp-corner tr">SAMPLE 01 ◥</div>
-      <svg class="fingerprint" id="fpSvg" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
-        <g id="fpGroup" fill="none" stroke="#e8ffb0" stroke-linecap="round"></g>
+      <svg class="fingerprint" id="fpSvg" viewBox="0 0 300 380" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="ringGradCore" cx="0.44" cy="0.40" r="0.050" gradientUnits="objectBoundingBox" spreadMethod="repeat">
+            <stop offset="0" stop-color="black"/>
+            <stop offset="0.34" stop-color="black"/>
+            <stop offset="0.42" stop-color="white"/>
+            <stop offset="1" stop-color="white"/>
+          </radialGradient>
+          <rect id="ringCoreRect" x="0" y="0" width="300" height="380" fill="url(#ringGradCore)"/>
+          <radialGradient id="deltaFade" cx="0.56" cy="0.86" r="0.30" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="white" stop-opacity="1"/>
+            <stop offset="1" stop-color="white" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="fpFilter" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.010 0.013" numOctaves="3" seed="17" stitchTiles="stitch" result="warp"/>
+            <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="4" result="microWarp"/>
+            <feImage href="#ringCoreRect" result="ringCore"/>
+            <feDisplacementMap in="ringCore" in2="warp" scale="8" xChannelSelector="R" yChannelSelector="G" result="ringsWarped"/>
+            <feDisplacementMap in="ringsWarped" in2="microWarp" scale="2" xChannelSelector="R" yChannelSelector="G" result="ringsWarped2"/>
+            <feComponentTransfer in="ringsWarped2" result="ridgeContrast">
+              <feFuncR type="linear" slope="1.7" intercept="-0.32"/>
+              <feFuncG type="linear" slope="1.7" intercept="-0.32"/>
+              <feFuncB type="linear" slope="1.7" intercept="-0.32"/>
+            </feComponentTransfer>
+            <feColorMatrix in="ridgeContrast" type="matrix"
+              values="0 0 0 0 0.831
+                      0 0 0 0 1
+                      0 0 0 0 0.247
+                      -1 -1 -1 0 1"/>
+          </filter>
+          <clipPath id="fpClip">
+            <ellipse cx="150" cy="168" rx="110" ry="150"/>
+          </clipPath>
+        </defs>
+        <g clip-path="url(#fpClip)">
+          <rect x="0" y="0" width="300" height="380" filter="url(#fpFilter)"/>
+        </g>
       </svg>
       <div class="fp-corner bl">◣ ANALYZE</div>
       <div class="fp-corner br">MATCH: -- ◢</div>
@@ -353,57 +388,6 @@
   </div>
 
 <script>
-  // build a glowing fingerprint from concentric egg-shaped ridge rings with natural gaps
-  function eggPath(cx, cy, rx, ry, taper){
-    const topRx = rx * (1 - taper*0.4);
-    const botRx = rx * (1 - taper*0.05);
-    return [
-      `M ${cx} ${(cy-ry).toFixed(2)}`,
-      `C ${(cx+topRx).toFixed(2)} ${(cy-ry).toFixed(2)} ${(cx+rx).toFixed(2)} ${(cy-ry*0.42).toFixed(2)} ${(cx+rx).toFixed(2)} ${cy.toFixed(2)}`,
-      `C ${(cx+rx).toFixed(2)} ${(cy+ry*0.58).toFixed(2)} ${(cx+botRx).toFixed(2)} ${(cy+ry).toFixed(2)} ${cx} ${(cy+ry).toFixed(2)}`,
-      `C ${(cx-botRx).toFixed(2)} ${(cy+ry).toFixed(2)} ${(cx-rx).toFixed(2)} ${(cy+ry*0.58).toFixed(2)} ${(cx-rx).toFixed(2)} ${cy.toFixed(2)}`,
-      `C ${(cx-rx).toFixed(2)} ${(cy-ry*0.42).toFixed(2)} ${(cx-topRx).toFixed(2)} ${(cy-ry).toFixed(2)} ${cx} ${(cy-ry).toFixed(2)}`,
-      "Z"
-    ].join(" ");
-  }
-  (function(){
-    const group = document.getElementById('fpGroup');
-    const cx = 100, cy = 132;
-    const n = 20;
-    const dashSets = ["54 9 30 12 46 8","38 11 58 7 26 13","44 8 24 10 62 9 20 12","30 14 50 8 34 11"];
-    for(let i=0;i<n;i++){
-      const t = i/(n-1);
-      const rx = 11 + t*84;
-      const ry = rx * (1.16 + 0.04*Math.sin(i*1.3));
-      const jx = cx + 3*Math.sin(i*0.8);
-      const jy = cy + 2.4*Math.cos(i*1.1);
-      const taper = 0.16 + 0.09*Math.sin(i*0.5+1);
-      const p = document.createElementNS("http://www.w3.org/2000/svg","path");
-      p.setAttribute("d", eggPath(jx, jy, rx, ry, taper));
-      p.setAttribute("stroke-width", (1.3 + t*2.2).toFixed(2));
-      p.setAttribute("stroke-dasharray", dashSets[i % dashSets.length]);
-      p.setAttribute("stroke-dashoffset", ((i*29) % 97).toString());
-      const op = 0.4 + 0.5 * Math.sin(t*Math.PI*0.85 + 0.3);
-      p.setAttribute("stroke-opacity", Math.max(0.35, Math.min(0.95, op)).toFixed(2));
-      group.appendChild(p);
-    }
-    // tight core spiral
-    for(let i=0;i<3;i++){
-      const p = document.createElementNS("http://www.w3.org/2000/svg","path");
-      const r = 4 + i*3.4;
-      p.setAttribute("d", eggPath(cx+1.5, cy-2, r, r*1.15, 0.2));
-      p.setAttribute("stroke-width","1.6");
-      p.setAttribute("stroke-opacity","0.9");
-      group.appendChild(p);
-    }
-    // delta triangle mark near lower-right, a classic fingerprint landmark
-    const delta = document.createElementNS("http://www.w3.org/2000/svg","path");
-    delta.setAttribute("d","M 150 190 L 162 202 L 140 206 Z");
-    delta.setAttribute("stroke-width","2");
-    delta.setAttribute("stroke-opacity","0.75");
-    group.appendChild(delta);
-  })();
-
   // barcode
   (function(){
     const bc = document.getElementById('barcode');
