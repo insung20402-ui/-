@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>CSI EXPERIENCE - 형광지문 분석실</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Oswald:wght@400;500;600&display=swap');
+
+  :root{
+    --neon: #d4f24a;
+    --neon-glow: rgba(212, 242, 74, 0.65);
+    --purple-deep: #120a1f;
+    --purple-mid: #241537;
+    --panel: rgba(157, 92, 255, 0.08);
+    --panel-border: rgba(184, 148, 255, 0.35);
+    --text-dim: #a99fc2;
+    --text-bright: #f2eefc;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  body{
+    font-family: 'Noto Sans KR', sans-serif;
+    background: radial-gradient(circle at 50% 15%, #2a1745 0%, #180d29 45%, #0c0714 100%);
+    display:flex;
+    justify-content:center;
+    padding: 40px 16px;
+  }
+
+  .poster{
+    position: relative;
+    width: 860px;
+    max-width: 100%;
+    background: radial-gradient(circle at 50% 20%, #2c1a48 0%, #180e29 55%, #0a0512 100%);
+    border: 1px solid rgba(184,148,255,0.25);
+    border-radius: 6px;
+    overflow: hidden;
+    color: var(--text-bright);
+    padding: 28px 44px 40px;
+  }
+
+  .poster::before, .poster::after{
+    content:"";
+    position:absolute;
+    width: 340px; height: 340px;
+    border-radius: 50%;
+    border: 1px solid rgba(184,148,255,0.15);
+    box-shadow: 0 0 0 40px rgba(184,148,255,0.04) inset;
+    opacity: 0.5;
+  }
+  .poster::before{ top:-120px; left:-140px; }
+  .poster::after{ bottom:60px; right:-160px; }
+
+  header{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family:'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(184,148,255,0.25);
+  }
+  header .case-file{ color: var(--neon); display:flex; align-items:center; gap:6px; }
+  header .case-file::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--neon); box-shadow:0 0 8px var(--neon-glow); }
+
+  .titles{
+    text-align:center;
+    margin-top: 34px;
+    position: relative;
+    z-index: 2;
+  }
+  .kicker{
+    font-family:'Oswald', sans-serif;
+    letter-spacing: 6px;
+    font-size: 14px;
+    color: #d9c8ff;
+    margin-bottom: 14px;
+  }
+  h1{
+    font-size: 56px;
+    line-height: 1.15;
+    font-weight: 900;
+    color: var(--neon);
+    text-shadow: 0 0 12px var(--neon-glow), 0 0 40px rgba(212,242,74,0.35);
+  }
+  .sub{
+    font-family:'Oswald', sans-serif;
+    letter-spacing: 5px;
+    font-size: 14px;
+    color: #cdbdf0;
+    margin-top: 16px;
+  }
+  .tagline{
+    margin-top: 14px;
+    font-size: 15px;
+    color: var(--text-bright);
+  }
+  .tagline b{ color: var(--neon); }
+
+  .print-stage{
+    position: relative;
+    margin: 30px auto 10px;
+    width: 420px;
+    height: 380px;
+  }
+  .print-stage .tag{
+    position:absolute;
+    font-family:'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+  }
+  .print-stage .tl{ top:0; left:0; }
+  .print-stage .tr{ top:0; right:0; }
+  .print-stage .bl{ bottom:0; left:0; }
+  .print-stage .br{ bottom:0; right:0; }
+
+  .fingerprint-wrap{
+    position:absolute;
+    top:50%; left:50%;
+    transform: translate(-50%,-50%);
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,242,74,0.18) 0%, rgba(120,60,200,0.12) 55%, transparent 75%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fingerprint-wrap svg{
+    filter: drop-shadow(0 0 10px var(--neon-glow)) drop-shadow(0 0 26px rgba(212,242,74,0.4));
+  }
+
+  .steps{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 26px;
+  }
+  .step{
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .step .num{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(212,242,74,0.15);
+    border: 1px solid var(--neon);
+    color: var(--neon);
+    font-family:'Oswald', sans-serif;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  .step h3{
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--text-bright);
+  }
+  .step p{
+    font-size: 13px;
+    line-height: 1.55;
+    color: #eae6f5; /* brightened from dim purple-gray for readability */
+  }
+
+  .event-info{
+    margin-top: 22px;
+    background: rgba(157,92,255,0.06);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 20px 26px;
+  }
+  .event-info .badge{
+    display:inline-block;
+    font-family:'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--neon);
+    border: 1px solid var(--neon);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 16px;
+  }
+  .event-info .grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .event-info .item .label{
+    font-family:'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #b9a6ff;
+    margin-bottom: 6px;
+  }
+  .event-info .item .label span{ color: var(--neon); margin-right:4px; }
+  .event-info .item .value{
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-bright);
+  }
+
+  .waveform{
+    display:flex;
+    justify-content:flex-end;
+    align-items:flex-end;
+    gap: 3px;
+    height: 26px;
+    margin-top: 26px;
+  }
+  .waveform span{
+    display:block;
+    width: 3px;
+    background: var(--neon);
+    box-shadow: 0 0 6px var(--neon-glow);
+  }
+</style>
+</head>
+<body>
+  <div class="poster">
+    <header>
+      <div class="case-file">CASE FILE // UV-FLUORESCENT LATENT PRINT</div>
+      <div>SCIENCE LAB · FORENSIC EXPERIENCE</div>
+    </header>
+
+    <div class="titles">
+      <div class="kicker">CSI EXPERIENCE</div>
+      <h1>형광지문<br>분석실</h1>
+      <div class="sub">FLUORESCENT FINGERPRINT LAB</div>
+      <div class="tagline">보이지 않는 흔적, <b>UV 빛</b>으로 찾아낸다</div>
+    </div>
+
+    <div class="print-stage">
+      <div class="tag tl">◤ LATENT PRINT</div>
+      <div class="tag tr">SAMPLE 01 ◥</div>
+      <div class="fingerprint-wrap">
+        <svg width="220" height="220" viewBox="0 0 220 220" fill="none">
+          <g stroke="#d4f24a" stroke-width="3" fill="none" stroke-linecap="round">
+            <path d="M110 30 C60 30 30 70 30 115 C30 165 65 195 110 195" />
+            <path d="M110 45 C72 45 48 78 48 115 C48 155 76 182 112 182" />
+            <path d="M112 60 C82 60 64 86 64 116 C64 148 86 168 114 168" />
+            <path d="M114 75 C92 75 80 94 80 117 C80 141 96 155 116 155" />
+            <path d="M116 90 C100 90 94 102 94 118 C94 134 104 143 118 143" />
+            <path d="M110 30 C150 32 175 62 178 100" />
+            <path d="M110 45 C142 47 162 70 165 100" />
+            <path d="M112 60 C136 62 150 80 152 102" />
+          </g>
+        </svg>
+      </div>
+      <div class="tag bl">◣ ANALYZE</div>
+      <div class="tag br">MATCH: -- ◢</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>형광 파우더 도포</h3>
+        <p>지문이 남아있을 만한 곳에 특수 형광 파우더를 살짝 뿌려 보아요.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>UV 라이트 조사</h3>
+        <p>자외선(UV) 손전등을 비추면 숨어있던 지문이 밝게 빛나며 나타나요.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>나만의 지문 카드</h3>
+        <p>채취한 지문을 관찰하고 기록하여 나만의 분석 카드를 완성해요.</p>
+      </div>
+    </div>
+
+    <div class="event-info">
+      <span class="badge">EVENT INFO</span>
+      <div class="grid">
+        <div class="item">
+          <div class="label"><span>일시</span>DATE</div>
+          <div class="value">10월 23일(금) ~ 10월 24일(토)</div>
+        </div>
+        <div class="item">
+          <div class="label"><span>대상</span>WHO</div>
+          <div class="value">전학년</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="waveform">
+      <span style="height:8px"></span><span style="height:16px"></span><span style="height:24px"></span>
+      <span style="height:12px"></span><span style="height:20px"></span><span style="height:26px"></span>
+      <span style="height:10px"></span><span style="height:18px"></span><span style="height:22px"></span>
+      <span style="height:14px"></span>
+    </div>
+  </div>
+</body>
+</html>
