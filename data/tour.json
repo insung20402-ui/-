@@ -1,0 +1,53 @@
+{
+  "school": "만수중학교",
+  "title": "만수중학교 학교 소개",
+  "floors": [
+    {
+      "id": "1f",
+      "label": "1층",
+      "locations": [
+        {
+          "id": "principal-office",
+          "name": "교장실",
+          "description": "학교를 대표하는 공간으로, 손님을 맞이하는 응접 공간과 회의 테이블이 마련되어 있습니다.",
+          "video": "videos/principal-office.mp4",
+          "thumbnail": "images/thumbnails/principal-office.jpg"
+        },
+        {
+          "id": "health-room",
+          "name": "보건실",
+          "description": "학생들의 건강을 관리하고 돌보는 공간입니다.",
+          "video": "videos/health-room.mp4",
+          "thumbnail": "images/thumbnails/health-room.jpg"
+        }
+      ]
+    },
+    {
+      "id": "2f",
+      "label": "2층",
+      "locations": [
+        {
+          "id": "science-room",
+          "name": "과학실",
+          "description": "실험 기구와 실습대가 마련된 과학 수업 전용 공간입니다.",
+          "video": "videos/science-room.mp4",
+          "thumbnail": "images/thumbnails/science-room.jpg"
+        },
+        {
+          "id": "library-broadcast",
+          "name": "도서관 · 방송실",
+          "description": "도서관과 이어진 방송·학습 공간으로, 다양한 활동이 이루어집니다.",
+          "video": "videos/library-broadcast.mp4",
+          "thumbnail": "images/thumbnails/library-broadcast.jpg"
+        },
+        {
+          "id": "library-stacks",
+          "name": "도서관",
+          "description": "다양한 도서가 비치되어 있는 학생들의 독서 공간입니다.",
+          "video": "videos/library-stacks.mp4",
+          "thumbnail": "images/thumbnails/library-stacks.jpg"
+        }
+      ]
+    }
+  ]
+}

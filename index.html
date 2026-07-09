@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>만수중학교 학교 소개</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <p class="eyebrow">SCHOOL TOUR</p>
+    <h1>만수중학교 학교 소개</h1>
+    <p class="subtitle">층별 공간을 둘러보며 만수중학교를 만나보세요.</p>
+  </div>
+</header>
+
+<main>
+  <nav class="floor-tabs" id="floor-tabs" aria-label="층 선택"></nav>
+
+  <section class="floor-panels" id="floor-panels"></section>
+</main>
+
+<div class="video-modal" id="video-modal" hidden>
+  <div class="video-modal-backdrop" data-close></div>
+  <div class="video-modal-content">
+    <button class="video-modal-close" data-close aria-label="닫기">&times;</button>
+    <video id="video-player" controls playsinline></video>
+    <div class="video-modal-info">
+      <h2 id="video-title"></h2>
+      <p id="video-description"></p>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>만수중학교 &middot; 학교 소개 네비게이션</p>
+</footer>
+
+<script src="assets/js/app.js"></script>
+</body>
+</html>

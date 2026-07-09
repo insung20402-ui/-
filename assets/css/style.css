@@ -1,0 +1,244 @@
+:root {
+  --color-bg: #f5f7f6;
+  --color-surface: #ffffff;
+  --color-primary: #1f6f4f;
+  --color-primary-dark: #14503a;
+  --color-accent: #e8b23d;
+  --color-text: #1c2420;
+  --color-text-muted: #5f6b66;
+  --color-border: #e1e6e3;
+  --radius: 14px;
+  --shadow: 0 6px 20px rgba(20, 40, 30, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.site-header {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  padding: 48px 20px 40px;
+  text-align: center;
+}
+
+.header-inner { max-width: 720px; margin: 0 auto; }
+
+.eyebrow {
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin: 0 0 8px;
+}
+
+.site-header h1 {
+  margin: 0 0 10px;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+.subtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 16px 60px;
+}
+
+.floor-tabs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.floor-tab {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.floor-tab:hover { border-color: var(--color-primary); }
+
+.floor-tab.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.floor-panel { display: none; }
+.floor-panel.active { display: block; }
+
+.location-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.location-card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-align: left;
+  padding: 0;
+}
+
+.location-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(20, 40, 30, 0.14);
+}
+
+.card-thumb {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: #dde3df;
+  overflow: hidden;
+}
+
+.card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.play-badge {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-badge::after {
+  content: "";
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(20, 30, 25, 0.55);
+  background-image: linear-gradient(rgba(20,30,25,0.35), rgba(20,30,25,0.35));
+}
+
+.play-badge::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px 0 10px 16px;
+  border-color: transparent transparent transparent #ffffff;
+  z-index: 1;
+  margin-left: 4px;
+}
+
+.card-body {
+  padding: 14px 16px 16px;
+}
+
+.card-body h3 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+}
+
+.card-body p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.video-modal[hidden] { display: none; }
+
+.video-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 15, 12, 0.75);
+}
+
+.video-modal-content {
+  position: relative;
+  background: #000;
+  border-radius: var(--radius);
+  overflow: hidden;
+  max-width: 420px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#video-player {
+  width: 100%;
+  max-height: 70vh;
+  display: block;
+  background: #000;
+}
+
+.video-modal-info {
+  background: var(--color-surface);
+  padding: 14px 18px 18px;
+}
+
+.video-modal-info h2 {
+  margin: 0 0 6px;
+  font-size: 1.1rem;
+}
+
+.video-modal-info p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.site-footer {
+  text-align: center;
+  padding: 20px;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+}
