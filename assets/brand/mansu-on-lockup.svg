@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 100" width="360" height="100" role="img" aria-label="MANSU-ON logo">
+  <title>MANSU-ON Logo</title>
+  <defs>
+    <linearGradient id="mansuon-bg-lockup" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#123B7A"/>
+      <stop offset="100%" stop-color="#1E6FE0"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="92" height="92" rx="20" fill="url(#mansuon-bg-lockup)"/>
+  <path d="M20,76 L20,26 L48,54 L84,14"
+        fill="none" stroke="#FFFFFF" stroke-width="10"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="86" cy="14" r="5" fill="#BEE2FF"/>
+  <text x="114" y="60" font-family="'Pretendard','Segoe UI',Arial,sans-serif" font-weight="700" font-size="40" letter-spacing="0.5" fill="#123B7A">MANSU<tspan fill="#1E6FE0">-ON</tspan></text>
+</svg>
