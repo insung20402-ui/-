@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="MANSU-ON symbol mark, solid version for small sizes">
+  <title>MANSU-ON Symbol Mark (Solid, for favicon/app icon)</title>
+  <polygon points="96,50 73,10 27,10 4,50 27,90 73,90" fill="#123B7A"/>
+  <path d="M28,70 L28,30 L50,52 L72,26"
+        fill="none" stroke="#FFFFFF" stroke-width="9"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="72" cy="26" r="5.5" fill="#BEE2FF"/>
+</svg>
