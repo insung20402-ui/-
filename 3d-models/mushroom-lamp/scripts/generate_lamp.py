@@ -147,21 +147,50 @@ def make_fern_leaf(length=42.0, width=9.0, thickness=1.6, curve=20.0):
     return mesh
 
 
+def make_fern_frond(length=42.0, n_pairs=7, leaflet_len=11.0, thickness=1.4, curve=18.0):
+    """A real pinnate fern frond: a thin curved rachis (central stalk) with
+    small tapered leaflets branching off in mirrored pairs, matching the
+    feathery fern fronds in the reference sculpt (not a single solid blade)."""
+    rachis = make_fern_leaf(length=length, width=2.0, thickness=thickness, curve=curve)
+    parts = [rachis]
+
+    ts = np.linspace(0.14, 0.96, n_pairs)
+    for t in ts:
+        size = np.sin(np.pi * np.clip((t - 0.04) / 0.96, 0.0, 1.0)) ** 0.7
+        llen = leaflet_len * (0.30 + 0.70 * size)
+        z = t * length
+        y = curve * t ** 1.6
+        elev_deg = 85.0 - 45.0 * t  # near-horizontal at the base, upright near the tip
+
+        for side in (-1.0, 1.0):
+            leaflet = make_fern_leaf(length=llen, width=llen * 0.30,
+                                      thickness=thickness * 0.85, curve=llen * 0.22)
+            # tip points +Z by default -> tip out to the side, tilted per `elev_deg`
+            leaflet.apply_transform(
+                trimesh.transformations.rotation_matrix(side * np.radians(elev_deg), [0, 1, 0])
+            )
+            leaflet.apply_translation([0, y, z])
+            parts.append(leaflet)
+
+    return trimesh.util.concatenate(parts)
+
+
 def make_fern_clump(n_leaves=6, base_length=40.0, spread_deg=130.0, seed=0):
-    """A small fan of fern leaves sprouting from one point, like the ferns
-    tucked around the mushrooms in the reference video."""
+    """A small fan of pinnate fern fronds sprouting from one point, like the
+    ferns tucked around the mushrooms in the reference sculpt."""
     rng = np.random.default_rng(seed)
     angles = np.linspace(-spread_deg / 2.0, spread_deg / 2.0, n_leaves)
-    leaves = []
+    fronds = []
     for ang in angles:
         frac = 1.0 - 0.30 * (abs(ang) / (spread_deg / 2.0))
         length = base_length * frac * rng.uniform(0.9, 1.08)
-        width = 8.5 * frac
         curve = 16.0 + 8.0 * rng.uniform(0.0, 1.0)
-        leaf = make_fern_leaf(length=length, width=width, thickness=1.6, curve=curve)
-        leaf.apply_transform(trimesh.transformations.rotation_matrix(np.radians(ang), [0, 0, 1]))
-        leaves.append(leaf)
-    return trimesh.util.concatenate(leaves)
+        n_pairs = int(round(5 + 3 * frac))
+        frond = make_fern_frond(length=length, n_pairs=n_pairs,
+                                 leaflet_len=length * 0.24, curve=curve)
+        frond.apply_transform(trimesh.transformations.rotation_matrix(np.radians(ang), [0, 0, 1]))
+        fronds.append(frond)
+    return trimesh.util.concatenate(fronds)
 
 
 def make_base(radius=105.0, height=26.0, flat_r=58.0,
