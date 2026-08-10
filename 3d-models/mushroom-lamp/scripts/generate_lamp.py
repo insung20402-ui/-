@@ -227,15 +227,25 @@ def make_base(radius=105.0, height=26.0, flat_r=58.0,
     small.apply_translation(small_pos)
     stone = stone.union(small, engine="manifold")
 
-    # ferns tucked around the mushrooms (matching the reference video)
-    fern_specs = [
-        # (x, y, z, rotation_deg, scale, n_leaves)
-        (socket_r + 34.0, socket_r + 10.0, socket_z * 0.7, 35.0, 1.0, 7),
-        (-(socket_r + 20.0), -(socket_r + 30.0), socket_z * 0.55, 200.0, 0.85, 6),
-        (small_pos[0] - 22.0, small_pos[1] + 14.0, socket_z * 0.4, 300.0, 0.6, 5),
+    # ferns wrapped most of the way around the stem, matching the reference
+    # sculpt's full fern coverage (not just a couple of accents)
+    fern_ring = [
+        # (angle_deg, radius, z_frac, scale, n_leaves)
+        (10.0, 60.0, 0.55, 1.15, 8),
+        (55.0, 66.0, 0.30, 0.70, 6),
+        (95.0, 62.0, 0.45, 0.90, 7),
+        (150.0, 57.0, 0.40, 0.95, 7),   # flanks the small mushroom
+        (185.0, 63.0, 0.60, 0.65, 5),
+        (230.0, 60.0, 0.35, 1.00, 8),
+        (275.0, 65.0, 0.55, 0.75, 6),
+        (320.0, 58.0, 0.45, 1.05, 8),
     ]
     ferns = []
-    for i, (x, y, z, rot, scale, n_leaves) in enumerate(fern_specs):
+    for i, (angle_deg, fr, z_frac, scale, n_leaves) in enumerate(fern_ring):
+        ang = np.radians(angle_deg)
+        x, y = fr * np.cos(ang), fr * np.sin(ang)
+        z = socket_z * z_frac
+        rot = angle_deg - 90.0  # fan opens radially outward from the stem
         fern = make_fern_clump(n_leaves=n_leaves, base_length=40.0 * scale, seed=i + 1)
         fern.apply_transform(trimesh.transformations.rotation_matrix(np.radians(rot), [0, 0, 1]))
         fern.apply_translation([x, y, z])
