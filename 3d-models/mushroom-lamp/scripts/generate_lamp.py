@@ -18,6 +18,7 @@ import os
 
 import numpy as np
 import trimesh
+from shapely.geometry import Polygon
 from trimesh.creation import revolve
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -122,6 +123,47 @@ def make_small_mushroom(scale=0.42, z_offset=0.0):
     return mesh
 
 
+def make_fern_leaf(length=42.0, width=9.0, thickness=1.6, curve=20.0):
+    """A single thin, pointed fern-frond blade standing on the XY plane,
+    tip at +Z, gently arced sideways (+Y) as it rises."""
+    n = 16
+    t = np.linspace(0.0, 1.0, n)[1:-1]  # drop the two zero-width endpoints
+    half_w = (width / 2.0) * np.clip(4 * t * (1 - t), 0.0, None)
+    xs = t * length
+    top = [(0.0, 0.0)] + list(zip(xs, half_w)) + [(length, 0.0)]
+    bottom = list(zip(xs[::-1], -half_w[::-1]))
+    poly = Polygon(top + bottom)
+
+    mesh = trimesh.creation.extrude_polygon(poly, height=thickness)
+    mesh.apply_translation([0, 0, -thickness / 2.0])
+    # stand the blade up: length axis (was X) becomes +Z
+    mesh.apply_transform(trimesh.transformations.rotation_matrix(-np.pi / 2, [0, 1, 0]))
+
+    verts = mesh.vertices.copy()
+    zt = np.clip(verts[:, 2] / length, 0.0, 1.0)
+    verts[:, 1] += curve * zt ** 1.6  # arch sideways toward the tip
+    mesh.vertices = verts
+    mesh.fix_normals()
+    return mesh
+
+
+def make_fern_clump(n_leaves=6, base_length=40.0, spread_deg=130.0, seed=0):
+    """A small fan of fern leaves sprouting from one point, like the ferns
+    tucked around the mushrooms in the reference video."""
+    rng = np.random.default_rng(seed)
+    angles = np.linspace(-spread_deg / 2.0, spread_deg / 2.0, n_leaves)
+    leaves = []
+    for ang in angles:
+        frac = 1.0 - 0.30 * (abs(ang) / (spread_deg / 2.0))
+        length = base_length * frac * rng.uniform(0.9, 1.08)
+        width = 8.5 * frac
+        curve = 16.0 + 8.0 * rng.uniform(0.0, 1.0)
+        leaf = make_fern_leaf(length=length, width=width, thickness=1.6, curve=curve)
+        leaf.apply_transform(trimesh.transformations.rotation_matrix(np.radians(ang), [0, 0, 1]))
+        leaves.append(leaf)
+    return trimesh.util.concatenate(leaves)
+
+
 def make_base(radius=105.0, height=26.0, flat_r=58.0,
               socket_r=20.6, socket_depth=18.0,
               cavity_r=42.0, floor_thickness=3.5,
@@ -181,8 +223,25 @@ def make_base(radius=105.0, height=26.0, flat_r=58.0,
 
     # small secondary mushroom fused onto the stone, off to one side
     small = make_small_mushroom(scale=0.6)
-    small.apply_translation([-radius * 0.68, radius * 0.35, socket_z * 0.45])
+    small_pos = np.array([-radius * 0.68, radius * 0.35, socket_z * 0.45])
+    small.apply_translation(small_pos)
     stone = stone.union(small, engine="manifold")
+
+    # ferns tucked around the mushrooms (matching the reference video)
+    fern_specs = [
+        # (x, y, z, rotation_deg, scale, n_leaves)
+        (socket_r + 34.0, socket_r + 10.0, socket_z * 0.7, 35.0, 1.0, 7),
+        (-(socket_r + 20.0), -(socket_r + 30.0), socket_z * 0.55, 200.0, 0.85, 6),
+        (small_pos[0] - 22.0, small_pos[1] + 14.0, socket_z * 0.4, 300.0, 0.6, 5),
+    ]
+    ferns = []
+    for i, (x, y, z, rot, scale, n_leaves) in enumerate(fern_specs):
+        fern = make_fern_clump(n_leaves=n_leaves, base_length=40.0 * scale, seed=i + 1)
+        fern.apply_transform(trimesh.transformations.rotation_matrix(np.radians(rot), [0, 0, 1]))
+        fern.apply_translation([x, y, z])
+        ferns.append(fern)
+    all_ferns = trimesh.util.concatenate(ferns)
+    stone = stone.union(all_ferns, engine="manifold")
 
     stone.fix_normals()
     return stone
