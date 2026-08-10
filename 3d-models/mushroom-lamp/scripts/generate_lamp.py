@@ -251,24 +251,24 @@ def make_moss_bumps(count, r_min, r_max, surface_h, seed=0,
     return trimesh.util.concatenate(bumps)
 
 
-def make_base(radius=105.0, height=26.0, flat_r=58.0,
-              socket_r=20.6, socket_depth=18.0,
-              cavity_r=42.0, floor_thickness=3.5,
-              cable_hole_r=4.0):
-    """Rounded river-stone base plate.
-    - flat underside (radius `flat_r`) so it sits on a table
-    - gently domed / rounded top and edge (organic stone look)
-    - socket boss on top that the shade's stem plugs into (friction fit)
-    - internal cavity accessed from underneath for the LED driver / battery,
-      surrounded by a solid `flat_r - cavity_r` wide standing rim so the
-      base still sits flat and rigid on the table
-    - small cable-exit hole through the standing rim
+def make_organic_stone(radius, height, flat_r, seed=3, n_theta=200, n_z=60):
+    """A layered, jagged rock-slab silhouette (like the reference sculpt's
+    chipped sedimentary-rock base) instead of a plain circle of revolution.
+
+    Same overall nominal profile as a plain axisymmetric pebble (flat
+    underside, rounded/domed top), but the radius at every height is
+    additionally scaled by:
+      - a gentle low-frequency "blob" wobble (organic, non-circular outline)
+      - a stronger high-frequency jitter that is banded in Z (each band gets
+        its own random phase/offset -> reads as stacked, irregular rock
+        layers), faded out near the centre/apex so the top where the
+        mushrooms and moss sit stays smooth.
     """
-    top_r = radius            # widest point of the pebble, at socket_z
-    socket_z = height * 0.62  # top surface height where the boss sits
+    top_r = radius
+    socket_z = height * 0.62
     apex_z = height * 1.04
 
-    outer = [
+    ctrl = np.array([
         (0.0, 0.0),
         (flat_r, 0.0),
         (radius * 0.92, socket_z * 0.55),
@@ -276,9 +276,94 @@ def make_base(radius=105.0, height=26.0, flat_r=58.0,
         (radius * 0.90, socket_z + (apex_z - socket_z) * 0.45),
         (radius * 0.55, apex_z * 0.97),
         (0.0, apex_z),
-    ]
-    stone = revolve(np.array(outer), sections=SECTIONS)
-    stone.merge_vertices()
+    ])
+    seg_len = np.linalg.norm(np.diff(ctrl, axis=0), axis=1)
+    cum = np.concatenate([[0.0], np.cumsum(seg_len)])
+    cum /= cum[-1]
+    t = np.linspace(0.0, 1.0, n_z)
+    r_nom = np.interp(t, cum, ctrl[:, 0])
+    z_nom = np.interp(t, cum, ctrl[:, 1])
+
+    theta = np.linspace(0.0, 2 * np.pi, n_theta, endpoint=False)
+    rng = np.random.default_rng(seed)
+
+    def fractal_noise(rng, n_harm, k_range, total_amp):
+        """Sum of many random-frequency/phase harmonics, decaying with k, so
+        the outline reads as organic/irregular rather than a repeating
+        flower/gear shape."""
+        ks = rng.integers(k_range[0], k_range[1], n_harm)
+        phases = rng.uniform(0, 2 * np.pi, n_harm)
+        weights = 1.0 / ks ** 0.8
+        weights = weights / weights.sum() * total_amp
+        s = np.zeros_like(theta)
+        for k, ph, w in zip(ks, phases, weights):
+            s = s + w * np.cos(k * theta + ph)
+        return s
+
+    # gentle organic blob outline (applies at every height) -- many random
+    # low/mid harmonics, small total amplitude, so it wobbles rather than
+    # forms a clean repeating star
+    blob = 1.0 + fractal_noise(rng, n_harm=9, k_range=(2, 9), total_amp=0.045)
+
+    # jagged, banded "rock strata" jitter: a handful of discrete z-bands,
+    # each with its own random wobble + a step offset, so consecutive
+    # layers don't line up (visible chipped ledges) without looking like a
+    # uniform gear
+    n_bands = 6
+    band_of = np.clip((t * n_bands).astype(int), 0, n_bands - 1)
+    band_jitter = np.zeros((n_bands, n_theta))
+    band_step = rng.uniform(-0.035, 0.035, n_bands)
+    for b in range(n_bands):
+        j = fractal_noise(rng, n_harm=8, k_range=(6, 22), total_amp=0.06)
+        band_jitter[b] = j + band_step[b]
+
+    # jaggedness fades out toward the centre/apex (r_nom small) so the area
+    # under the mushrooms and moss stays smooth; strongest on the outer rim
+    edge_amount = np.clip((r_nom - flat_r * 0.35) / (top_r - flat_r * 0.35), 0.0, 1.0) ** 0.6
+
+    verts = np.empty((n_z, n_theta, 3))
+    for iz in range(n_z):
+        scale = blob * (1.0 + edge_amount[iz] * band_jitter[band_of[iz]])
+        r = r_nom[iz] * scale
+        verts[iz, :, 0] = r * np.cos(theta)
+        verts[iz, :, 1] = r * np.sin(theta)
+        verts[iz, :, 2] = z_nom[iz]
+
+    v = verts.reshape(-1, 3)
+    faces = []
+    for iz in range(n_z - 1):
+        row0 = iz * n_theta
+        row1 = (iz + 1) * n_theta
+        for it in range(n_theta):
+            it2 = (it + 1) % n_theta
+            a, b, c, d = row0 + it, row0 + it2, row1 + it2, row1 + it
+            faces.append((a, b, c))
+            faces.append((a, c, d))
+
+    mesh = trimesh.Trimesh(vertices=v, faces=np.array(faces), process=False)
+    mesh.merge_vertices()
+    mesh.update_faces(mesh.nondegenerate_faces())
+    mesh.fix_normals()
+    return mesh
+
+
+def make_base(radius=105.0, height=26.0, flat_r=58.0,
+              socket_r=20.6, socket_depth=18.0,
+              cavity_r=42.0, floor_thickness=3.5,
+              cable_hole_r=4.0):
+    """Jagged layered-rock base plate.
+    - flat-ish underside (radius `flat_r`) so it sits on a table
+    - domed top with an organic, chipped-rock outline (not a perfect circle)
+    - socket boss on top that the shade's stem plugs into (friction fit)
+    - internal cavity accessed from underneath for the LED driver / battery,
+      surrounded by a solid `flat_r - cavity_r` wide standing rim so the
+      base still sits flat and rigid on the table
+    - small cable-exit hole through the standing rim
+    """
+    socket_z = height * 0.62  # top surface height where the boss sits
+    apex_z = height * 1.04
+
+    stone = make_organic_stone(radius, height, flat_r)
 
     # socket boss (raised ring the shade's stem friction-fits into)
     boss_h = 10.0
