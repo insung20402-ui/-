@@ -18,7 +18,7 @@ import os
 
 import numpy as np
 import trimesh
-from shapely.geometry import Polygon
+from shapely.geometry import Point, Polygon
 from trimesh.creation import revolve
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -193,6 +193,64 @@ def make_fern_clump(n_leaves=6, base_length=40.0, spread_deg=130.0, seed=0):
     return trimesh.util.concatenate(fronds)
 
 
+def make_curl(turns=2.3, r0=9.0, tip_r=0.6, rise=14.0, thickness=1.3, n_pts=60):
+    """A curling fiddlehead/snail-shell tendril (as seen coiled around the
+    stem base in the reference sculpt): a spiral path swept with a small
+    round cross-section, base thick end at the origin."""
+    theta = np.linspace(0.0, turns * 2 * np.pi, n_pts)
+    k = np.log(r0 / tip_r) / theta[-1]
+    r = r0 * np.exp(-k * theta)
+    x = r * np.cos(theta)
+    z = r * np.sin(theta) + rise * (theta / theta[-1])
+    y = np.zeros_like(theta)
+    path = np.column_stack([x, y, z])
+    path -= path[0]
+    poly = Point(0, 0).buffer(thickness / 2.0, resolution=6)
+    mesh = trimesh.creation.sweep_polygon(poly, path)
+    mesh.fix_normals()
+    return mesh
+
+
+def make_pin(rod_len=16.0, rod_r=0.9, ball_r=2.1):
+    """A thin rod topped with a small glowing sphere (the little
+    bioluminescent light-stick accents dotted around the reference base)."""
+    rod = trimesh.creation.cylinder(radius=rod_r, height=rod_len, sections=16)
+    rod.apply_translation([0, 0, rod_len / 2.0])
+    ball = trimesh.creation.icosphere(subdivisions=2, radius=ball_r)
+    ball.apply_translation([0, 0, rod_len])
+    return trimesh.util.concatenate([rod, ball])
+
+
+def make_moss_bumps(count, r_min, r_max, surface_h, seed=0,
+                     bump_r=(1.6, 4.2), avoid=()):
+    """Scatter small flattened pebble/moss bumps over an annular region of
+    the ground, following the base's own surface height so they sit flush
+    (not floating or buried)."""
+    rng = np.random.default_rng(seed)
+    bumps = []
+    tries = 0
+    placed = 0
+    while placed < count and tries < count * 8:
+        tries += 1
+        rad = np.sqrt(rng.uniform(r_min ** 2, r_max ** 2))
+        ang = rng.uniform(0, 2 * np.pi)
+        x, y = rad * np.cos(ang), rad * np.sin(ang)
+        if any(np.hypot(x - ax, y - ay) < ar for ax, ay, ar in avoid):
+            continue
+        rr = rng.uniform(*bump_r)
+        zscale = rng.uniform(0.45, 0.7)
+        bump = trimesh.creation.icosphere(subdivisions=0, radius=rr)
+        bump.apply_scale([1.0, 1.0, zscale])  # squashed pebble
+        half_h = rr * zscale
+        z = surface_h(x, y) - rr * 0.35
+        if z - half_h < 0.3:  # never let the bump's underside poke below the table plane
+            z = half_h + 0.3
+        bump.apply_translation([x, y, z])
+        bumps.append(bump)
+        placed += 1
+    return trimesh.util.concatenate(bumps)
+
+
 def make_base(radius=105.0, height=26.0, flat_r=58.0,
               socket_r=20.6, socket_depth=18.0,
               cavity_r=42.0, floor_thickness=3.5,
@@ -250,30 +308,41 @@ def make_base(radius=105.0, height=26.0, flat_r=58.0,
     cable.apply_translation([(cavity_r + flat_r) / 2.0, 0, floor_thickness / 2.0])
     stone = stone.difference(cable, engine="manifold")
 
+    # The stone's top is a dome (highest at the centre, ~apex_z, sloping
+    # down to socket_z at the rim) -- NOT a flat plateau. Query the actual
+    # mesh via a downward raycast so every decoration sits flush on the
+    # real surface instead of an approximated height.
+    def surface_z(x, y):
+        origin = np.array([[x, y, apex_z + 100.0]])
+        direction = np.array([[0.0, 0.0, -1.0]])
+        locs, _, _ = stone.ray.intersects_location(origin, direction)
+        return float(locs[:, 2].max()) if len(locs) else socket_z
+
     # small secondary mushroom fused onto the stone, off to one side
     small = make_small_mushroom(scale=0.6)
-    small_pos = np.array([-radius * 0.68, radius * 0.35, socket_z * 0.45])
+    sx, sy = -radius * 0.68, radius * 0.35
+    small_pos = np.array([sx, sy, surface_z(sx, sy) - 8.0])
     small.apply_translation(small_pos)
     stone = stone.union(small, engine="manifold")
 
     # ferns wrapped most of the way around the stem, matching the reference
     # sculpt's full fern coverage (not just a couple of accents)
     fern_ring = [
-        # (angle_deg, radius, z_frac, scale, n_leaves)
-        (10.0, 60.0, 0.55, 1.15, 8),
-        (55.0, 66.0, 0.30, 0.70, 6),
-        (95.0, 62.0, 0.45, 0.90, 7),
-        (150.0, 57.0, 0.40, 0.95, 7),   # flanks the small mushroom
-        (185.0, 63.0, 0.60, 0.65, 5),
-        (230.0, 60.0, 0.35, 1.00, 8),
-        (275.0, 65.0, 0.55, 0.75, 6),
-        (320.0, 58.0, 0.45, 1.05, 8),
+        # (angle_deg, radius, scale, n_leaves)
+        (10.0, 60.0, 1.15, 8),
+        (55.0, 66.0, 0.70, 6),
+        (95.0, 62.0, 0.90, 7),
+        (150.0, 57.0, 0.95, 7),   # flanks the small mushroom
+        (185.0, 63.0, 0.65, 5),
+        (230.0, 60.0, 1.00, 8),
+        (275.0, 65.0, 0.75, 6),
+        (320.0, 58.0, 1.05, 8),
     ]
     ferns = []
-    for i, (angle_deg, fr, z_frac, scale, n_leaves) in enumerate(fern_ring):
+    for i, (angle_deg, fr, scale, n_leaves) in enumerate(fern_ring):
         ang = np.radians(angle_deg)
         x, y = fr * np.cos(ang), fr * np.sin(ang)
-        z = socket_z * z_frac
+        z = surface_z(x, y) - 4.0
         rot = angle_deg - 90.0  # fan opens radially outward from the stem
         fern = make_fern_clump(n_leaves=n_leaves, base_length=40.0 * scale, seed=i + 1)
         fern.apply_transform(trimesh.transformations.rotation_matrix(np.radians(rot), [0, 0, 1]))
@@ -281,6 +350,66 @@ def make_base(radius=105.0, height=26.0, flat_r=58.0,
         ferns.append(fern)
     all_ferns = trimesh.util.concatenate(ferns)
     stone = stone.union(all_ferns, engine="manifold")
+
+    occupied = [(0.0, 0.0, socket_r + 8.0), (small_pos[0], small_pos[1], 16.0)]
+
+    # curling fiddlehead/snail-shell tendrils, coiled up out of the moss
+    # near the stem base (matching the spiral accents in the reference)
+    curl_specs = [
+        # (angle_deg, radius, r0, turns, rise, scale)
+        (35.0, 26.0, 8.5, 2.3, 15.0, 1.0),
+        (150.0, 30.0, 7.0, 2.0, 12.0, 0.85),
+        (205.0, 25.0, 6.5, 2.5, 11.0, 0.8),
+        (300.0, 45.0, 8.0, 2.1, 13.0, 0.95),
+    ]
+    curls = []
+    for i, (angle_deg, fr, r0, turns, rise, scale) in enumerate(curl_specs):
+        ang = np.radians(angle_deg)
+        x, y = fr * np.cos(ang), fr * np.sin(ang)
+        curl = make_curl(turns=turns, r0=r0 * scale, tip_r=0.5, rise=rise * scale,
+                          thickness=1.3)
+        tilt = 12.0 + 8.0 * ((i * 37) % 5) / 5.0
+        curl.apply_transform(trimesh.transformations.rotation_matrix(np.radians(tilt), [1, 0, 0]))
+        curl.apply_transform(trimesh.transformations.rotation_matrix(ang + np.pi / 2, [0, 0, 1]))
+        curl.apply_translation([x, y, surface_z(x, y) - 1.5])
+        curls.append(curl)
+        occupied.append((x, y, r0 * scale + 4.0))
+    all_curls = trimesh.util.concatenate(curls)
+    stone = stone.union(all_curls, engine="manifold")
+
+    # tiny bioluminescent light-stick pins dotted around the base
+    pin_specs = [(70.0, 48.0), (255.0, 52.0), (170.0, 44.0)]
+    pins = []
+    for angle_deg, fr in pin_specs:
+        ang = np.radians(angle_deg)
+        x, y = fr * np.cos(ang), fr * np.sin(ang)
+        pin = make_pin(rod_len=16.0, rod_r=0.9, ball_r=2.1)
+        pin.apply_translation([x, y, surface_z(x, y) - 0.8])
+        pins.append(pin)
+        occupied.append((x, y, 4.0))
+    all_pins = trimesh.util.concatenate(pins)
+    stone = stone.union(all_pins, engine="manifold")
+
+    # a couple of tiny mushroom buds poking out of the moss
+    bud_specs = [(120.0, 40.0, 0.16), (340.0, 44.0, 0.20)]
+    buds = []
+    for angle_deg, fr, scale in bud_specs:
+        ang = np.radians(angle_deg)
+        x, y = fr * np.cos(ang), fr * np.sin(ang)
+        bud = make_small_mushroom(scale=scale)
+        bud.apply_translation([x, y, surface_z(x, y) - 2.0])
+        buds.append(bud)
+        occupied.append((x, y, 10.0))
+    all_buds = trimesh.util.concatenate(buds)
+    stone = stone.union(all_buds, engine="manifold")
+
+    # dense moss/pebble bump texture covering the open ground between
+    # the mushrooms, ferns, curls and pins (matching the mossy base texture
+    # in the reference photos)
+    moss = make_moss_bumps(count=150, r_min=socket_r + 6.0, r_max=72.0,
+                            surface_h=surface_z, seed=7, bump_r=(1.4, 3.6),
+                            avoid=occupied)
+    stone = stone.union(moss, engine="manifold")
 
     stone.fix_normals()
     return stone
