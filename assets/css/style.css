@@ -123,6 +123,20 @@ body {
 }
 .viewer-frame__actions button:hover { border-color: var(--accent); color: var(--accent); }
 
+.viewer-courses {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px;
+  padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg);
+}
+.viewer-courses[hidden] { display: none; }
+.viewer-courses__label { font-size: 0.85rem; color: var(--ink-soft); font-weight: 700; margin-right: 4px; }
+.course-btn {
+  border: 1px solid var(--line); background: var(--panel); border-radius: 999px;
+  padding: 7px 14px; font-size: 0.85rem; cursor: pointer;
+}
+.course-btn:hover { border-color: var(--accent); }
+.course-btn.is-active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+.viewer-courses.is-touring { opacity: 0.5; pointer-events: none; }
+
 .viewer-stage {
   background: var(--map-bg); border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
 }

@@ -11,12 +11,17 @@
     return map + '||' + node;
   }
 
-  function buildGraph() {
+  /** avoidEdges: [{map,a,b}] 형태로, 특정 지도의 특정 간선을 그래프에서 제외한다 (대체 경로 계산용) */
+  function buildGraph(avoidEdges) {
     const vertices = new Map(); // key -> {map,node,x,y}
     const adj = new Map(); // key -> [{to,dist}]
 
     function ensure(k) {
       if (!adj.has(k)) adj.set(k, []);
+    }
+
+    function isAvoided(mapId, a, b) {
+      return (avoidEdges || []).some((e) => e.map === mapId && ((e.a === a && e.b === b) || (e.a === b && e.b === a)));
     }
 
     Object.values(MAPS).forEach((map) => {
@@ -28,6 +33,7 @@
         ensure(k);
       });
       map.edges.forEach(([a, b]) => {
+        if (isAvoided(map.id, a, b)) return;
         const na = byId[a], nb = byId[b];
         if (!na || !nb) return;
         const d = Math.hypot(na.x - nb.x, na.y - nb.y);
@@ -97,9 +103,10 @@
     return path;
   }
 
-  /** 정문에서 destRoomId 까지 경로를 지도별 장면(scene) 배열로 반환 */
-  function computeRoute(destRoomId) {
-    const graph = buildGraph();
+  /** 정문에서 destRoomId 까지 경로를 지도별 장면(scene) 배열로 반환
+   *  opts.avoidEdges: [{map,a,b}] — 특정 간선을 피해서 대체 경로를 계산할 때 사용 */
+  function computeRoute(destRoomId, opts) {
+    const graph = buildGraph(opts && opts.avoidEdges);
     const start = global.SCHOOL_START;
     const startKey = key(start.map, start.node);
     const targetMap = findRoomOwner(destRoomId);

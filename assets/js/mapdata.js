@@ -152,7 +152,7 @@
 
   buildMainFloor({
     id: 'main-1', name: '본관 1층', floorLabel: '1층', hasCenterStair: true,
-    leftAppend: { label: '동쪽문', category: 'circulation', campus: { map: 'campus', node: 'eastDoorApproach' } },
+    leftAppend: { label: '동쪽문', category: 'circulation' },
     rightAppend: { label: '서쪽문', category: 'circulation', campus: { map: 'campus', node: 'westDoor' } },
     cells: ['학생인생건강부', '스포츠동아리실', '건강체력교실', '택배보관실', null, '행정실', '교장실', '통합교육지원실', '보건실'],
   });
@@ -284,7 +284,6 @@
       { id: 'westDoor', x: 767, y: 55 },
       { id: 'westPathSouth', x: 700, y: 300 },
       { id: 'hakpokEntrance', x: 35, y: 300 },
-      { id: 'eastDoorApproach', x: 35, y: 200 },
       { id: 'haneolEntrance', x: 65, y: 445 },
     ];
     const westDoorRoom = { id: 'westDoor', label: '서쪽문', category: 'circulation', x: 735, y: 30, w: 65, h: 45, cx: 767, cy: 52 };
@@ -295,8 +294,8 @@
     const edges = [
       ['mainGate', 'sidewalk'], ['sidewalk', 'road'], ['road', 'roadNorth'], ['roadNorth', 'westDoor'],
       ['road', 'westPathSouth'], ['westPathSouth', 'field'], ['field', 'basketballCourt'],
-      ['westPathSouth', 'hakpokEntrance'], ['hakpokEntrance', 'eastDoorApproach'],
-      ['hakpokEntrance', 'haneolEntrance'], ['haneolEntrance', 'garden'], ['garden', 'basketballCourt'],
+      ['westPathSouth', 'hakpokEntrance'],
+      ['field', 'haneolEntrance'], ['haneolEntrance', 'garden'], ['garden', 'basketballCourt'],
       ['roadNorth', 'parking'],
     ];
     // 경로에는 쓰이지 않지만 지형을 알아볼 수 있게 그려주는 배경 구조물
@@ -314,4 +313,10 @@
   global.SCHOOL_MAPS = MAPS;
   global.SCHOOL_INTER_LINKS = INTER_LINKS;
   global.SCHOOL_START = { map: 'campus', node: 'mainGate' };
+  // 한얼관으로 가는 "운동장을 가로지르는" 직행 코스의 캠퍼스 쪽 간선들 — 이 문이 닫혀 있을 수도 있어
+  // 시설안내 화면에서는 이 간선들을 모두 뺀 "서쪽문 → 본관 → 한얼관 가는 길" 실내 대체 경로도 함께 보여준다.
+  global.SCHOOL_HANEOL_OUTDOOR_EDGES = [
+    { map: 'campus', a: 'field', b: 'haneolEntrance' },
+    { map: 'campus', a: 'haneolEntrance', b: 'garden' },
+  ];
 })(window);

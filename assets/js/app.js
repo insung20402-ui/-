@@ -39,9 +39,13 @@
   const tourStartBtn = document.getElementById('tour-start');
   const tourStopBtn = document.getElementById('tour-stop');
   const tourProgressEl = document.getElementById('tour-progress');
+  const coursesEl = document.getElementById('viewer-courses');
+
+  const HANEOL_OUTDOOR_EDGES = window.SCHOOL_HANEOL_OUTDOOR_EDGES;
 
   let cancelToken = { cancelled: false };
   let currentDest = null;
+  let currentCourse = 'direct'; // 한얼관 목적지일 때만 의미 있음: 'direct' | 'indoor'
   let tourState = null; // {cancelled:false} 둘러보기 진행 중일 때만 존재
 
   const TOUR_MAP_ORDER = ['campus', 'main-1', 'main-2', 'main-3', 'main-4', 'main-5', 'hakpok-1', 'hakpok-2', 'haneol-1', 'haneol-2'];
@@ -120,20 +124,41 @@
     }
   }
 
-  async function openRoute(room) {
+  function updateCourseUI(room) {
+    const isHaneol = room.building === '한얼관';
+    coursesEl.hidden = !isHaneol;
+    if (!isHaneol) return;
+    coursesEl.querySelectorAll('.course-btn').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.course === currentCourse);
+    });
+  }
+
+  async function openRoute(room, course) {
     currentDest = room;
-    const scenes = window.RouteEngine.computeRoute(room.id);
+    const isHaneol = room.building === '한얼관';
+    currentCourse = isHaneol ? (course || 'direct') : 'direct';
+    const avoidEdges = (isHaneol && currentCourse === 'indoor') ? HANEOL_OUTDOOR_EDGES : undefined;
+
+    const scenes = window.RouteEngine.computeRoute(room.id, { avoidEdges });
     if (!scenes) {
       alert('경로를 계산할 수 없습니다: ' + room.label);
       return;
     }
     viewerEl.classList.add('is-open');
     viewerTitle.textContent = `정문 → ${room.label}`;
+    updateCourseUI(room);
     cancelToken.cancelled = true; // 이전 애니메이션 중단
     cancelToken = { cancelled: false };
     const myToken = cancelToken;
     await window.MapViewer.playRoute(scenes, room.id, { svg: viewerSvg, statusEl: viewerStatus }, myToken);
   }
+
+  coursesEl.querySelectorAll('.course-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!currentDest || tourState) return;
+      openRoute(currentDest, btn.dataset.course);
+    });
+  });
 
   closeBtn.addEventListener('click', () => {
     cancelToken.cancelled = true;
@@ -142,7 +167,7 @@
   });
 
   replayBtn.addEventListener('click', () => {
-    if (currentDest) openRoute(currentDest);
+    if (currentDest) openRoute(currentDest, currentCourse);
   });
 
   searchEl.addEventListener('input', () => renderList(searchEl.value));
@@ -152,6 +177,7 @@
     searchEl.disabled = isTouring;
     tourStartBtn.hidden = isTouring;
     tourStopBtn.hidden = !isTouring;
+    coursesEl.classList.toggle('is-touring', isTouring);
   }
 
   async function startTour() {
