@@ -63,6 +63,21 @@ body {
   margin-bottom: 12px;
 }
 
+.tour-box { margin-bottom: 14px; }
+.tour-btn {
+  width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--accent);
+  background: var(--accent); color: #fff; font-weight: 700; font-size: 0.98rem; cursor: pointer;
+}
+.tour-btn:hover { filter: brightness(1.05); }
+.tour-btn:disabled { opacity: 0.6; cursor: default; }
+.tour-btn--stop { background: var(--panel); color: var(--accent); margin-top: 8px; }
+.tour-progress {
+  margin: 10px 2px 0; font-size: 0.88rem; color: var(--ink-soft); font-weight: 600;
+}
+
+.facility-list.is-touring { opacity: 0.5; pointer-events: none; }
+#facility-search:disabled { opacity: 0.6; }
+
 .facility-list details {
   border-top: 1px solid var(--line);
   padding: 8px 0;

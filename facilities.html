@@ -19,6 +19,11 @@
         <span class="sr-only">시설 검색</span>
         <input id="facility-search" type="search" placeholder="장소 이름으로 검색 (예: 다목적실, 보건실, 도서관…)">
       </label>
+      <div class="tour-box">
+        <button id="tour-start" type="button" class="tour-btn">🎬 정문에서 모든 곳 둘러보기</button>
+        <button id="tour-stop" type="button" class="tour-btn tour-btn--stop" hidden>⏹ 둘러보기 중지</button>
+        <p id="tour-progress" class="tour-progress" hidden></p>
+      </div>
       <div id="facility-list" class="facility-list"></div>
     </section>
 
