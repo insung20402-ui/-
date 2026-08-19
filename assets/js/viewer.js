@@ -28,14 +28,15 @@
     opts = opts || {};
     svg.setAttribute('viewBox', map.viewBox);
     svg.innerHTML = '';
+    const scene = el('g', { class: 'scene' }, svg);
 
-    const bg = el('rect', { x: -1000, y: -1000, width: 5000, height: 5000, fill: 'var(--map-bg, #fbfaf7)' }, svg);
+    const bg = el('rect', { x: -1000, y: -1000, width: 5000, height: 5000, fill: 'var(--map-bg, #fbfaf7)' }, scene);
 
     (map.rects || []).forEach((r) => {
       if (r.wall) {
-        el('rect', { x: r.x, y: r.y, width: r.w, height: r.h, fill: 'none', stroke: 'var(--map-wall, #2b2b2b)', 'stroke-width': 6 }, svg);
+        el('rect', { x: r.x, y: r.y, width: r.w, height: r.h, fill: 'none', stroke: 'var(--map-wall, #2b2b2b)', 'stroke-width': 6 }, scene);
       } else if (r.landmark) {
-        const g = el('g', {}, svg);
+        const g = el('g', {}, scene);
         el('rect', { x: r.x, y: r.y, width: r.w, height: r.h, fill: 'var(--landmark-fill, #eceae2)', stroke: 'var(--map-wall, #2b2b2b)', 'stroke-width': 3, 'stroke-dasharray': '2 6', rx: 4 }, g);
         const fontSize = Math.max(13, Math.min(r.w, r.h) * 0.18);
         const t = el('text', { x: r.x + r.w / 2, y: r.y + r.h / 2, 'text-anchor': 'middle', 'dominant-baseline': 'middle', 'font-size': fontSize, fill: 'var(--ink-soft, #5b6270)', 'font-weight': 600 }, g);
@@ -43,7 +44,7 @@
       }
     });
 
-    const roomLayer = el('g', {}, svg);
+    const roomLayer = el('g', {}, scene);
     map.rooms.forEach((room) => {
       const isDest = opts.destId === room.id;
       const g = el('g', { class: 'room' + (isDest ? ' room--dest' : '') }, roomLayer);
@@ -61,7 +62,7 @@
       text.textContent = room.label;
     });
 
-    const routeLayer = el('g', { class: 'route-layer' }, svg);
+    const routeLayer = el('g', { class: 'route-layer' }, scene);
     return { svg, routeLayer };
   }
 
@@ -111,6 +112,7 @@
    */
   async function playRoute(scenes, destRoomId, refs, onCancelToken) {
     const destMapId = scenes[scenes.length - 1].mapId;
+    let lastRouteLayer = null;
     for (let i = 0; i < scenes.length; i++) {
       if (onCancelToken.cancelled) return;
       const scene = scenes[i];
@@ -118,6 +120,7 @@
       const isLast = i === scenes.length - 1;
       refs.statusEl.textContent = `${i + 1} / ${scenes.length} 단계 · ${map.building}${map.floor ? ' ' + map.floor : ''} 이동 중…`;
       const { routeLayer } = renderMap(refs.svg, map, { destId: isLast ? destRoomId : null });
+      lastRouteLayer = routeLayer;
       // 출발 표시
       const startPt = scene.points[0];
       const startDot = el('circle', { cx: startPt.x, cy: startPt.y, r: 14, fill: 'var(--route-start, #2b6fe0)' }, routeLayer);
@@ -132,6 +135,9 @@
     }
     const destMap = MAPS[destMapId];
     const destRoom = destMap.rooms.find((r) => r.id === destRoomId);
+    if (lastRouteLayer && destRoom) {
+      el('circle', { class: 'route-arrive-ring', cx: destRoom.cx, cy: destRoom.cy, r: 16, fill: 'none', stroke: 'var(--map-dest, #ff8a3d)', 'stroke-width': 4 }, lastRouteLayer);
+    }
     refs.statusEl.textContent = `도착! ${destMap.building}${destMap.floor ? ' ' + destMap.floor : ''} · ${destRoom ? destRoom.label : ''}`;
   }
 

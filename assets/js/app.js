@@ -25,6 +25,8 @@
   }
 
   const allRooms = collectRooms();
+  const statEl = document.getElementById('page-stat');
+  if (statEl) statEl.textContent = `총 ${allRooms.length}개 장소를 정문에서부터 안내해요.`;
 
   const listEl = document.getElementById('facility-list');
   const searchEl = document.getElementById('facility-search');
