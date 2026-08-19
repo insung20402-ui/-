@@ -118,7 +118,10 @@
       const scene = scenes[i];
       const map = MAPS[scene.mapId];
       const isLast = i === scenes.length - 1;
-      refs.statusEl.textContent = `${i + 1} / ${scenes.length} 단계 · ${map.building}${map.floor ? ' ' + map.floor : ''} 이동 중…`;
+      const placeLabel = `${map.building}${map.floor ? ' ' + map.floor : ''}`;
+      refs.statusEl.textContent = i === 0
+        ? `좋아, 나만 따라와! 정문에서 출발해서 ${placeLabel} 쪽으로 갈게. (${i + 1}/${scenes.length}단계)`
+        : `계속 따라오고 있지? 이번엔 ${placeLabel} 쪽으로 이동할게! (${i + 1}/${scenes.length}단계)`;
       const { routeLayer } = renderMap(refs.svg, map, { destId: isLast ? destRoomId : null });
       lastRouteLayer = routeLayer;
       // 출발 표시
@@ -129,7 +132,7 @@
       await animateScene(routeLayer, scene.points, {});
       if (onCancelToken.cancelled) return;
       if (!isLast) {
-        refs.statusEl.textContent = `${map.building}${map.floor ? ' ' + map.floor : ''} → 다음 구역으로 이동`;
+        refs.statusEl.textContent = `${placeLabel} 구간은 지나왔고, 다음 장소로 넘어갈게!`;
         await wait(500);
       }
     }
@@ -138,7 +141,8 @@
     if (lastRouteLayer && destRoom) {
       el('circle', { class: 'route-arrive-ring', cx: destRoom.cx, cy: destRoom.cy, r: 16, fill: 'none', stroke: 'var(--map-dest, #ff8a3d)', 'stroke-width': 4 }, lastRouteLayer);
     }
-    refs.statusEl.textContent = `도착! ${destMap.building}${destMap.floor ? ' ' + destMap.floor : ''} · ${destRoom ? destRoom.label : ''}`;
+    const destLabel = `${destMap.building}${destMap.floor ? ' ' + destMap.floor : ''} · ${destRoom ? destRoom.label : ''}`;
+    refs.statusEl.textContent = `두구두구... 도착! 여기는 ${destLabel}! 🦅`;
   }
 
   global.MapViewer = { renderMap, playRoute };

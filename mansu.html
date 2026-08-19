@@ -12,7 +12,7 @@
   <header class="page-header">
     <a class="brand" href="index.html">🦅 만수중학교</a>
     <h1>시설안내</h1>
-    <p class="page-sub">정문을 출발해 목적지까지 가는 길을, 화재대피 안내영상처럼 평면도 위에서 그대로 보여드려요.</p>
+    <p class="page-sub">수호 독수리 만돌이가 정문에서 목적지까지 가는 길을, 화재대피 안내영상처럼 평면도 위에서 그대로 안내해줘요.</p>
     <p class="page-stat" id="page-stat"></p>
   </header>
 
@@ -32,8 +32,9 @@
 
     <section class="panel panel--viewer" id="viewer">
       <div class="viewer-placeholder">
-        <p>왼쪽 목록에서 가고 싶은 장소를 눌러보세요.</p>
-        <p class="viewer-placeholder__sub">정문에서 출발해서 경로가 애니메이션으로 그려집니다.</p>
+        <div class="viewer-placeholder__avatar" aria-hidden="true">🦅</div>
+        <p>왼쪽 목록에서 가고 싶은 장소를 눌러보세요!</p>
+        <p class="viewer-placeholder__sub">만돌이가 정문에서부터 경로를 애니메이션으로 안내해줄게요.</p>
       </div>
       <div class="viewer-frame">
         <div class="viewer-frame__head">
@@ -51,7 +52,10 @@
         <div class="viewer-stage">
           <svg id="viewer-svg" viewBox="0 0 900 500" preserveAspectRatio="xMidYMid meet"></svg>
         </div>
-        <p id="viewer-status" class="viewer-status">정문에서 출발합니다…</p>
+        <div class="guide">
+          <div class="guide__avatar" id="guide-avatar" aria-hidden="true">🦅</div>
+          <p id="viewer-status" class="guide__bubble">안녕! 나는 만돌이야. 어디로 가고 싶어?</p>
+        </div>
       </div>
     </section>
   </main>
