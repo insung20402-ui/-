@@ -294,7 +294,7 @@
     const edges = [
       ['mainGate', 'sidewalk'], ['sidewalk', 'road'], ['road', 'roadNorth'], ['roadNorth', 'westDoor'],
       ['road', 'westPathSouth'], ['westPathSouth', 'field'], ['field', 'basketballCourt'],
-      ['westPathSouth', 'hakpokEntrance'],
+      ['field', 'hakpokEntrance'],
       ['field', 'haneolEntrance'], ['haneolEntrance', 'garden'], ['garden', 'basketballCourt'],
       ['roadNorth', 'parking'],
     ];
