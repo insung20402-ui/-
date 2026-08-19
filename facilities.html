@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시설안내 | 만수중학교</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="page-header">
+    <a class="brand" href="index.html">🦅 만수중학교</a>
+    <h1>시설안내</h1>
+    <p class="page-sub">정문을 출발해 목적지까지 가는 길을, 화재대피 안내영상처럼 평면도 위에서 그대로 보여드려요.</p>
+  </header>
+
+  <main class="layout">
+    <section class="panel panel--list">
+      <label class="search">
+        <span class="sr-only">시설 검색</span>
+        <input id="facility-search" type="search" placeholder="장소 이름으로 검색 (예: 다목적실, 보건실, 도서관…)">
+      </label>
+      <div id="facility-list" class="facility-list"></div>
+    </section>
+
+    <section class="panel panel--viewer" id="viewer">
+      <div class="viewer-placeholder">
+        <p>왼쪽 목록에서 가고 싶은 장소를 눌러보세요.</p>
+        <p class="viewer-placeholder__sub">정문에서 출발해서 경로가 애니메이션으로 그려집니다.</p>
+      </div>
+      <div class="viewer-frame">
+        <div class="viewer-frame__head">
+          <h2 id="viewer-title">경로 안내</h2>
+          <div class="viewer-frame__actions">
+            <button id="viewer-replay" type="button">🔁 다시보기</button>
+            <button id="viewer-close" type="button">✕ 닫기</button>
+          </div>
+        </div>
+        <div class="viewer-stage">
+          <svg id="viewer-svg" viewBox="0 0 900 500" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <p id="viewer-status" class="viewer-status">정문에서 출발합니다…</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-footer">&copy; 만수중학교 · 시설안내</footer>
+
+  <script src="assets/js/mapdata.js"></script>
+  <script src="assets/js/route-engine.js"></script>
+  <script src="assets/js/viewer.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
