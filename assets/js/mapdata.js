@@ -209,7 +209,6 @@
       const edges = [[rooms[0].id, rooms[1].id]];
       const rects = [{ x: 90, y: 90, w: 370, h: 420, wall: true }];
       addMap({ id: mapId, name: '학폭관 1층', building: '학폭관', floor: '1층', viewBox: '0 0 500 550', rects, rooms, nodes, edges });
-      INTER_LINKS.push({ a: { map: mapId, node: rooms[0].id }, b: { map: 'campus', node: 'hakpokEntrance' }, label: '학폭관 출입구' });
     }
     {
       const mapId = 'hakpok-2';
@@ -224,6 +223,8 @@
       addMap({ id: mapId, name: '학폭관 2층', building: '학폭관', floor: '2층', viewBox: '0 0 550 600', rects, rooms, nodes, edges });
     }
     INTER_LINKS.push({ a: { map: 'hakpok-1', node: nid('hakpok-1', 'stair') }, b: { map: 'hakpok-2', node: nid('hakpok-2', 'stair') }, label: '학폭관 계단' });
+    // 학폭관은 밖으로 난 문이 아니라, 본관 2층 "한얼관 가는 길" 복도를 통해서만 들어간다.
+    INTER_LINKS.push({ a: { map: 'main-2', node: nid('main-2', 'leftAppend') }, b: { map: 'hakpok-2', node: nid('hakpok-2', 'stair') }, label: '학폭관 가는 길' });
   })();
 
   // ------------------------------------------------------------------
@@ -283,7 +284,6 @@
       { id: 'roadNorth', x: 800, y: 100 },
       { id: 'westDoor', x: 767, y: 55 },
       { id: 'westPathSouth', x: 700, y: 300 },
-      { id: 'hakpokEntrance', x: 35, y: 300 },
       { id: 'haneolEntrance', x: 65, y: 445 },
     ];
     const westDoorRoom = { id: 'westDoor', label: '서쪽문', category: 'circulation', x: 735, y: 30, w: 65, h: 45, cx: 767, cy: 52 };
@@ -294,7 +294,6 @@
     const edges = [
       ['mainGate', 'sidewalk'], ['sidewalk', 'road'], ['road', 'roadNorth'], ['roadNorth', 'westDoor'],
       ['road', 'westPathSouth'], ['westPathSouth', 'field'], ['field', 'basketballCourt'],
-      ['westDoor', 'hakpokEntrance'],
       ['field', 'haneolEntrance'], ['haneolEntrance', 'garden'], ['garden', 'basketballCourt'],
       ['roadNorth', 'parking'],
     ];

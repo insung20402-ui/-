@@ -136,8 +136,11 @@
   async function openRoute(room, course) {
     currentDest = room;
     const isHaneol = room.building === '한얼관';
+    const isHakpok = room.building === '학폭관';
     currentCourse = isHaneol ? (course || 'direct') : 'direct';
-    const avoidEdges = (isHaneol && currentCourse === 'indoor') ? HANEOL_OUTDOOR_EDGES : undefined;
+    // 학폭관은 항상 서쪽문 → 본관 2층 → "한얼관 가는 길" 갈림길을 통해서만 간다.
+    // (그 갈림길로 가는 두 방법 중 하나인 한얼관 건물 통과 지름길은 여기서는 막는다.)
+    const avoidEdges = (isHakpok || (isHaneol && currentCourse === 'indoor')) ? HANEOL_OUTDOOR_EDGES : undefined;
 
     const scenes = window.RouteEngine.computeRoute(room.id, { avoidEdges });
     if (!scenes) {
