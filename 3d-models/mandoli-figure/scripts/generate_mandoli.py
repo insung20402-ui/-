@@ -190,10 +190,14 @@ def make_head(radius=52.0):
     head = scale(head, [1.0, 0.92, 1.05])
     parts.append(head)
 
-    # beak: flattened cone wedge pointing forward, tip drooping down slightly
-    beak = wedge_cone(length=30.0, width=30.0, thick=17.0, tip_droop_deg=18.0)
-    beak.apply_translation([0, radius * 0.86, -radius * 0.06])
-    parts.append(beak)
+    # beak: open, in two parts (upper/lower) with a visible gap between them,
+    # matching the reference's open, smiling beak
+    beak_up = wedge_cone(length=28.0, width=30.0, thick=13.0, tip_droop_deg=8.0)
+    beak_up.apply_translation([0, radius * 0.86, radius * 0.015])
+    parts.append(beak_up)
+    beak_lo = wedge_cone(length=24.0, width=27.0, thick=11.0, tip_droop_deg=30.0)
+    beak_lo.apply_translation([0, radius * 0.86, -radius * 0.075])
+    parts.append(beak_lo)
 
     # eyes: raised domes with pupils sitting flush on their front surface
     eye_r = 15.0
@@ -207,12 +211,12 @@ def make_head(radius=52.0):
         pupil.apply_translation([ex, ey + eye_r * 0.62, ez])
         parts.append(pupil)
 
-    # brow ridges
+    # brow ridges: bold raised arcs above each eye
     for side in (-1, 1):
-        brow = blade(24, 8, 5, curve=3)
-        brow = rot(brow, [1, 0, 0], 90)
-        brow = rot(brow, [0, 0, 1], side * 8)
-        brow.apply_translation([side * radius * 0.40, radius * 0.80, radius * 0.32])
+        brow = blade(30, 10, 6.5, curve=10)
+        brow = rot(brow, [1, 0, 0], 96)
+        brow = rot(brow, [0, 0, 1], side * 20)
+        brow.apply_translation([side * radius * 0.40, radius * 0.72, radius * 0.36])
         parts.append(brow)
 
     # head crest: two big spiky feather tufts (matching the reference's twin
@@ -225,19 +229,30 @@ def make_head(radius=52.0):
         tuft.apply_translation([0, -radius * 0.08, radius * 0.92])
         parts.append(tuft)
 
-    # fluffy cheek/jaw feather ruff (ring of small blades around the lower head)
-    n_ruff = 14
-    for i in range(n_ruff):
-        a = 360.0 * i / n_ruff
-        if 60 < ((a + 90) % 360) < 300:  # skip the front/beak area
-            continue
-        f = blade(16, 8, 4, curve=2)
-        f = rot(f, [1, 0, 0], 100)
-        f = rot(f, [0, 0, 1], a)
-        pos = np.array([np.sin(np.radians(a)), np.cos(np.radians(a)), 0]) * radius * 0.95
-        pos[2] = -radius * 0.25
-        f.apply_translation(pos)
-        parts.append(f)
+    # fluffy cascading feather ruff/mane covering most of the head, in several
+    # overlapping rings (crown -> down over the cheeks/back of the neck),
+    # matching the layered "mophead" fluff in the colour reference photos
+    ring_specs = [
+        # (z_frac, tilt_from_horizontal_deg, length, width, n_blades, skip_front_deg)
+        (0.62, 15, 30, 15, 18, 78),
+        (0.30, 45, 42, 17, 18, 82),
+        (0.00, 75, 50, 19, 18, 88),
+        (-0.30, 100, 48, 18, 16, 100),
+        (-0.55, 120, 40, 16, 14, 112),
+    ]
+    for z_frac, tilt, length, width, n_blades, skip_deg in ring_specs:
+        for i in range(n_blades):
+            a = 360.0 * i / n_blades
+            da = min(a, 360.0 - a)
+            if da < skip_deg:
+                continue
+            f = blade(length, width, 4.2, curve=length * 0.12)
+            f = rot(f, [1, 0, 0], 90 + tilt)
+            f = rot(f, [0, 0, 1], -a)
+            pos = np.array([np.sin(np.radians(a)), np.cos(np.radians(a)), 0]) * radius * 0.92
+            pos[2] = radius * z_frac
+            f.apply_translation(pos)
+            parts.append(f)
 
     return trimesh.util.concatenate(parts)
 
@@ -271,6 +286,12 @@ def build(scale_factor=1.0):
     shield.apply_translation([20, 42.0, torso_h * 0.58])
     parts.append(shield)
 
+    # collar tie, hanging from the neckline
+    tie = blade(30, 9, 2.5, curve=0)
+    tie = rot(tie, [1, 0, 0], 180)
+    tie.apply_translation([0, 43.0, torso_h * 0.96])
+    parts.append(tie)
+
     torso_top = torso_h
 
     head = make_head(62.0)
@@ -290,6 +311,13 @@ def build(scale_factor=1.0):
     parts.append(leg_r)
 
     shoulder_z = torso_top * 0.92
+
+    # puffy round shoulder pauldrons (white sleeve caps in the reference)
+    for side in (-1, 1):
+        poof = sphere(18.0, subdiv=3)
+        poof = scale(poof, [1.0, 0.9, 0.85])
+        poof.apply_translation([side * 40.0, 2.0, shoulder_z + 4.0])
+        parts.append(poof)
 
     # left arm: relaxed, hanging at the side
     arm_l, _ = make_arm(upper_dir=(-0.30, 0.10, -0.95), fore_dir=(-0.20, 0.20, -0.96),
