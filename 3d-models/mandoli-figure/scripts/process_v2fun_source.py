@@ -134,6 +134,7 @@ def colorize(mesh):
     WHITE, NAVY = np.array([245, 243, 238]), np.array([26, 33, 58])
     BLUE_DARK, BLUE_LIGHT = np.array([28, 70, 160]), np.array([120, 180, 235])
     YELLOW, SOLE_DARK = np.array([245, 190, 40]), np.array([40, 45, 70])
+    EYE_DARK = np.array([20, 22, 32])
 
     colors = np.tile(WHITE, (len(v), 1)).astype(float)
 
@@ -146,13 +147,32 @@ def colorize(mesh):
 
     colors[(z >= 33) & (z < 63)] = NAVY                               # shorts
 
+    # shoes: yellow only on the front/mid outer panel, NOT the heel/back
+    # (the reference photos show no yellow when viewed from behind)
     shoe_mask = z < 14
     colors[shoe_mask] = WHITE
-    colors[shoe_mask & (ax > 18)] = YELLOW                            # shoe outer
+    colors[shoe_mask & (ax > 18) & (y > -15)] = YELLOW                # shoe outer, front
     colors[z < 4] = SOLE_DARK                                         # sole
 
-    colors[z >= 210] = BLUE_DARK                                      # crest tips
-    colors[(z >= 178) & (z <= 202) & (y > 44) & (ax < 20)] = YELLOW   # beak
+    colors[z >= 215] = BLUE_DARK                                      # crest tips (small)
+    colors[(z >= 178) & (z <= 200) & (y > 44) & (ax < 17)] = YELLOW   # beak
+
+    # small round eyes, above/outside the beak (approximate placement --
+    # no exact texture data to place them precisely)
+    for side in (-1, 1):
+        d = np.sqrt((x - side * 26.0) ** 2 + (z - 206.0) ** 2)
+        colors[(d < 6.5) & (y > 38)] = EYE_DARK
+
+    # smooth colours across the mesh graph so region boundaries aren't
+    # hard-edged blocky decals
+    adjacency = mesh.vertex_adjacency_graph
+    neighbors = [list(adjacency[i]) for i in range(len(v))]
+    for _ in range(2):
+        new_colors = colors.copy()
+        for i, nb in enumerate(neighbors):
+            if nb:
+                new_colors[i] = 0.5 * colors[i] + 0.5 * colors[nb].mean(axis=0)
+        colors = new_colors
 
     rgba = np.concatenate([colors, np.full((len(v), 1), 255)], axis=1).astype(np.uint8)
     mesh.visual.vertex_colors = rgba
