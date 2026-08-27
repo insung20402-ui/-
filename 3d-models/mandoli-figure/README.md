@@ -53,9 +53,11 @@ v2fun.ai가 내보낸 원본 OBJ는 그 자체로는 3D 프린팅이 불가능�
 │   └── material.mtl                 # 원본 머티리얼 정의 (텍스처 파일은 없음)
 ├── stl/
 │   ├── mandoli_figure.stl           # 프린트용 STL (1파트, 220mm, 워터타이트, 꼬리 없음, 무채색)
-│   └── mandoli_figure_colored.glb   # 컬러 미리보기/풀컬러 프린팅용 (근사 채색)
+│   ├── mandoli_figure_colored.glb   # 컬러 미리보기/풀컬러 프린팅용 (근사 채색)
+│   └── mandoli_keyring_40mm.stl     # 키링용 STL (40mm, 머리 위 고리 포함, 워터타이트)
 ├── scripts/
-│   └── process_v2fun_source.py      # 원본 OBJ -> STL/컬러 GLB 가공 스크립트
+│   ├── process_v2fun_source.py      # 원본 OBJ -> STL/컬러 GLB 가공 스크립트
+│   └── make_keyring.py              # mandoli_figure.stl -> 키링용 STL(고리 추가) 스크립트
 └── preview/
     └── hero.png                      # 렌더 미리보기 이미지 (컬러 버전)
 ```
