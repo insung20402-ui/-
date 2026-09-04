@@ -1,5 +1,5 @@
 <title>RESCENE Keycap Set</title>
-<meta name="description" content="원이·제나·미나미·메이·리브 5인의 시그니처 컬러와 실루엣을 담은 WASD+F 아티산 키캡 컨셉 디자인">
+<meta name="description" content="원이·제나·미나미·메이·리브 5인의 시그니처 컬러와 얼굴 일러스트를 담은 WASD+F 아티산 키캡 컨셉 디자인">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -13,6 +13,7 @@
     --plate:#EDE3D6;
     --plate-well:#E2D5C4;
     --shadow:rgba(42,36,48,.16);
+    --skin:#FFE3C8;
 
     --woni:#FF9C82;   --woni-deep:#E67A5F;
     --zena:#B7A2FF;   --zena-deep:#9078E8;
@@ -135,7 +136,8 @@
     display:flex;
     flex-direction:column;
     justify-content:space-between;
-    padding:10px;
+    align-items:center;
+    padding:8px 10px 6px;
     transition:transform .18s ease, box-shadow .18s ease;
   }
   .keycap:hover{
@@ -147,6 +149,7 @@
       0 10px 18px -8px var(--shadow);
   }
   .legend{
+    align-self:flex-start;
     font-family:"JetBrains Mono",monospace;
     font-weight:700;
     font-size:15px;
@@ -154,12 +157,8 @@
     text-shadow:0 1px 0 rgba(255,255,255,.4);
   }
   .face{
-    align-self:center;
-    width:64px;height:64px;
-  }
-
-  .gap-spacer::before{
-    content:"";
+    width:76px;height:76px;
+    filter:drop-shadow(0 2px 3px rgba(42,36,48,.18));
   }
 
   .board-caption{
@@ -183,16 +182,31 @@
     background:var(--surface);
     border:1px solid var(--line);
     border-radius:18px;
-    padding:20px 18px 18px;
+    padding:18px 18px 18px;
     display:flex;
     flex-direction:column;
     gap:12px;
   }
-  .card .tag{
+  .card-top{
     display:flex;
     align-items:center;
-    gap:8px;
+    gap:12px;
   }
+  .avatar{
+    flex:none;
+    width:52px;height:52px;
+    border-radius:50%;
+    background:var(--bg);
+    box-shadow:inset 0 0 0 1px var(--line);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .avatar svg{width:40px;height:40px;}
+  .card .tag{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .swatch-row{display:flex;align-items:center;gap:8px;}
   .swatch{
     width:14px;height:14px;border-radius:4px;
     background:var(--c);
@@ -252,8 +266,8 @@
       grid-template-rows:72px 72px;
       gap:8px;
     }
-    .keycap{width:72px;height:72px;border-radius:12px;padding:6px;}
-    .face{width:40px;height:40px;}
+    .keycap{width:72px;height:72px;border-radius:12px;padding:5px 6px 4px;}
+    .face{width:48px;height:48px;}
     .legend{font-size:11px;}
     .plate{padding:32px 18px 28px;border-radius:20px;}
   }
@@ -264,7 +278,7 @@
   <header>
     <p class="eyebrow">Fan-made concept &middot; artisan keycap set</p>
     <h1>Re:Scene<span class="kr">리센느 WASD 키캡</span></h1>
-    <p class="lede">원이·제나·미나미·메이·리브, 다섯 멤버의 시그니처 컬러를 새긴 비공식 팬 컨셉 키캡입니다. 실루엣 아이콘은 실제 얼굴을 본뜨지 않은 오리지널 일러스트예요.</p>
+    <p class="lede">원이·제나·미나미·메이·리브, 다섯 멤버의 시그니처 컬러와 얼굴 일러스트를 새긴 비공식 팬 컨셉 키캡입니다. 실제 사진이 아닌, 헤어스타일과 표정으로 재해석한 오리지널 일러스트예요.</p>
   </header>
 
   <div class="plate">
@@ -272,14 +286,20 @@
       <div class="well slot-w">
         <div class="keycap" style="--c:var(--woni);--c-deep:var(--woni-deep)">
           <span class="legend">W</span>
-          <svg class="face" viewBox="0 0 64 64">
-            <circle cx="32" cy="34" r="17" fill="#fff" opacity=".92"/>
+          <svg class="face" viewBox="0 0 64 64" role="img" aria-label="원이">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
             <path d="M13 30 C13 12 51 12 51 30 L51 22 C51 22 44 15 32 15 C20 15 13 22 13 22 Z" fill="var(--woni-deep)"/>
             <path d="M16 24 C16 24 15 34 20 40 L21 30 Z" fill="var(--woni-deep)"/>
             <path d="M48 24 C48 24 49 34 44 40 L43 30 Z" fill="var(--woni-deep)"/>
-            <circle cx="25" cy="36" r="2.1" fill="#2A2430"/>
-            <circle cx="39" cy="36" r="2.1" fill="#2A2430"/>
-            <path d="M27 44 Q32 48 37 44" stroke="#2A2430" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <path d="M21 31.5 Q24.5 29.3 28 31.5" stroke="#2A2430" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            <path d="M36 31.5 Q39.5 29.3 43 31.5" stroke="#2A2430" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            <ellipse cx="24.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <circle cx="23.3" cy="34.8" r=".9" fill="#fff"/>
+            <circle cx="38.3" cy="34.8" r=".9" fill="#fff"/>
+            <path d="M28 45 Q32 48.5 36 45" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
           </svg>
           <span></span>
         </div>
@@ -288,12 +308,18 @@
       <div class="well slot-a">
         <div class="keycap" style="--c:var(--zena);--c-deep:var(--zena-deep)">
           <span class="legend">A</span>
-          <svg class="face" viewBox="0 0 64 64">
-            <circle cx="32" cy="34" r="17" fill="#fff" opacity=".92"/>
+          <svg class="face" viewBox="0 0 64 64" role="img" aria-label="제나">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
             <path d="M12 20 C12 20 20 12 32 12 C44 12 52 20 52 20 L52 46 C52 46 49 34 46 30 L46 40 C40 34 34 32 22 34 L22 42 C17 36 15 28 12 20 Z" fill="var(--zena-deep)"/>
-            <circle cx="25" cy="37" r="2.1" fill="#2A2430"/>
-            <circle cx="39" cy="37" r="2.1" fill="#2A2430"/>
-            <path d="M27 45 Q32 49 37 45" stroke="#2A2430" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <path d="M21 32 Q24.5 29.8 28 32" stroke="#2A2430" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            <path d="M36 32 Q39.5 29.8 43 32" stroke="#2A2430" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            <ellipse cx="24.5" cy="37" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="37" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <circle cx="23.3" cy="35.3" r=".9" fill="#fff"/>
+            <circle cx="38.3" cy="35.3" r=".9" fill="#fff"/>
+            <path d="M28 45.5 Q32 49 36 45.5" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
           </svg>
           <span></span>
         </div>
@@ -302,14 +328,18 @@
       <div class="well slot-s">
         <div class="keycap" style="--c:var(--minami);--c-deep:var(--minami-deep)">
           <span class="legend">S</span>
-          <svg class="face" viewBox="0 0 64 64">
-            <circle cx="32" cy="34" r="17" fill="#fff" opacity=".92"/>
+          <svg class="face" viewBox="0 0 64 64" role="img" aria-label="미나미">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
             <path d="M14 26 C14 13 50 13 50 26 C50 20 44 24 32 24 C20 24 14 20 14 26 Z" fill="var(--minami-deep)"/>
             <path d="M15 22 C13 30 15 40 20 45 C17 36 18 28 20 24 Z" fill="var(--minami-deep)"/>
             <path d="M49 22 C51 30 49 40 44 45 C47 36 46 28 44 24 Z" fill="var(--minami-deep)"/>
-            <circle cx="25" cy="36" r="2.1" fill="#2A2430"/>
-            <circle cx="39" cy="36" r="2.1" fill="#2A2430"/>
-            <path d="M27 44 Q32 48 37 44" stroke="#2A2430" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="24.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <circle cx="23.3" cy="34.8" r=".9" fill="#fff"/>
+            <circle cx="38.3" cy="34.8" r=".9" fill="#fff"/>
+            <path d="M27 44.5 Q32 48.5 37 44.5" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
           </svg>
           <span></span>
         </div>
@@ -318,14 +348,20 @@
       <div class="well slot-d">
         <div class="keycap" style="--c:var(--may);--c-deep:var(--may-deep)">
           <span class="legend">D</span>
-          <svg class="face" viewBox="0 0 64 64">
-            <circle cx="32" cy="34" r="17" fill="#fff" opacity=".92"/>
+          <svg class="face" viewBox="0 0 64 64" role="img" aria-label="메이">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
             <path d="M14 24 C14 12 50 12 50 24 C50 18 42 21 32 21 C22 21 14 18 14 24 Z" fill="var(--may-deep)"/>
             <path d="M40 18 C48 18 50 26 46 32 C46 24 43 20 40 18 Z" fill="var(--may-deep)"/>
             <path d="M45 20 C52 24 53 34 47 40 L45 30 Z" fill="var(--may-deep)"/>
-            <circle cx="25" cy="36" r="2.1" fill="#2A2430"/>
-            <circle cx="39" cy="36" r="2.1" fill="#2A2430"/>
-            <path d="M27 44 Q32 48 37 44" stroke="#2A2430" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <path d="M21 31.5 Q24.5 29.3 28 31.5" stroke="#2A2430" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            <path d="M36 31.5 Q39.5 29.3 43 31.5" stroke="#2A2430" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            <ellipse cx="24.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <circle cx="23.3" cy="34.8" r=".9" fill="#fff"/>
+            <circle cx="38.3" cy="34.8" r=".9" fill="#fff"/>
+            <path d="M28 45 Q32 48.5 36 45" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
           </svg>
           <span></span>
         </div>
@@ -336,14 +372,18 @@
       <div class="well slot-f">
         <div class="keycap" style="--c:var(--liv);--c-deep:var(--liv-deep)">
           <span class="legend">F</span>
-          <svg class="face" viewBox="0 0 64 64">
-            <circle cx="32" cy="34" r="17" fill="#fff" opacity=".92"/>
+          <svg class="face" viewBox="0 0 64 64" role="img" aria-label="리브">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
             <path d="M14 22 C14 12 50 12 50 22 C50 17 41 19 32 19 C23 19 14 17 14 22 Z" fill="var(--liv-deep)"/>
             <circle cx="17" cy="30" r="6" fill="var(--liv-deep)"/>
             <circle cx="47" cy="30" r="6" fill="var(--liv-deep)"/>
-            <circle cx="25" cy="36" r="2.1" fill="#2A2430"/>
-            <circle cx="39" cy="36" r="2.1" fill="#2A2430"/>
-            <path d="M27 44 Q32 48 37 44" stroke="#2A2430" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="24.5" cy="36.5" rx="2.9" ry="3.4" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="36.5" rx="2.9" ry="3.4" fill="#2A2430"/>
+            <circle cx="23.2" cy="34.6" r="1" fill="#fff"/>
+            <circle cx="38.2" cy="34.6" r="1" fill="#fff"/>
+            <path d="M27 44 Q32 48.5 37 44" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
           </svg>
           <span></span>
         </div>
@@ -354,31 +394,128 @@
 
   <div class="roster">
     <div class="card">
-      <div class="tag"><span class="swatch" style="--c:var(--woni)"></span><span class="key">KEY — W</span></div>
+      <div class="card-top">
+        <div class="avatar">
+          <svg viewBox="0 0 64 64" role="img" aria-label="원이">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
+            <path d="M13 30 C13 12 51 12 51 30 L51 22 C51 22 44 15 32 15 C20 15 13 22 13 22 Z" fill="var(--woni-deep)"/>
+            <path d="M16 24 C16 24 15 34 20 40 L21 30 Z" fill="var(--woni-deep)"/>
+            <path d="M48 24 C48 24 49 34 44 40 L43 30 Z" fill="var(--woni-deep)"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="24.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <circle cx="23.3" cy="34.8" r=".9" fill="#fff"/>
+            <circle cx="38.3" cy="34.8" r=".9" fill="#fff"/>
+            <path d="M28 45 Q32 48.5 36 45" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="tag">
+          <div class="swatch-row"><span class="swatch" style="--c:var(--woni)"></span><span class="key">KEY — W</span></div>
+        </div>
+      </div>
       <h3>원이<span>WONI</span></h3>
       <p class="silhouette">둥근 단발 실루엣, 가운데 가르마. 따뜻한 코랄 톤으로 리더의 안정감을 표현.</p>
       <div class="spec"><span>COLORWAY</span><span>#FF9C82</span></div>
     </div>
+
     <div class="card">
-      <div class="tag"><span class="swatch" style="--c:var(--zena)"></span><span class="key">KEY — A</span></div>
+      <div class="card-top">
+        <div class="avatar">
+          <svg viewBox="0 0 64 64" role="img" aria-label="제나">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
+            <path d="M12 20 C12 20 20 12 32 12 C44 12 52 20 52 20 L52 46 C52 46 49 34 46 30 L46 40 C40 34 34 32 22 34 L22 42 C17 36 15 28 12 20 Z" fill="var(--zena-deep)"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="24.5" cy="37" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="37" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <circle cx="23.3" cy="35.3" r=".9" fill="#fff"/>
+            <circle cx="38.3" cy="35.3" r=".9" fill="#fff"/>
+            <path d="M28 45.5 Q32 49 36 45.5" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="tag">
+          <div class="swatch-row"><span class="swatch" style="--c:var(--zena)"></span><span class="key">KEY — A</span></div>
+        </div>
+      </div>
       <h3>제나<span>ZENA</span></h3>
       <p class="silhouette">긴 생머리에 시스루 뱅. 은은한 라일락으로 시각적 포인트를 살린 비주얼 담당.</p>
       <div class="spec"><span>COLORWAY</span><span>#B7A2FF</span></div>
     </div>
+
     <div class="card">
-      <div class="tag"><span class="swatch" style="--c:var(--minami)"></span><span class="key">KEY — S</span></div>
+      <div class="card-top">
+        <div class="avatar">
+          <svg viewBox="0 0 64 64" role="img" aria-label="미나미">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
+            <path d="M14 26 C14 13 50 13 50 26 C50 20 44 24 32 24 C20 24 14 20 14 26 Z" fill="var(--minami-deep)"/>
+            <path d="M15 22 C13 30 15 40 20 45 C17 36 18 28 20 24 Z" fill="var(--minami-deep)"/>
+            <path d="M49 22 C51 30 49 40 44 45 C47 36 46 28 44 24 Z" fill="var(--minami-deep)"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="24.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <circle cx="23.3" cy="34.8" r=".9" fill="#fff"/>
+            <circle cx="38.3" cy="34.8" r=".9" fill="#fff"/>
+            <path d="M27 44.5 Q32 48.5 37 44.5" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="tag">
+          <div class="swatch-row"><span class="swatch" style="--c:var(--minami)"></span><span class="key">KEY — S</span></div>
+        </div>
+      </div>
       <h3>미나미<span>MINAMI</span></h3>
       <p class="silhouette">웨이브 단발에 일자 뱅. 민트 컬러로 상큼하고 발랄한 매력을 담음.</p>
       <div class="spec"><span>COLORWAY</span><span>#7BE0C9</span></div>
     </div>
+
     <div class="card">
-      <div class="tag"><span class="swatch" style="--c:var(--may)"></span><span class="key">KEY — D</span></div>
+      <div class="card-top">
+        <div class="avatar">
+          <svg viewBox="0 0 64 64" role="img" aria-label="메이">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
+            <path d="M14 24 C14 12 50 12 50 24 C50 18 42 21 32 21 C22 21 14 18 14 24 Z" fill="var(--may-deep)"/>
+            <path d="M40 18 C48 18 50 26 46 32 C46 24 43 20 40 18 Z" fill="var(--may-deep)"/>
+            <path d="M45 20 C52 24 53 34 47 40 L45 30 Z" fill="var(--may-deep)"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="24.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="36.5" rx="2.6" ry="3.2" fill="#2A2430"/>
+            <circle cx="23.3" cy="34.8" r=".9" fill="#fff"/>
+            <circle cx="38.3" cy="34.8" r=".9" fill="#fff"/>
+            <path d="M28 45 Q32 48.5 36 45" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="tag">
+          <div class="swatch-row"><span class="swatch" style="--c:var(--may)"></span><span class="key">KEY — D</span></div>
+        </div>
+      </div>
       <h3>메이<span>MAY</span></h3>
       <p class="silhouette">하이 포니테일 실루엣. 골드 옐로로 에너제틱한 무드를 표현.</p>
       <div class="spec"><span>COLORWAY</span><span>#FFCA4A</span></div>
     </div>
+
     <div class="card">
-      <div class="tag"><span class="swatch" style="--c:var(--liv)"></span><span class="key">KEY — F</span></div>
+      <div class="card-top">
+        <div class="avatar">
+          <svg viewBox="0 0 64 64" role="img" aria-label="리브">
+            <circle cx="32" cy="34" r="17" fill="var(--skin)"/>
+            <path d="M14 22 C14 12 50 12 50 22 C50 17 41 19 32 19 C23 19 14 17 14 22 Z" fill="var(--liv-deep)"/>
+            <circle cx="17" cy="30" r="6" fill="var(--liv-deep)"/>
+            <circle cx="47" cy="30" r="6" fill="var(--liv-deep)"/>
+            <ellipse cx="22.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="41.5" cy="41" rx="3" ry="1.6" fill="#FF9EAE" opacity=".6"/>
+            <ellipse cx="24.5" cy="36.5" rx="2.9" ry="3.4" fill="#2A2430"/>
+            <ellipse cx="39.5" cy="36.5" rx="2.9" ry="3.4" fill="#2A2430"/>
+            <circle cx="23.2" cy="34.6" r="1" fill="#fff"/>
+            <circle cx="38.2" cy="34.6" r="1" fill="#fff"/>
+            <path d="M27 44 Q32 48.5 37 44" stroke="#2A2430" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="tag">
+          <div class="swatch-row"><span class="swatch" style="--c:var(--liv)"></span><span class="key">KEY — F</span></div>
+        </div>
+      </div>
       <h3>리브<span>LIV</span></h3>
       <p class="silhouette">양갈래 트윈테일 실루엣. 스카이블루로 막내다운 사랑스러움을 강조.</p>
       <div class="spec"><span>COLORWAY</span><span>#82C6F2</span></div>
@@ -386,7 +523,7 @@
   </div>
 
   <footer>
-    ※ 본 디자인은 팬이 제작한 비공식 컨셉 목업이며, 실제 멤버 사진을 사용하지 않고 컬러와 실루엣만으로 재해석한 오리지널 일러스트입니다. RESCENE(리센느)은 더뮤즈 엔터테인먼트 소속 아티스트입니다.
+    ※ 본 디자인은 팬이 제작한 비공식 컨셉 목업이며, 실제 멤버 사진을 사용하지 않고 헤어스타일·표정을 재해석한 오리지널 일러스트입니다. RESCENE(리센느)은 더뮤즈 엔터테인먼트 소속 아티스트입니다.
   </footer>
 
 </div>
