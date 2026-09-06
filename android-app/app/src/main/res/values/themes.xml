@@ -1,0 +1,12 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Donghaeng" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#81D4FA</item>
+        <item name="android:windowBackground">#FFFFFF</item>
+    </style>
+
+    <!-- 충동 지연 화면: 잠금화면 위에도 뜰 수 있도록 별도 테마 사용 -->
+    <style name="Theme.Donghaeng.UrgeSurfing" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowBackground">#E0F7FA</item>
+    </style>
+</resources>
