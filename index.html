@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memories of Mansu Middle School</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<main class="library">
+  <h1 class="library-title">Memories of Mansu Middle School</h1>
+
+  <div class="shelf-wrap" id="shelfWrap">
+    <img class="shelf-img" id="shelfImg" src="assets/images/bookshelf.webp" alt="연도별 추억 책장">
+
+    <!-- 책이 빠져나간 자리를 표시하는 그림자 -->
+    <div class="shelf-gap" id="shelfGap" style="left:19.9%; top:4.15%; width:5.4%; height:41.97%;"></div>
+
+    <!-- 2024년 책 (현재 동작하는 유일한 책) -->
+    <button
+      type="button"
+      class="book-hotspot"
+      id="hotspot-2024"
+      data-year="2024"
+      style="left:19.9%; top:4.15%; width:5.4%; height:41.97%;"
+      aria-label="2024년 추억 책 꺼내기">
+    </button>
+  </div>
+
+  <p class="library-hint">책 표지의 연도를 클릭하면 그 해의 추억이 담긴 책이 펼쳐집니다.</p>
+</main>
+
+<!-- 뽑혀 나오는 책 (애니메이션용, 실제 책장 이미지와 겹쳐서 시작) -->
+<div class="pulled-book" id="pulledBook" aria-hidden="true">
+  <div class="pulled-face pulled-face--spine" id="pulledSpine"></div>
+  <div class="pulled-face pulled-face--cover" id="pulledCover">
+    <span class="pulled-cover-year" id="pulledCoverYear">2024</span>
+  </div>
+</div>
+
+<!-- 펼쳐진 책 오버레이 -->
+<div class="book-overlay" id="bookOverlay" aria-hidden="true">
+  <div class="book-overlay-backdrop" id="bookBackdrop"></div>
+  <div class="open-book" id="openBook">
+    <button type="button" class="close-book" id="closeBook" aria-label="책 덮기">×</button>
+    <img class="open-book-img" id="openBookImg" src="assets/images/book-2024-spread.webp" alt="2024년 추억 페이지">
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
