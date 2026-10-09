@@ -1,0 +1,32 @@
+{
+ "tours": [
+  {
+   "id": "corridor",
+   "title": "복도 (가로 영상)",
+   "type": "walk",
+   "count": 76,
+   "ext": "jpg"
+  },
+  {
+   "id": "corridor2",
+   "title": "복도 (세로 영상)",
+   "type": "walk",
+   "count": 73,
+   "ext": "jpg"
+  },
+  {
+   "id": "office1",
+   "title": "교무실 둘러보기 1",
+   "type": "pan",
+   "count": 23,
+   "ext": "jpg"
+  },
+  {
+   "id": "office2",
+   "title": "교무실 둘러보기 2",
+   "type": "pan",
+   "count": 22,
+   "ext": "jpg"
+  }
+ ]
+}
