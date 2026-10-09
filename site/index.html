@@ -38,6 +38,7 @@
   <input id="seek" type="range" min="0" value="0">
   <span id="pos"></span>
 </footer>
+<script src="tours.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 let tours = [], tour = null, idx = 0, timer = null;
@@ -84,14 +85,15 @@ addEventListener('pointermove', e => {
   stop(); show(dragIdx + Math.round((dragX - e.clientX) / 40));
 });
 
-fetch('tours.json').then(r => r.json()).then(d => {
+function init(d){
   tours = d.tours;
   tours.forEach(t => {
     const b = document.createElement('button'); b.textContent = t.title;
     b.onclick = () => setTour(t); $('tabs').appendChild(b);
   });
   setTour(tours[0]);
-});
+}
+if (window.TOURS) init(window.TOURS); else fetch('tours.json').then(r => r.json()).then(init);
 </script>
 </body>
 </html>

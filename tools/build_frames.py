@@ -79,3 +79,5 @@ for t in cfg["tours"]:
     tours.append({"id": t["id"], "title": t["title"], "type": t.get("type", "walk"),
                   "count": len(keep), "ext": "jpg"})
 json.dump({"tours": tours}, open(os.path.join(OUT, "tours.json"), "w"), ensure_ascii=False, indent=1)
+# file:// 로 바로 열어도 동작하도록 같은 내용을 tours.js 로도 저장
+open(os.path.join(OUT, "tours.js"), "w").write("window.TOURS = " + json.dumps({"tours": tours}, ensure_ascii=False) + ";")
