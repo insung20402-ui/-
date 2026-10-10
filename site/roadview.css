@@ -9,7 +9,7 @@ body.landscape #rv{width:100vw;height:100dvh}
 body.portrait #rv{height:100dvh;width:calc(100dvh*9/16);max-width:100vw}
 @media (max-aspect-ratio:9/16){body.portrait #rv{width:100vw;height:calc(100vw*16/9)}}
 #rv.drag{cursor:grabbing}
-.layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .22s ease;will-change:transform,opacity;pointer-events:none}
+.layer{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .45s ease,transform .45s ease;will-change:transform,opacity;pointer-events:none}
 #a{opacity:1}#b{opacity:0}
 /* 바닥 이동 마커 (카카오맵 로드뷰 스타일) */
 #marker{position:absolute;width:86px;height:34px;margin:-17px 0 0 -43px;border-radius:50%;

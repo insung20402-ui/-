@@ -8,7 +8,8 @@
    "fps": 6,
    "type": "walk",
    "people": "none",
-   "max_w": 1024
+   "max_w": 1600,
+   "pick": 5
   },
   {
    "id": "corridor2",
@@ -16,26 +17,27 @@
    "video": "/root/.claude/uploads/4759cb7a-e87b-5a28-b614-25ea0e85da34/82da95eb-KakaoTalk_20261009_164106298.mp4",
    "fps": 6,
    "type": "walk",
-   "max_w": 1024,
-   "people": "none"
+   "max_w": 1600,
+   "people": "none",
+   "pick": 5
   },
   {
    "id": "office1",
    "title": "교무실 둘러보기 1",
    "video": "/root/.claude/uploads/4759cb7a-e87b-5a28-b614-25ea0e85da34/a9141b80-KakaoTalk_20261009_163652161.mp4",
-   "fps": 10,
+   "fps": 15,
    "type": "pan",
    "people": "none",
-   "max_w": 1024
+   "max_w": 1280
   },
   {
    "id": "office2",
    "title": "교무실 둘러보기 2",
    "video": "/root/.claude/uploads/4759cb7a-e87b-5a28-b614-25ea0e85da34/04adf1e6-KakaoTalk_20261009_163656800.mp4",
-   "fps": 10,
+   "fps": 15,
    "type": "pan",
    "people": "none",
-   "max_w": 1024
+   "max_w": 1280
   }
  ]
 }

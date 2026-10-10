@@ -67,6 +67,9 @@ for t in cfg["tours"]:
         if nb and sc < 0.55 * np.median(nb): continue
         keep.append(fr)
     blurred = 0
+    # pick: 흐린 프레임을 거른 뒤 N장만 일정한 간격으로 선택 (예: 복도 5장)
+    if t.get("pick") and len(keep) > t["pick"]:
+        keep = [keep[round(j * (len(keep) - 1) / (t["pick"] - 1))] for j in range(t["pick"])]
     # drop: 사람이 크게 나오는 프레임 번호(0부터, 흔들린 프레임 제거 후 기준)는 통째로 제외
     drop = set(t.get("drop", []))
     keep = [fr for k, fr in enumerate(keep) if k not in drop]
