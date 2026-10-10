@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadview core — minimal example</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  html, body { height: 100%; margin: 0; font: 14px system-ui, sans-serif; }
+  body { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr auto; }
+  #map, #pano { min-height: 0; }
+  #bar { grid-column: 1 / -1; padding: 8px 12px; background: #111; color: #eee; display: flex; gap: 12px; align-items: center; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="pano"></div>
+<div id="bar">
+  <span id="info"></span>
+  <select id="vintage"></select>
+  <button id="report">블러 누락 신고</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="city.js"></script>
+<script src="reproject.js"></script>
+<script src="pano-render.js"></script>
+<script src="viewer.js"></script>
+<script src="map.js"></script>
+<script>
+  var q = new URLSearchParams(location.search);
+  var viewer = RV.createViewer(document.getElementById('pano'), {
+    nodeId: q.get('node') || 'ew0-008',
+    vintage: q.get('vintage') || 'latest',
+    pov: q.get('heading') ? { heading: +q.get('heading'), pitch: +(q.get('pitch') || 0) } : undefined
+  });
+  var map = RV.createMap(document.getElementById('map')).bindViewer(viewer);
+  var info = document.getElementById('info');
+  function show() {
+    var m = viewer.getManifest();
+    info.textContent = m.address + ' · ' + m.photodate + ' · privacy rev ' + m.privacy.revision;
+  }
+  viewer.on('pano_changed', show);
+  show();
+  map.on('no_coverage', function () { info.textContent = '반경 50m 안에 로드뷰가 없습니다'; });
+
+  var sel = document.getElementById('vintage');
+  ['latest'].concat(RV.VINTAGES.map(function (v) { return v.year; })).forEach(function (v) {
+    sel.add(new Option(v === 'latest' ? '최신' : v, v));
+  });
+  sel.value = q.get('vintage') || 'latest';
+  sel.onchange = function () { viewer.setVintage(sel.value); };
+  document.getElementById('report').onclick = function () { viewer.setReportMode(true); };
+</script>
+</body>
+</html>

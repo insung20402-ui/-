@@ -1,0 +1,1396 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로드뷰 백오피스 — 사진 등록</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root {
+    --bg: #f4f5f7; --panel: #ffffff; --line: #dfe3e8; --line-strong: #c4cbd4;
+    --text: #1d232b; --muted: #66707d; --accent: #2563eb; --accent-soft: #e8effd;
+    --ok: #15803d; --ok-soft: #e3f4e8; --warn: #b45309; --warn-soft: #fdf1dc;
+    --danger: #c62828; --danger-soft: #fde8e8; --plan: #ea580c;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
+  body { font: 14px/1.45 system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; background: var(--bg); color: var(--text); }
+  button, input, select { font: inherit; color: inherit; }
+  a { color: var(--accent); }
+  h2 { font-size: 16px; margin: 0 0 4px; }
+  h3 { font-size: 13px; margin: 0 0 8px; color: var(--muted); font-weight: 600; letter-spacing: .02em; }
+  p { margin: 0 0 8px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 12px; }
+
+  /* ---- page frame ---- */
+  header.top { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  header.top h1 { font-size: 15px; margin: 0; }
+  header.top .spacer { flex: 1; }
+  #storageWarn { background: var(--danger-soft); color: var(--danger); padding: 8px 16px; font-weight: 600; }
+  #targetBar { position: sticky; top: 0; z-index: 1100; display: flex; align-items: center; gap: 6px 14px; flex-wrap: wrap; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  #targetBar .label { font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 99px; }
+  #targetBar strong { font-size: 15px; }
+  #targetBar .links { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 12px 16px 32px; }
+  nav.tabs { display: flex; gap: 4px; overflow-x: auto; }
+  nav.tabs button { flex: 1 0 auto; border: 1px solid var(--line); background: var(--panel); padding: 8px 12px; border-radius: var(--radius); cursor: pointer; font-weight: 600; white-space: nowrap; }
+  nav.tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+  .box > .boxhead { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .box > .boxhead b { color: var(--text); }
+  #map { height: 260px; }
+  #pano { height: 240px; background: #111; position: relative; }
+  .legend { display: inline-flex; align-items: center; gap: 4px; }
+  .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 2px solid var(--line-strong); background: #fff; }
+  .legend i.on { background: var(--ok); border-color: var(--ok); }
+  .legend i.plan { border-color: var(--plan); }
+
+  @media (min-width: 960px) {
+    html, body { height: 100%; }
+    body { display: flex; flex-direction: column; }
+    main { flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) 440px; grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr); padding-bottom: 12px; }
+    nav.tabs { grid-column: 1; grid-row: 1; }
+    #panels { grid-column: 1; grid-row: 2 / 4; overflow-y: auto; }
+    #mapBox { grid-column: 2; grid-row: 1 / 3; }
+    #previewBox { grid-column: 2; grid-row: 3; }
+    #map, #pano { height: auto; flex: 1; min-height: 0; }
+  }
+
+  /* ---- workflow panels ---- */
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .step { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; margin-bottom: 10px; }
+  .step > h3 .n { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: var(--text); color: #fff; font-size: 11px; margin-right: 6px; }
+  .row { display: flex; gap: 8px 12px; flex-wrap: wrap; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  label.field { display: inline-flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
+  select, input[type="number"] { border: 1px solid var(--line-strong); border-radius: 6px; padding: 5px 8px; background: #fff; min-height: 32px; }
+  input[type="number"] { width: 76px; }
+  .btn { border: 1px solid var(--line-strong); background: #fff; border-radius: 6px; padding: 6px 12px; cursor: pointer; min-height: 32px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; color: var(--text); }
+  .btn:hover { background: var(--bg); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; padding: 8px 18px; }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn.danger { color: var(--danger); border-color: #e7b3b3; }
+  .btn.sm { padding: 2px 8px; min-height: 26px; font-size: 12px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 6px; overflow: hidden; }
+  .seg button { border: 0; border-right: 1px solid var(--line-strong); background: #fff; padding: 4px 10px; cursor: pointer; min-height: 30px; font-size: 13px; }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .choice { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; width: 100%; }
+  .choice button { text-align: left; border: 1px solid var(--line-strong); background: #fff; border-radius: 6px; padding: 8px 10px; cursor: pointer; }
+  .choice button.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--accent-soft); }
+  .choice button b { display: block; }
+  .drop { border: 2px dashed var(--line-strong); border-radius: var(--radius); padding: 22px 12px; text-align: center; background: #fafbfc; transition: background .1s, border-color .1s; }
+  .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  .drop .row { justify-content: center; margin-top: 10px; }
+  .drop input[type="file"] { display: none; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 99px; background: var(--bg); color: var(--muted); white-space: nowrap; }
+  .badge.eq { background: var(--accent-soft); color: var(--accent); }
+  .badge.flat { background: #eee9fb; color: #6d3fc4; }
+  .badge.ok { background: var(--ok-soft); color: var(--ok); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .badge.bad { background: var(--danger-soft); color: var(--danger); }
+  .note { border-radius: 6px; padding: 8px 10px; font-size: 13px; margin-top: 8px; }
+  .note.warn { background: var(--warn-soft); color: var(--warn); }
+  .note.bad { background: var(--danger-soft); color: var(--danger); }
+  .note.ok { background: var(--ok-soft); color: var(--ok); }
+  .note.info { background: var(--bg); color: var(--muted); }
+  .empty { color: var(--muted); text-align: center; padding: 14px; border: 1px dashed var(--line); border-radius: 6px; font-size: 13px; }
+  .progress { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; flex: 1; min-width: 120px; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .15s; }
+  .runbar { display: none; align-items: center; gap: 10px; margin-top: 10px; }
+  .runbar.on { display: flex; }
+
+  /* ---- lists ---- */
+  ul.items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  ul.items li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; border: 1px solid var(--line); border-radius: 6px; padding: 6px; align-items: start; }
+  ul.items img.thumb { width: 84px; height: 56px; object-fit: cover; border-radius: 4px; background: var(--bg); display: block; }
+  ul.items .name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  ul.items .ctl { display: flex; gap: 6px 10px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; white-space: nowrap; }
+  th { background: var(--bg); font-size: 12px; color: var(--muted); position: sticky; top: 0; }
+  tr:last-child td { border-bottom: 0; }
+  tr.extra td { background: var(--danger-soft); }
+  td img { width: 60px; height: 36px; object-fit: cover; border-radius: 3px; display: block; background: var(--bg); }
+  td.fname { max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+  .bar { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; min-width: 80px; }
+  .bar i { display: block; height: 100%; background: var(--ok); }
+
+  /* ---- video review + filmstrip ---- */
+  .review { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; margin-top: 8px; }
+  .review .stage { background: #16191d; aspect-ratio: 16 / 9; max-height: 46vh; width: 100%; display: flex; align-items: center; justify-content: center; position: relative; color: #9aa3ae; }
+  .review .stage img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .review .stage.off img { opacity: .35; }
+  .review .stage .mark { position: absolute; left: 10px; top: 10px; background: var(--danger); color: #fff; font-weight: 700; padding: 2px 10px; border-radius: 99px; }
+  .review .stage .pos { position: absolute; right: 10px; top: 10px; background: rgba(0, 0, 0, .65); color: #fff; font-weight: 700; padding: 2px 10px; border-radius: 99px; }
+  .review .bar2 { display: flex; gap: 6px 10px; align-items: center; flex-wrap: wrap; padding: 8px; }
+  .review .info { flex: 1; min-width: 180px; }
+  .strip { position: relative; display: flex; gap: 6px; overflow-x: auto; padding: 8px 2px; margin-top: 4px; }
+  .tile { flex: 0 0 132px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #fff; font-size: 12px; cursor: pointer; }
+  .tile.flag { border-color: #e2b25c; }
+  .tile.cur { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .tile.off .shot, .tile.off .meta { opacity: .45; }
+  .tile .shot { aspect-ratio: 16 / 9; background: #20242a center / cover no-repeat; display: flex; align-items: center; justify-content: center; color: #9aa3ae; position: relative; }
+  .tile .shot .slot { position: absolute; left: 4px; top: 4px; background: rgba(0, 0, 0, .65); color: #fff; padding: 0 6px; border-radius: 99px; font-weight: 700; }
+  .tile .meta { padding: 4px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile .meta b { display: block; font-size: 13px; }
+  .tile .acts { display: flex; gap: 3px; padding: 0 6px 6px; }
+  video#vidEl { width: 100%; max-width: 240px; max-height: 130px; background: #000; border-radius: 6px; display: block; }
+  video#vidEl.locked { pointer-events: none; }
+  kbd { border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font: 11px ui-monospace, monospace; background: #fff; }
+
+  @media (max-width: 480px) {
+    header.top, #targetBar { padding-left: 10px; padding-right: 10px; }
+    main { padding: 10px 10px 32px; }
+    #targetBar .links { margin-left: 0; }
+    ul.items li { grid-template-columns: 64px minmax(0, 1fr); }
+    ul.items img.thumb { width: 64px; height: 44px; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>로드뷰 백오피스</h1>
+  <span class="muted small">모의시 촬영 사진 등록</span>
+  <span class="spacer"></span>
+  <a class="btn sm" href="../index.html">← 시안 비교로</a>
+</header>
+<div id="storageWarn" hidden>이 브라우저에서 IndexedDB를 쓸 수 없습니다. 등록한 사진은 새로 고치면 사라집니다. 내보내기로 백업하세요.</div>
+
+<div id="targetBar">
+  <span class="label">대상 지점</span>
+  <strong id="tNode"></strong>
+  <span id="tAddr"></span>
+  <label class="row small muted" style="gap:4px">촬영 연도 <select id="tYear" title="대상 촬영 연도"></select></label>
+  <span class="badge" id="tCount"></span>
+  <span class="links small">
+    <span class="muted">이 지점을 뷰어로 열기</span>
+    <a class="btn sm" id="linkA" target="_blank">A 분할</a>
+    <a class="btn sm" id="linkB" target="_blank">B 몰입</a>
+    <a class="btn sm" id="linkC" target="_blank">C 인스펙터</a>
+  </span>
+</div>
+
+<main>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="single" aria-selected="true">사진 등록</button>
+    <button role="tab" data-tab="seq" aria-selected="false">연속 등록</button>
+    <button role="tab" data-tab="video" aria-selected="false">영상에서 추출</button>
+    <button role="tab" data-tab="status" aria-selected="false">등록 현황</button>
+  </nav>
+
+  <section class="box" id="mapBox">
+    <div class="boxhead">
+      <b>지도</b>
+      <span>눌러서 지점 선택</span>
+      <span style="flex:1"></span>
+      <label>표시 연도 <select id="statYear"></select></label>
+    </div>
+    <div id="map"></div>
+    <div class="boxhead" style="border-bottom:0;border-top:1px solid var(--line)">
+      <span class="legend"><i class="on"></i> 사진 등록됨</span>
+      <span class="legend"><i></i> 미등록</span>
+      <span class="legend"><i class="plan"></i> 이번에 등록될 지점</span>
+    </div>
+  </section>
+
+  <div id="panels">
+    <!-- A. single / few photos -->
+    <section class="panel active" id="panel-single">
+      <div class="step">
+        <h3><span class="n">1</span>지점 선택</h3>
+        <div class="row">
+          <label class="field">도로 <select id="aRoad"></select></label>
+          <label class="field">촬영 지점 <select id="aNode"></select></label>
+          <span class="muted small">지도를 눌러도 됩니다. 연도는 위 대상 지점 줄에서 바꿉니다.</span>
+        </div>
+      </div>
+      <div class="step">
+        <h3><span class="n">2</span>사진 추가</h3>
+        <div class="drop" id="aDrop">
+          <div><b>사진을 여기에 끌어다 놓으세요</b></div>
+          <div class="muted small">360° 파노라마(가로:세로 2:1)는 자동으로 인식합니다. 여러 장 가능.</div>
+          <div class="row">
+            <label class="btn">파일 선택<input type="file" id="aFiles" accept="image/*" multiple></label>
+            <label class="btn">카메라로 촬영<input type="file" id="aCamera" accept="image/*" capture="environment"></label>
+          </div>
+        </div>
+        <div id="aStaged" style="margin-top:10px"></div>
+        <div class="runbar" id="aRun"><div class="progress"><i></i></div><span class="small"></span></div>
+      </div>
+      <div class="step">
+        <h3><span class="n">3</span>이 지점에 등록된 사진</h3>
+        <div id="aList"></div>
+      </div>
+    </section>
+
+    <!-- B. photos in driving order -->
+    <section class="panel" id="panel-seq">
+      <div class="step">
+        <h3><span class="n">1</span>주행 경로</h3>
+        <div id="bRoute"></div>
+      </div>
+      <div class="step">
+        <h3><span class="n">2</span>사진 묶음</h3>
+        <div class="drop" id="bDrop">
+          <div><b>주행 순서대로 찍은 사진들을 끌어다 놓으세요</b></div>
+          <div class="muted small">파일 이름 순(숫자 인식)으로 정렬해 시작 지점부터 한 지점에 한 장씩 배정합니다.</div>
+          <div class="row"><label class="btn">파일 선택<input type="file" id="bFiles" accept="image/*" multiple></label></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <label class="field">사진 종류
+            <select id="bKind"><option value="auto">자동 인식</option><option value="equirect">모두 360°</option><option value="flat">모두 일반 사진</option></select>
+          </label>
+          <label class="field">일반 사진 방향 (주행 방향 기준)<span class="seg" id="bRel"></span></label>
+          <label class="field">일반 사진 화각(°) <input type="number" id="bFov" min="20" max="140" value="65"></label>
+        </div>
+      </div>
+      <div class="step">
+        <h3><span class="n">3</span>배정 확인 후 등록</h3>
+        <div id="bMap"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn primary" id="bCommit" disabled>등록</button>
+          <button class="btn" id="bClear">목록 비우기</button>
+        </div>
+        <div class="runbar" id="bRun"><div class="progress"><i></i></div><span class="small"></span><button class="btn sm" data-act="cancel">중단</button></div>
+        <div id="bResult"></div>
+      </div>
+    </section>
+
+    <!-- C. drive-through video -->
+    <section class="panel" id="panel-video">
+      <div class="step">
+        <h3><span class="n">1</span>주행 영상</h3>
+        <div class="drop" id="cDrop">
+          <div><b>도로를 지나가며 찍은 영상을 끌어다 놓으세요</b></div>
+          <div class="muted small">시작 지점에서 출발해 한 방향으로 달린 영상 하나. 브라우저 안에서만 분석합니다.</div>
+          <div class="row"><label class="btn">영상 선택<input type="file" id="cFile" accept="video/*"></label></div>
+        </div>
+        <div class="row" style="margin-top:10px;align-items:flex-start">
+          <video id="vidEl" muted playsinline preload="auto" hidden></video>
+          <div id="cVidInfo" class="small"></div>
+        </div>
+      </div>
+      <div class="step">
+        <h3><span class="n">2</span>주행 경로와 추출 간격</h3>
+        <div id="cRoute"></div>
+        <div class="row">
+          <label class="field">추출 방식
+            <span class="seg" id="cMode"><button data-v="interval">N초마다 한 장</button><button data-v="fit">지점 수에 맞추기</button></span>
+          </label>
+          <label class="field" id="cIntervalField">간격(초) — 이 시간마다 가장 선명한 프레임 하나
+            <input type="number" id="cInterval" min="0.2" max="60" step="0.1" value="1.0"></label>
+          <label class="field" id="cCountField" hidden>채울 지점 수 <input type="number" id="cCount" min="1" value="1"></label>
+          <label class="field">영상 종류
+            <span class="seg" id="cKind"><button data-v="equirect">360° 영상</button><button data-v="flat">일반(전방) 영상</button></span>
+          </label>
+          <label class="field">일반 영상 화각(°) <input type="number" id="cFov" min="20" max="140" value="65"></label>
+        </div>
+        <div class="row">
+          <button class="btn primary" id="cAnalyse" disabled>영상 분석</button>
+          <span class="small" id="cPlan"></span>
+        </div>
+        <div class="runbar" id="cRun"><div class="progress"><i></i></div><span class="small"></span><button class="btn sm" data-act="cancel">중단</button></div>
+      </div>
+      <div class="step">
+        <h3><span class="n">3</span>추출 결과 훑어보고 등록</h3>
+        <div id="cSummary"></div>
+        <div class="review" id="cReview" hidden>
+          <div class="stage" id="cStage"><img id="cBig" alt=""><span class="pos" id="cPos"></span><span class="mark" id="cMark" hidden>제외됨</span></div>
+          <div class="bar2">
+            <button class="btn" id="cPrev" title="이전 (←)">◀ 이전</button>
+            <button class="btn" id="cNext" title="다음 (→)">다음 ▶</button>
+            <button class="btn" id="cToggle" title="제외/포함 (X 또는 Space)">제외</button>
+            <button class="btn" id="cPlay">훑어보기 ▶</button>
+            <span class="info small" id="cInfo"></span>
+            <span class="small muted"><kbd>←</kbd> <kbd>→</kbd> 넘기기 · <kbd>X</kbd>/<kbd>Space</kbd> 제외</span>
+          </div>
+        </div>
+        <div id="cStrip"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn primary" id="cCommit" disabled>등록</button>
+        </div>
+        <div class="runbar" id="cRun2"><div class="progress"><i></i></div><span class="small"></span><button class="btn sm" data-act="cancel">중단</button></div>
+        <div id="cResult"></div>
+      </div>
+    </section>
+
+    <!-- D. overview -->
+    <section class="panel" id="panel-status">
+      <div class="step">
+        <h3>도로별 등록 현황</h3>
+        <div id="dCoverage"></div>
+        <p class="muted small" style="margin-top:8px">지도의 점을 누르면 그 지점이 "사진 등록" 탭의 대상이 됩니다. 연도는 지도 위 "표시 연도"로 바꿉니다.</p>
+      </div>
+      <div class="step">
+        <h3>등록된 사진</h3>
+        <div class="row">
+          <label class="field">도로 <select id="dRoad"></select></label>
+          <span style="flex:1"></span>
+          <button class="btn" id="dExport">내보내기</button>
+          <label class="btn">가져오기<input type="file" id="dImport" accept="application/json,.json" hidden></label>
+          <span id="dClearBox"><button class="btn danger" id="dClear">전체 삭제</button></span>
+        </div>
+        <div id="dMsg"></div>
+        <div id="dList" style="margin-top:10px"></div>
+      </div>
+      <div class="step">
+        <h3>알아 둘 점</h3>
+        <ul class="small" style="margin:0;padding-left:18px">
+          <li>사진은 <b>이 브라우저 안(IndexedDB)에만</b> 저장됩니다. 다른 기기·브라우저로 옮기려면 내보내기/가져오기를 쓰세요. 가져오기는 기존 목록에 더합니다.</li>
+          <li>올린 사진의 얼굴·번호판은 <b>자동으로 블러 처리되지 않습니다</b>. 실제 서비스라면 공개 전에 블러 파이프라인을 거칩니다. 등록 전에 직접 확인하고, 뷰어의 "블러 누락 신고"로 가림 패치를 더할 수 있습니다.</li>
+          <li>일반 사진은 렌즈 재투영 없이 파노라마 위에 평면으로 붙입니다. 화각이 넓을수록 가장자리가 어긋나 보입니다.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <section class="box" id="previewBox">
+    <div class="boxhead"><b>미리보기</b><span id="pvInfo"></span></div>
+    <div id="pano"></div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="../shared/city.js"></script>
+<script src="../shared/reproject.js"></script>
+<script src="../shared/pano-render.js"></script>
+<script src="../shared/viewer.js"></script>
+<script src="../shared/map.js"></script>
+<script src="../shared/photo-store.js"></script>
+<script src="../shared/keyframes.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ---------- helpers ----------
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmtBytes(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.round(n / 1024) + ' KB'; }
+  function fmtTime(t) {
+    var m = Math.floor(t / 60), s = t - m * 60;
+    return m + ':' + (s < 10 ? '0' : '') + s.toFixed(1);
+  }
+  var naturalCompare = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }).compare;
+  var REL = [{ off: 0, name: '전방' }, { off: 90, name: '우측' }, { off: 180, name: '후방' }, { off: 270, name: '좌측' }];
+  var COMPASS = ['북', '북동', '동', '남동', '남', '남서', '서', '북서'];
+  var KIND_LABEL = { equirect: '360°', flat: '일반 사진' };
+  var SOURCE_LABEL = { upload: '업로드', camera: '카메라', sequence: '연속 등록', video: '영상 추출' };
+  function compass(h) { return COMPASS[Math.round(RV.norm360(h) / 45) % 8]; }
+  function address(nodeId, year) { return RV.getManifest(nodeId, year).address; }
+  function kindBadge(kind) { return '<span class="badge ' + (kind === 'flat' ? 'flat' : 'eq') + '">' + KIND_LABEL[kind] + '</span>'; }
+  function clampFov(v) { v = Number(v); return isFinite(v) ? Math.max(20, Math.min(140, v)) : 65; }
+  // heading described relative to the node's road direction, e.g. "우측 · 동 90°"
+  function describeHeading(heading, baseHeading) {
+    var rel = RV.norm360(heading - baseHeading), hit = null;
+    REL.forEach(function (r) { if (Math.abs(RV.norm180(rel - r.off)) < 1) hit = r.name; });
+    return (hit ? hit + ' · ' : '') + compass(heading) + ' ' + Math.round(heading) + '°';
+  }
+  function imageFiles(fileList) {
+    return Array.prototype.filter.call(fileList, function (f) {
+      return /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|bmp|avif)$/i.test(f.name);
+    });
+  }
+  // decoded pixel size of an image file (EXIF orientation applied, like the store does)
+  function measure(file) {
+    return createImageBitmap(file, { imageOrientation: 'from-image' }).then(function (bm) {
+      var size = { width: bm.width, height: bm.height };
+      bm.close();
+      return size;
+    });
+  }
+  function setProgress(barEl, done, total, text) {
+    barEl.classList.add('on');
+    barEl.querySelector('.progress i').style.width = (total ? done / total * 100 : 0) + '%';
+    barEl.querySelector('span').textContent = text;
+  }
+  function wireDrop(zone, onFiles) {
+    zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', function () { zone.classList.remove('over'); });
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      zone.classList.remove('over');
+      onFiles(e.dataTransfer.files);
+    });
+  }
+  function wireInput(input, onFiles) {
+    input.addEventListener('change', function () {
+      onFiles(input.files);
+      input.value = '';   // allow picking the same file again
+    });
+  }
+  // a file dropped outside a drop zone must not navigate the page away
+  window.addEventListener('dragover', function (e) { e.preventDefault(); });
+  window.addEventListener('drop', function (e) { e.preventDefault(); });
+
+  // ---------- global state ----------
+  var target = { nodeId: 'ew0-008', year: RV.resolveYear(RV.getNode('ew0-008'), 'latest') };
+  var activeTab = 'single';
+  var busy = false, cancelRequested = false;
+  var uid = 0;
+
+  function setBusy(flag) {
+    busy = flag;
+    if (flag) cancelRequested = false;
+    renderVideo();
+  }
+  document.addEventListener('click', function (e) {
+    if (e.target.dataset && e.target.dataset.act === 'cancel') cancelRequested = true;
+  });
+
+  // ---------- map + preview viewer ----------
+  var viewer = RV.createViewer($('pano'), { nodeId: target.nodeId, vintage: target.year });
+  var map = RV.createMap($('map'), { theme: 'light', showCoverage: false });
+  var dots = {};
+  RV.nodes.forEach(function (node) {
+    dots[node.id] = L.circleMarker([node.lat, node.lon], { radius: 4, weight: 1.5, fillOpacity: 1, bubblingMouseEvents: false })
+      .addTo(map.leaflet)
+      .on('click', function () { pickSpot(node.id); });
+  });
+  map.on('pick', function (e) { pickSpot(e.nodeId); });
+  window.addEventListener('resize', function () { map.invalidateSize(); });
+  // the map box gets its final size only after first layout
+  window.addEventListener('load', function () { map.invalidateSize(); map.fit(); });
+
+  function statYear() { var v = $('statYear').value; return v === 'all' ? 'all' : Number(v); }
+  function registeredNodes(year) {
+    var set = {};
+    RV.photos.list().forEach(function (m) { if (year === 'all' || m.year === year) set[m.nodeId] = true; });
+    return set;
+  }
+  // node ids the active bulk workflow is about to write to
+  function plannedNodes() {
+    if (activeTab === 'seq') return seqNodes();
+    if (activeTab === 'video') return videoNodes();
+    return [];
+  }
+  function drawDots() {
+    var css = getComputedStyle(document.documentElement);
+    var ok = css.getPropertyValue('--ok').trim(), plan = css.getPropertyValue('--plan').trim();
+    var year = statYear(), has = registeredNodes(year), planned = {};
+    plannedNodes().forEach(function (id) { planned[id] = true; });
+    RV.nodes.forEach(function (node) {
+      var captured = year === 'all' || node.years.indexOf(year) >= 0;
+      dots[node.id].setStyle({
+        color: planned[node.id] ? plan : has[node.id] ? ok : '#9aa3ae',
+        weight: planned[node.id] ? 3 : 1.5,
+        fillColor: has[node.id] ? ok : '#ffffff',
+        opacity: captured ? 1 : 0.3, fillOpacity: captured ? 1 : 0.3
+      });
+    });
+  }
+
+  function pickSpot(nodeId) {
+    setTarget(nodeId);
+    if (activeTab === 'status') selectTab('single');
+  }
+  // keep the year when the new spot was captured that year, else its latest
+  function setTarget(nodeId, year) {
+    var node = RV.getNode(nodeId);
+    if (!node) return;
+    if (year === undefined) year = node.years.indexOf(target.year) >= 0 ? target.year : RV.resolveYear(node, 'latest');
+    var moved = nodeId !== target.nodeId;
+    target = { nodeId: nodeId, year: year };
+    viewer.setPano(nodeId, { vintage: year, pov: moved ? { heading: node.heading, pitch: 0 } : undefined });
+    renderTarget();
+  }
+  // walking with the preview's arrows moves the target too
+  viewer.on('pano_changed', function (e) {
+    if (e.nodeId === target.nodeId && e.year === target.year) return;
+    target = { nodeId: e.nodeId, year: e.year };
+    renderTarget();
+  });
+  viewer.on('pov_changed', function (p) { map.setWalker(target.nodeId, p.heading, p.fov); });
+
+  function renderTarget() {
+    var node = RV.getNode(target.nodeId), m = RV.getManifest(target.nodeId, target.year);
+    var count = RV.photos.byNode(target.nodeId, target.year).length;
+    $('tNode').textContent = node.id;
+    $('tAddr').textContent = m.address;
+    $('tYear').innerHTML = node.years.map(function (y) {
+      return '<option value="' + y + '"' + (y === target.year ? ' selected' : '') + '>' + esc(RV.vintage(y).label) + '</option>';
+    }).join('');
+    $('tCount').textContent = count ? '등록 사진 ' + count + '장' : '등록 사진 없음';
+    $('tCount').className = 'badge' + (count ? ' ok' : '');
+    var q = '?node=' + node.id + '&vintage=' + target.year;
+    $('linkA').href = '../a-split/index.html' + q;
+    $('linkB').href = '../b-immersive/index.html' + q;
+    $('linkC').href = '../c-inspector/index.html' + q;
+    $('pvInfo').textContent = node.id + ' · ' + m.photodate + (count ? ' · 등록 사진 표시 중' : ' · 합성 화면(등록 사진 없음)');
+    var pov = viewer.getPov();
+    map.setWalker(node.id, pov.heading, pov.fov);
+    if (!map.leaflet.getBounds().contains([node.lat, node.lon])) map.leaflet.panTo([node.lat, node.lon]);
+    $('aRoad').value = node.roadId;
+    fillNodeSelect($('aNode'), node.roadId, target.year);
+    $('aNode').value = node.id;
+    renderStaged();
+    renderCaptureList();
+  }
+  $('tYear').addEventListener('change', function () { setTarget(target.nodeId, Number($('tYear').value)); });
+
+  function fillRoadSelect(sel, withAll) {
+    sel.innerHTML = (withAll ? '<option value="">전체 도로</option>' : '') + RV.roads.map(function (r) {
+      return '<option value="' + r.id + '">' + esc(r.name) + ' (' + r.id + ')</option>';
+    }).join('');
+  }
+  function fillNodeSelect(sel, roadId, year) {
+    sel.innerHTML = RV.getRoad(roadId).nodeIds.map(function (id) {
+      return '<option value="' + id + '">' + id + ' · ' + esc(address(id, year)) + '</option>';
+    }).join('');
+  }
+
+  // ---------- tabs ----------
+  function selectTab(name) {
+    activeTab = name;
+    Array.prototype.forEach.call(document.querySelectorAll('nav.tabs button'), function (b) {
+      b.setAttribute('aria-selected', b.dataset.tab === name ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.panel'), function (p) {
+      p.classList.toggle('active', p.id === 'panel-' + name);
+    });
+    drawDots();
+  }
+  document.querySelector('nav.tabs').addEventListener('click', function (e) {
+    if (e.target.dataset.tab) selectTab(e.target.dataset.tab);
+  });
+
+  // ---------- A. single / few photos ----------
+  var staged = [];   // { key, file, name, url, width, height, auto, kind, rel, hfov, source, error }
+
+  fillRoadSelect($('aRoad'));
+  $('aRoad').addEventListener('change', function () {
+    var road = RV.getRoad($('aRoad').value);
+    setTarget(road.nodeIds[Math.min(RV.getNode(target.nodeId).seq, road.nodeIds.length - 1)]);
+  });
+  $('aNode').addEventListener('change', function () { setTarget($('aNode').value); });
+
+  function stageFiles(fileList, source) {
+    var files = imageFiles(fileList);
+    files.forEach(function (file) {
+      var item = { key: ++uid, file: file, name: file.name, url: URL.createObjectURL(file), rel: 0, hfov: 65, source: source };
+      staged.push(item);
+      measure(file).then(function (size) {
+        item.width = size.width;
+        item.height = size.height;
+        item.auto = item.kind = RV.photos.guessKind(size.width, size.height);
+      }, function () { item.error = true; }).then(renderStaged);
+    });
+    renderStaged(fileList.length && !files.length ? '이미지 파일이 아닙니다.' : '');
+  }
+  wireDrop($('aDrop'), function (f) { stageFiles(f, 'upload'); });
+  wireInput($('aFiles'), function (f) { stageFiles(f, 'upload'); });
+  wireInput($('aCamera'), function (f) { stageFiles(f, 'camera'); });
+
+  function relButtons(current, act) {
+    return '<span class="seg">' + REL.map(function (r) {
+      return '<button data-act="' + act + '" data-off="' + r.off + '"' + (current === r.off ? ' class="on"' : '') + '>' + r.name + '</button>';
+    }).join('') + '</span>';
+  }
+  function renderStaged(message) {
+    var box = $('aStaged');
+    if (!staged.length) {
+      box.innerHTML = typeof message === 'string' && message ? '<div class="note bad">' + esc(message) + '</div>' : '';
+      return;
+    }
+    var ready = staged.filter(function (s) { return s.kind; });
+    var eqCount = ready.filter(function (s) { return s.kind === 'equirect'; }).length;
+    var hasEq = RV.photos.byNode(target.nodeId, target.year).some(function (m) { return m.kind === 'equirect'; });
+    var notes = '';
+    if (eqCount > 1) notes += '<div class="note warn">360° 사진이 ' + eqCount + '장입니다. 한 지점에는 360° 사진이 한 장만 남습니다(마지막 것). 여러 지점에 나눠 올리려면 "연속 등록" 탭을 쓰세요.</div>';
+    else if (eqCount === 1 && hasEq) notes += '<div class="note warn">이 지점에 이미 있는 360° 사진을 새 사진으로 교체합니다.</div>';
+    box.innerHTML = '<ul class="items">' + staged.map(function (s) {
+      var body;
+      if (s.error) body = '<span class="badge bad">읽을 수 없는 이미지</span>';
+      else if (!s.kind) body = '<span class="muted small">확인 중…</span>';
+      else {
+        body = '<span class="small muted">' + s.width + '×' + s.height + ' · 자동 인식: ' + KIND_LABEL[s.auto] + '</span>' +
+          '<div class="ctl"><select data-act="kind" title="사진 종류"><option value="equirect"' + (s.kind === 'equirect' ? ' selected' : '') +
+          '>360° 파노라마</option><option value="flat"' + (s.kind === 'flat' ? ' selected' : '') + '>일반 사진</option></select>' +
+          (s.kind === 'flat' ? relButtons(s.rel, 'rel') + '<label class="small muted">화각 <input type="number" data-act="fov" min="20" max="140" value="' + s.hfov + '">°</label>' : '') +
+          '</div>';
+      }
+      return '<li data-key="' + s.key + '"><img class="thumb" src="' + s.url + '" alt=""><div><div class="row" style="justify-content:space-between">' +
+        '<span class="name">' + esc(s.name) + '</span><button class="btn sm" data-act="unstage">빼기</button></div>' + body + '</div></li>';
+    }).join('') + '</ul>' + notes +
+      '<div class="row" style="margin-top:10px"><button class="btn primary" id="aCommit"' + (ready.length && !busy ? '' : ' disabled') + '>' +
+      esc(target.nodeId) + '에 ' + ready.length + '장 등록</button>' +
+      '<span class="muted small">' + esc(address(target.nodeId, target.year)) + ' · ' + esc(RV.vintage(target.year).label) + '</span></div>';
+  }
+  function stagedOf(el) {
+    var li = el.closest('li[data-key]');
+    return li && staged.filter(function (s) { return s.key === Number(li.dataset.key); })[0];
+  }
+  $('aStaged').addEventListener('click', function (e) {
+    var act = e.target.dataset.act, item = stagedOf(e.target);
+    if (e.target.id === 'aCommit') { commitStaged(); return; }
+    if (!item) return;
+    if (act === 'unstage') { URL.revokeObjectURL(item.url); staged.splice(staged.indexOf(item), 1); }
+    else if (act === 'rel') item.rel = Number(e.target.dataset.off);
+    else return;
+    renderStaged();
+  });
+  $('aStaged').addEventListener('change', function (e) {
+    var act = e.target.dataset.act, item = stagedOf(e.target);
+    if (!item) return;
+    if (act === 'kind') item.kind = e.target.value;
+    if (act === 'fov') item.hfov = clampFov(e.target.value);
+    renderStaged();
+  });
+
+  function commitStaged() {
+    var todo = staged.filter(function (s) { return s.kind; });
+    var node = RV.getNode(target.nodeId), year = target.year, done = 0, last = null;
+    setBusy(true);
+    todo.reduce(function (chain, s) {
+      return chain.then(function () {
+        setProgress($('aRun'), done, todo.length, done + ' / ' + todo.length + ' 등록 중');
+        return RV.photos.add({
+          nodeId: node.id, year: year, file: s.file, kind: s.kind, name: s.name, source: s.source,
+          heading: s.kind === 'flat' ? node.heading + s.rel : undefined, hfov: s.hfov
+        });
+      }).then(function (meta) {
+        last = meta;
+        done++;
+        URL.revokeObjectURL(s.url);
+        staged.splice(staged.indexOf(s), 1);
+      });
+    }, Promise.resolve()).then(function () {
+      setProgress($('aRun'), done, todo.length, done + '장 등록 완료');
+      if (last && target.nodeId === node.id) viewer.setPov({ heading: last.heading, pitch: 0 });
+    }, function (err) {
+      setProgress($('aRun'), done, todo.length, '등록 실패: ' + err.message);
+    }).then(function () { setBusy(false); renderStaged(); });
+  }
+
+  function renderCaptureList() {
+    var node = RV.getNode(target.nodeId);
+    var photos = RV.photos.byNode(target.nodeId, target.year);
+    if (!photos.length) {
+      $('aList').innerHTML = '<div class="empty">이 지점(' + esc(RV.vintage(target.year).label) + ')에는 아직 등록된 사진이 없습니다. 미리보기는 합성 화면입니다.</div>';
+      return;
+    }
+    $('aList').innerHTML = '<ul class="items">' + photos.map(function (m) {
+      var rel = Math.round(RV.norm360(m.heading - node.heading));
+      return '<li data-id="' + m.id + '"><img class="thumb" loading="lazy" src="' + RV.photos.url(m.id) + '" alt="">' +
+        '<div><div class="row" style="justify-content:space-between"><span class="name">' + kindBadge(m.kind) + ' ' + esc(m.name || '(이름 없음)') + '</span>' +
+        '<span class="row" style="gap:4px"><button class="btn sm" data-act="look">보기</button><button class="btn sm danger" data-act="del">삭제</button></span></div>' +
+        '<div class="small muted">' + esc(describeHeading(m.heading, node.heading)) + ' · ' + m.width + '×' + m.height + ' · ' + fmtBytes(m.bytes) +
+        ' · ' + (SOURCE_LABEL[m.source] || esc(m.source)) + '</div>' +
+        (m.kind === 'flat'
+          ? '<div class="ctl">' + relButtons(rel, 'setrel') +
+            '<label class="small muted">방위 <input type="number" data-act="heading" min="0" max="359" value="' + Math.round(m.heading) + '">°</label>' +
+            '<label class="small muted">화각 <input type="number" data-act="hfov" min="20" max="140" value="' + Math.round(m.hfov) + '">°</label></div>'
+          : '') +
+        '</div></li>';
+    }).join('') + '</ul>';
+  }
+  $('aList').addEventListener('click', function (e) {
+    var li = e.target.closest('li[data-id]'), act = e.target.dataset.act;
+    if (!li || !act) return;
+    var id = li.dataset.id, node = RV.getNode(target.nodeId);
+    var meta = RV.photos.byNode(target.nodeId).filter(function (m) { return m.id === id; })[0];
+    if (act === 'del') RV.photos.remove(id);
+    if (act === 'look' && meta) viewer.setPov({ heading: meta.heading, pitch: 0 });
+    if (act === 'setrel') {
+      var heading = node.heading + Number(e.target.dataset.off);
+      RV.photos.update(id, { heading: heading }).then(function () { viewer.setPov({ heading: heading, pitch: 0 }); });
+    }
+  });
+  $('aList').addEventListener('change', function (e) {
+    var li = e.target.closest('li[data-id]'), act = e.target.dataset.act, value = Number(e.target.value);
+    if (!li || !isFinite(value)) return;
+    if (act === 'heading') RV.photos.update(li.dataset.id, { heading: value }).then(function () { viewer.setPov({ heading: value, pitch: 0 }); });
+    if (act === 'hfov') RV.photos.update(li.dataset.id, { hfov: value });
+  });
+
+  // ---------- route picker shared by B and C ----------
+  // route: { roadId, dir (+1 | -1), startSeq, year }
+  function endName(road, seq) {
+    var node = RV.getNode(road.nodeIds[seq]), cross = null;
+    RV.nodes.forEach(function (o) {
+      if (o.roadId !== road.id && Math.abs(o.lat - node.lat) < 1e-9 && Math.abs(o.lon - node.lon) < 1e-9) cross = RV.getRoad(o.roadId).name;
+    });
+    return (cross ? cross + ' 쪽 ' : '') + node.id;
+  }
+  function createRoute(el, onChange) {
+    var route = { roadId: RV.roads[0].id, dir: 1, startSeq: 0, year: null };
+    function road() { return RV.getRoad(route.roadId); }
+    function firstSeq() { return route.dir > 0 ? 0 : road().nodeIds.length - 1; }
+    function render() {
+      var r = road(), last = r.nodeIds.length - 1;
+      if (r.years.indexOf(route.year) < 0) route.year = Math.max.apply(null, r.years);
+      function dirButton(dir) {
+        var from = dir > 0 ? 0 : last, to = dir > 0 ? last : 0;
+        return '<button data-dir="' + dir + '"' + (route.dir === dir ? ' class="on"' : '') + '><b>' + (dir > 0 ? '정방향' : '역방향') +
+          ' · ' + compass(RV.keyframes.travelHeading(r.id, dir)) + '쪽으로</b><span class="small muted">' +
+          esc(endName(r, from)) + ' → ' + esc(endName(r, to)) + '</span></button>';
+      }
+      el.innerHTML =
+        '<div class="row"><label class="field">도로 <select data-f="road">' + RV.roads.map(function (x) {
+          return '<option value="' + x.id + '"' + (x.id === r.id ? ' selected' : '') + '>' + esc(x.name) + ' (' + x.id + ', ' + x.nodeIds.length + '지점)</option>';
+        }).join('') + '</select></label>' +
+        '<label class="field">촬영 연도 <select data-f="year">' + r.years.map(function (y) {
+          return '<option value="' + y + '"' + (y === route.year ? ' selected' : '') + '>' + esc(RV.vintage(y).label) + '</option>';
+        }).join('') + '</select></label></div>' +
+        '<div class="row"><div class="choice">' + dirButton(1) + dirButton(-1) + '</div></div>' +
+        '<div class="row"><label class="field">시작 지점 <select data-f="start">' + r.nodeIds.map(function (id, seq) {
+          return '<option value="' + seq + '"' + (seq === route.startSeq ? ' selected' : '') + '>' + id + ' · ' + esc(address(id, route.year)) + '</option>';
+        }).join('') + '</select></label>' +
+        '<button class="btn" data-f="fromTarget" style="align-self:flex-end">대상 지점(' + esc(target.nodeId) + ')에서 시작</button></div>';
+    }
+    el.addEventListener('change', function (e) {
+      var f = e.target.dataset.f;
+      if (f === 'road') { route.roadId = e.target.value; route.startSeq = firstSeq(); }
+      if (f === 'year') route.year = Number(e.target.value);
+      if (f === 'start') route.startSeq = Number(e.target.value);
+      render();
+      onChange();
+    });
+    el.addEventListener('click', function (e) {
+      var dirBtn = e.target.closest('button[data-dir]');
+      if (dirBtn) {
+        route.dir = Number(dirBtn.dataset.dir);
+        route.startSeq = firstSeq();   // a new direction starts from its own end of the road
+      } else if (e.target.dataset.f === 'fromTarget') {
+        var node = RV.getNode(target.nodeId);
+        route.roadId = node.roadId;
+        route.startSeq = node.seq;
+        route.year = target.year;
+      } else return;
+      render();
+      onChange();
+    });
+    render();
+    route.render = render;
+    route.nodes = function (count) { return RV.keyframes.sequence(route.roadId, route.startSeq, route.dir, count); };
+    route.remaining = function () { return route.nodes(Infinity).length; };
+    route.heading = function () { return RV.keyframes.travelHeading(route.roadId, route.dir); };
+    return route;
+  }
+
+  // ---------- B. photos in driving order ----------
+  var seqItems = [];   // { key, file, name, url, width, height, auto }
+  var seqOpts = { kind: 'auto', rel: 0, hfov: 65 };
+  var seqRoute = createRoute($('bRoute'), function () { renderSeq(); drawDots(); });
+  function seqNodes() { return seqRoute.nodes(seqItems.length); }
+  function seqKind(item) { return seqOpts.kind === 'auto' ? item.auto : seqOpts.kind; }
+
+  function addSeqFiles(fileList) {
+    var files = imageFiles(fileList), failed = [];
+    $('bResult').innerHTML = '';
+    files.forEach(function (file) {
+      var item = { key: ++uid, file: file, name: file.name, url: URL.createObjectURL(file) };
+      seqItems.push(item);
+      measure(file).then(function (size) {
+        item.width = size.width;
+        item.height = size.height;
+        item.auto = RV.photos.guessKind(size.width, size.height);
+      }, function () {
+        // an unreadable file must not hold a road position
+        seqItems.splice(seqItems.indexOf(item), 1);
+        failed.push(item.name);
+        $('bResult').innerHTML = '<div class="note bad">읽을 수 없어 제외한 파일: ' + esc(failed.join(', ')) + '</div>';
+      }).then(function () { renderSeq(); drawDots(); });
+    });
+    seqItems.sort(function (p, q) { return naturalCompare(p.name, q.name); });
+    renderSeq();
+    drawDots();
+  }
+  wireDrop($('bDrop'), addSeqFiles);
+  wireInput($('bFiles'), addSeqFiles);
+
+  $('bRel').innerHTML = REL.map(function (r) { return '<button data-off="' + r.off + '">' + r.name + '</button>'; }).join('');
+  function renderSeqOpts() {
+    Array.prototype.forEach.call($('bRel').children, function (b) { b.classList.toggle('on', Number(b.dataset.off) === seqOpts.rel); });
+  }
+  $('bRel').addEventListener('click', function (e) {
+    if (e.target.dataset.off === undefined) return;
+    seqOpts.rel = Number(e.target.dataset.off);
+    renderSeqOpts();
+  });
+  $('bKind').addEventListener('change', function () { seqOpts.kind = $('bKind').value; renderSeq(); });
+  $('bFov').addEventListener('change', function () { seqOpts.hfov = clampFov($('bFov').value); $('bFov').value = seqOpts.hfov; });
+  $('bClear').addEventListener('click', function () {
+    seqItems.forEach(function (s) { URL.revokeObjectURL(s.url); });
+    seqItems = [];
+    renderSeq();
+    drawDots();
+  });
+
+  // what registering `kind` on nodeId@year does to the photos already there
+  function overwriteNote(nodeId, year, kind) {
+    var existing = RV.photos.byNode(nodeId, year);
+    if (!existing.length) return '<span class="badge ok">신규</span>';
+    if (kind === 'equirect' && existing.some(function (m) { return m.kind === 'equirect'; })) return '<span class="badge warn">기존 360° 교체</span>';
+    return '<span class="badge">기존 ' + existing.length + '장에 추가</span>';
+  }
+  function renderSeq() {
+    var nodes = seqNodes(), n = seqItems.length;
+    var pending = seqItems.some(function (s) { return !s.auto; });
+    if (!n) {
+      $('bMap').innerHTML = '<div class="empty">사진을 추가하면 어느 사진이 어느 지점에 등록되는지 여기에 표시됩니다.</div>';
+      $('bCommit').textContent = '등록';
+      refreshButtons();
+      return;
+    }
+    var extra = n - nodes.length, replaced = 0;
+    var rows = seqItems.map(function (s, i) {
+      var nodeId = nodes[i], kind = seqKind(s);
+      var note = !nodeId ? '<span class="badge bad">지점 없음 · 등록 안 됨</span>' : kind ? overwriteNote(nodeId, seqRoute.year, kind) : '';
+      if (note.indexOf('교체') >= 0) replaced++;
+      return '<tr data-key="' + s.key + '"' + (nodeId ? '' : ' class="extra"') + '><td>' + (i + 1) + '</td><td><img src="' + s.url + '" alt=""></td>' +
+        '<td class="fname" title="' + esc(s.name) + '">' + esc(s.name) + '</td><td>' + (kind ? kindBadge(kind) : '<span class="muted">확인 중…</span>') + '</td>' +
+        '<td>' + (nodeId ? '<b>' + nodeId + '</b> <span class="muted">' + esc(address(nodeId, seqRoute.year)) + '</span>' : '—') + '</td><td>' + note + '</td>' +
+        '<td><button class="btn sm" data-act="up" title="앞으로"' + (i === 0 ? ' disabled' : '') + '>↑</button> ' +
+        '<button class="btn sm" data-act="down" title="뒤로"' + (i === n - 1 ? ' disabled' : '') + '>↓</button> ' +
+        '<button class="btn sm" data-act="drop" title="목록에서 빼기">×</button></td></tr>';
+    }).join('');
+    var road = RV.getRoad(seqRoute.roadId);
+    var notes = '<div class="note info">' + esc(road.name) + ' ' + (seqRoute.dir > 0 ? '정방향' : '역방향') + '(' + compass(seqRoute.heading()) + '쪽) · ' +
+      (nodes.length ? nodes[0] + ' → ' + nodes[nodes.length - 1] : '') + ' · ' + esc(RV.vintage(seqRoute.year).label) + '</div>';
+    if (extra > 0) notes += '<div class="note bad">사진이 남은 지점보다 ' + extra + '장 많습니다. 시작 지점에서 도로 끝까지 ' + nodes.length +
+      '지점뿐이라 마지막 ' + extra + '장(빨간 줄)은 등록되지 않습니다.</div>';
+    if (replaced) notes += '<div class="note warn">' + replaced + '개 지점의 기존 360° 사진이 새 사진으로 교체됩니다.</div>';
+    $('bMap').innerHTML = notes + '<div class="tablewrap" style="margin-top:8px;max-height:420px;overflow-y:auto"><table><thead><tr><th>#</th><th>사진</th><th>파일</th><th>종류</th>' +
+      '<th>등록될 지점</th><th>상태</th><th>순서</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+    $('bCommit').textContent = pending ? '사진 확인 중…' : nodes.length + '장 등록';
+    refreshButtons();
+  }
+  $('bMap').addEventListener('click', function (e) {
+    var tr = e.target.closest('tr[data-key]'), act = e.target.dataset.act;
+    if (!tr || !act || busy) return;
+    var i = seqItems.map(function (s) { return s.key; }).indexOf(Number(tr.dataset.key));
+    if (act === 'drop') { URL.revokeObjectURL(seqItems[i].url); seqItems.splice(i, 1); }
+    var j = act === 'up' ? i - 1 : act === 'down' ? i + 1 : -1;
+    if (j >= 0 && j < seqItems.length) seqItems.splice(j, 0, seqItems.splice(i, 1)[0]);
+    renderSeq();
+    drawDots();
+  });
+
+  $('bCommit').addEventListener('click', function () {
+    var nodes = seqNodes(), year = seqRoute.year, travel = seqRoute.heading();
+    var jobs = nodes.map(function (nodeId, i) { return { nodeId: nodeId, item: seqItems[i], kind: seqKind(seqItems[i]) }; });
+    var done = 0;
+    setBusy(true);
+    jobs.reduce(function (chain, job) {
+      return chain.then(function () {
+        if (cancelRequested) return;
+        setProgress($('bRun'), done, jobs.length, done + ' / ' + jobs.length + ' 등록 중');
+        return RV.photos.add({
+          nodeId: job.nodeId, year: year, file: job.item.file, kind: job.kind, name: job.item.name, source: 'sequence',
+          heading: travel + (job.kind === 'flat' ? seqOpts.rel : 0), hfov: seqOpts.hfov
+        }).then(function () { done++; });
+      });
+    }, Promise.resolve()).then(function () {
+      // registered photos leave the list; anything left (cancelled or beyond the road end) stays visible
+      seqItems.splice(0, done).forEach(function (s) { URL.revokeObjectURL(s.url); });
+      setProgress($('bRun'), done, jobs.length, done + '장 등록' + (cancelRequested ? ' 후 중단' : ' 완료'));
+      $('bResult').innerHTML = done ? '<div class="note ok">' + nodes[0] + ' → ' + nodes[done - 1] + ' 에 ' + done + '장을 등록했습니다. ' +
+        '<button class="btn sm" data-goto="' + nodes[0] + '" data-year="' + year + '">첫 지점 미리보기</button></div>' : '';
+    }, function (err) {
+      seqItems.splice(0, done).forEach(function (s) { URL.revokeObjectURL(s.url); });
+      $('bResult').innerHTML = '<div class="note bad">' + done + '장 등록 후 실패: ' + esc(err.message) + '</div>';
+    }).then(function () { setBusy(false); renderSeq(); drawDots(); });
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.dataset && e.target.dataset.goto) setTarget(e.target.dataset.goto, Number(e.target.dataset.year));
+  });
+
+  // ---------- C. drive-through video ----------
+  var MAX_CANDIDATES = 600, MIN_STEP = 0.1, THUMB_W = 640, PLAY_MS = 600;
+  var video = { file: null, url: null, ok: false };
+  var vidOpts = { mode: 'interval', kind: 'flat', hfov: 65 };
+  // { cands, forSize, tiles: [{ cand, excluded }], windows: [[candidate index]], thumbs: { candidate index: data URL } }
+  var vidResult = null;
+  var reviewIdx = 0, playTimer = null, playStoppedAt = 0;
+  var vidEl = $('vidEl');
+  var vidRoute = createRoute($('cRoute'), function () {
+    $('cCount').value = vidRoute.remaining();   // default: to the end of the road
+    applySelection();
+  });
+  $('cCount').value = vidRoute.remaining();
+  function vidInterval() {
+    var v = Number($('cInterval').value);
+    return isFinite(v) && v >= 0.2 ? Math.min(60, v) : 1;
+  }
+  function vidCount() {
+    var n = Math.floor(Number($('cCount').value));
+    return Math.max(1, Math.min(vidRoute.remaining(), isFinite(n) ? n : 1));
+  }
+  // clock seconds one selected frame stands for with the current settings
+  function wantedSize() {
+    return vidOpts.mode === 'interval' ? vidInterval() : (video.ok ? vidEl.duration / vidCount() : 1);
+  }
+  // number of frames the current settings produce (an estimate until analysed)
+  function frameCount() {
+    if (vidResult && vidResult.tiles) return vidResult.tiles.length;
+    if (vidOpts.mode === 'fit') return vidCount();
+    return video.ok ? Math.max(1, Math.ceil(vidEl.duration / vidInterval())) : 0;
+  }
+  function videoNodes() { return vidRoute.nodes(frameCount()); }
+
+  // everything that seeks the shared <video> runs through this queue, one at a time
+  var videoQueue = Promise.resolve(), thumbGen = 0;
+  function enqueue(fn) {
+    videoQueue = videoQueue.then(fn).catch(function () {});
+    return videoQueue;
+  }
+
+  function loadVideo(fileList) {
+    var file = fileList[0];
+    if (!file || busy) return;
+    if (video.url) URL.revokeObjectURL(video.url);
+    video = { file: file, url: URL.createObjectURL(file), ok: false };
+    vidResult = null;
+    thumbGen++;
+    $('cResult').innerHTML = '';
+    $('cRun').classList.remove('on');
+    $('cRun2').classList.remove('on');
+    vidEl.hidden = false;
+    vidEl.src = video.url;
+    $('cVidInfo').innerHTML = '<span class="muted">영상을 여는 중…</span>';
+    renderVideo();
+  }
+  vidEl.addEventListener('loadedmetadata', function () {
+    video.ok = true;
+    vidOpts.kind = RV.photos.guessKind(vidEl.videoWidth, vidEl.videoHeight);
+    $('cVidInfo').innerHTML = '<b>' + esc(video.file.name) + '</b><br>' + vidEl.videoWidth + '×' + vidEl.videoHeight + ' · ' +
+      fmtTime(vidEl.duration) + ' · ' + fmtBytes(video.file.size) + '<br><span class="muted">화면 비율로 본 종류: ' + KIND_LABEL[vidOpts.kind] + '</span>';
+    renderVideo();
+    drawDots();
+  });
+  vidEl.addEventListener('error', function () {
+    if (!video.file) return;
+    video.ok = false;
+    vidEl.hidden = true;
+    $('cVidInfo').innerHTML = '<div class="note bad">이 영상을 브라우저가 열지 못했습니다(지원하지 않는 코덱일 수 있습니다). MP4(H.264)로 변환해 다시 시도하세요.</div>';
+    renderVideo();
+  });
+  wireDrop($('cDrop'), loadVideo);
+  wireInput($('cFile'), loadVideo);
+
+  $('cMode').addEventListener('click', function (e) {
+    if (!e.target.dataset.v || busy) return;
+    vidOpts.mode = e.target.dataset.v;
+    applySelection();
+  });
+  $('cInterval').addEventListener('input', applySelection);
+  $('cCount').addEventListener('change', function () { $('cCount').value = vidCount(); applySelection(); });
+  $('cKind').addEventListener('click', function (e) {
+    if (!e.target.dataset.v) return;
+    vidOpts.kind = e.target.dataset.v;
+    renderVideo();
+  });
+  $('cFov').addEventListener('change', function () { vidOpts.hfov = clampFov($('cFov').value); $('cFov').value = vidOpts.hfov; });
+
+  // The scored candidates are dense enough for windows down to half the size
+  // they were scanned for (>= 2 candidates per window); finer needs a new scan,
+  // unless the scan already hit the engine's density limits.
+  function needsRescan() {
+    if (!vidResult) return false;
+    var scoredStep = vidEl.duration / vidResult.cands.length;
+    var densest = scoredStep <= MIN_STEP + 1e-6 || vidResult.cands.length >= MAX_CANDIDATES;
+    return !densest && wantedSize() < vidResult.forSize / 2 - 1e-6;
+  }
+  // Candidate indexes per window, for nudging a tile to a neighbouring frame.
+  // Mirrors the windows RV.keyframes.select()/selectByInterval() cut (travel time, stills left out).
+  function slotWindows(cands, slots) {
+    return RV.keyframes.windows(cands, vidOpts.mode === 'interval' ? { seconds: vidInterval() } : { slots: slots });
+  }
+  // Re-pick frames from the already scored candidates (no video scan).
+  function applySelection() {
+    stopPlay();
+    if (vidResult) {
+      if (needsRescan()) {
+        vidResult.tiles = null;
+      } else {
+        var cands = vidResult.cands;
+        var picked = vidOpts.mode === 'interval'
+          ? RV.keyframes.selectByInterval(cands, vidInterval())
+          : RV.keyframes.select(cands, vidCount());
+        var windows = slotWindows(cands, picked.length);
+        vidResult.tiles = picked.map(function (ci) { return { cand: ci, excluded: ci === null }; });
+        vidResult.windows = picked.map(function (ci, s) {
+          return ci !== null && windows[s].indexOf(ci) >= 0 ? windows[s] : (ci === null ? [] : [ci]);
+        });
+        reviewIdx = Math.min(reviewIdx, Math.max(0, picked.length - 1));
+        loadThumbs();
+      }
+    }
+    renderVideo();
+    drawDots();
+  }
+  function loadThumbs() {
+    var gen = ++thumbGen, result = vidResult;
+    result.tiles.forEach(function (tile) {
+      var ci = tile.cand;
+      if (ci === null || result.thumbs[ci]) return;
+      enqueue(function () {
+        if (gen !== thumbGen || result.thumbs[ci]) return;
+        return RV.keyframes.grab(vidEl, result.cands[ci].t, THUMB_W).then(function (canvas) {
+          result.thumbs[ci] = canvas.toDataURL('image/jpeg', 0.75);
+          if (result !== vidResult) return;
+          Array.prototype.forEach.call(document.querySelectorAll('#cStrip .tile[data-cand="' + ci + '"] .shot'), function (el) {
+            el.style.backgroundImage = 'url(' + result.thumbs[ci] + ')';
+            if (el.lastChild.nodeType === 3) el.removeChild(el.lastChild);
+          });
+          showReview();
+        });
+      });
+    });
+  }
+
+  $('cAnalyse').addEventListener('click', function () {
+    var size = wantedSize();
+    var step = Math.max(MIN_STEP, size / 4);
+    vidResult = null;
+    thumbGen++;
+    $('cResult').innerHTML = '';
+    $('cRun2').classList.remove('on');
+    renderVideo();
+    setBusy(true);
+    enqueue(function () {
+      return RV.keyframes.sample(vidEl, {
+        step: step, maxCount: MAX_CANDIDATES,
+        onProgress: function (done, total) {
+          setProgress($('cRun'), done, total, '프레임 채점 ' + done + ' / ' + total);
+          if (cancelRequested) throw new Error('cancelled');   // rejecting here stops the remaining seeks
+        }
+      }).then(function (cands) {
+        vidResult = { cands: cands, forSize: size, tiles: null, windows: null, thumbs: {} };
+        reviewIdx = 0;
+        setProgress($('cRun'), 1, 1, '분석 완료 · 후보 ' + cands.length + '개');
+      }, function (err) {
+        setProgress($('cRun'), 0, 1, err.message === 'cancelled' ? '분석을 중단했습니다.' : '분석 실패: ' + err.message);
+      }).then(function () {
+        setBusy(false);
+        applySelection();
+        if (vidResult) $('cSummary').scrollIntoView({ block: 'start', behavior: 'smooth' });
+      });
+    });
+  });
+
+  function renderVideo() {
+    var nodes = videoNodes(), year = vidRoute.year, count = frameCount();
+    var interval = vidOpts.mode === 'interval';
+    Array.prototype.forEach.call($('cKind').children, function (b) { b.classList.toggle('on', b.dataset.v === vidOpts.kind); });
+    Array.prototype.forEach.call($('cMode').children, function (b) { b.classList.toggle('on', b.dataset.v === vidOpts.mode); });
+    $('cIntervalField').hidden = !interval;
+    $('cCountField').hidden = interval;
+    $('cCount').max = vidRoute.remaining();
+    vidEl.classList.toggle('locked', busy || !!vidResult);
+    vidEl.controls = video.ok && !busy && !vidResult;
+
+    var tiles = vidResult && vidResult.tiles;
+    var plan;
+    if (!video.ok) plan = '먼저 영상을 추가하세요.';
+    else if (tiles) plan = '<b>약 ' + count + '장 → 노드 ' + nodes.length + '개</b> (' + (nodes.length ? nodes[0] + ' → ' + nodes[nodes.length - 1] : '') + ')' +
+      (interval ? ' · 간격을 바꾸면 다시 분석하지 않고 바로 다시 고릅니다' : '');
+    else plan = '분석 전 추정: 약 ' + count + '장 → 노드 ' + nodes.length + '개 (정차 구간은 분석 후 빠집니다) · ' +
+      Math.max(MIN_STEP, wantedSize() / 4).toFixed(2) + '초마다 채점';
+    $('cPlan').innerHTML = plan;
+
+    if (!tiles) {
+      $('cSummary').innerHTML = vidResult
+        ? '<div class="note warn">이 간격은 분석해 둔 후보 간격(' + (vidEl.duration / vidResult.cands.length).toFixed(2) +
+          '초)보다 촘촘합니다. "영상 분석"을 다시 눌러 더 촘촘히 채점하거나, 간격을 ' + (vidResult.forSize / 2).toFixed(1) + '초 이상으로 두세요.</div>'
+        : '';
+      $('cReview').hidden = true;
+      $('cStrip').innerHTML = vidResult ? '' : '<div class="empty">' + (video.ok ? '"영상 분석"을 누르면 간격마다 가장 선명한 프레임을 골라 보여 줍니다.' : '영상을 추가하고 분석하면 추출한 프레임이 여기에 나열됩니다.') + '</div>';
+      $('cCommit').textContent = '등록';
+      refreshButtons();
+      return;
+    }
+    var cands = vidResult.cands;
+    var step = vidEl.duration / cands.length;
+    var stills = cands.filter(function (c) { return c.still; }).length;
+    var kept = 0, empty = 0, extra = 0, replaced = 0;
+    var strip = $('cStrip').firstChild, scroll = strip ? strip.scrollLeft : 0;
+    $('cStrip').innerHTML = '<div class="strip">' + tiles.map(function (tile, s) {
+      var c = tile.cand === null ? null : cands[tile.cand];
+      var win = vidResult.windows[s], pos = win.indexOf(tile.cand), nodeId = nodes[s];
+      var thumb = c && vidResult.thumbs[tile.cand];
+      var note = '';
+      if (!c) { empty++; note = '<span class="badge bad">프레임 없음</span>'; }
+      else if (!nodeId) { extra++; note = '<span class="badge bad">지점 없음</span>'; }
+      else if (tile.excluded) note = '<span class="badge">제외</span>';
+      else {
+        kept++;
+        note = overwriteNote(nodeId, year, vidOpts.kind);
+        if (note.indexOf('교체') >= 0) replaced++;
+      }
+      return '<div class="tile' + (!c || !nodeId ? ' flag' : '') + (tile.excluded || !nodeId ? ' off' : '') + (s === reviewIdx ? ' cur' : '') +
+        '" data-slot="' + s + '" data-cand="' + tile.cand + '">' +
+        '<div class="shot"' + (thumb ? ' style="background-image:url(' + thumb + ')"' : '') + '><span class="slot">' + (s + 1) + '</span>' + (thumb ? '' : c ? '불러오는 중' : '프레임 없음') + '</div>' +
+        '<div class="meta"><b>' + (nodeId || '—') + '</b>' + (c ? fmtTime(c.t) + ' · 선명도 ' + Math.round(c.sharpness) : '—') + '<br>' + note + '</div>' +
+        '<div class="acts">' +
+        '<button class="btn sm" data-act="prev" title="이 구간의 앞 프레임"' + (c && pos > 0 ? '' : ' disabled') + '>◀</button>' +
+        '<button class="btn sm" data-act="next" title="이 구간의 뒤 프레임"' + (c && pos < win.length - 1 ? '' : ' disabled') + '>▶</button>' +
+        '<button class="btn sm" data-act="toggle"' + (c ? '' : ' disabled') + '>' + (tile.excluded ? '포함' : '제외') + '</button></div></div>';
+    }).join('') + '</div>';
+    $('cStrip').firstChild.scrollLeft = scroll;
+    $('cSummary').innerHTML = '<div class="note info">채점한 프레임 ' + cands.length + '개 (약 ' + step.toFixed(2) + '초 간격) · <b>정차로 제외 ' + stills + '개</b> · ' +
+      '영상 길이 ' + vidEl.duration.toFixed(1) + '초 중 <b>주행 ' + (vidEl.duration - stills * step).toFixed(1) + '초</b> (정차 약 ' + (stills * step).toFixed(1) + '초) · ' +
+      tiles.length + '칸 중 <b>' + kept + '개 프레임 등록 예정</b>' + (empty ? ' · 프레임 없는 칸 ' + empty + '개' : '') + '</div>' +
+      (extra ? '<div class="note bad">프레임이 남은 지점보다 ' + extra + '개 많습니다. 시작 지점에서 도로 끝까지 ' + nodes.length + '지점뿐이라 뒤쪽 ' + extra +
+        '개는 등록되지 않습니다. 간격을 늘리거나 시작 지점을 앞당기세요.</div>' : '') +
+      (replaced ? '<div class="note warn">' + replaced + '개 지점의 기존 360° 사진이 새 프레임으로 교체됩니다.</div>' : '') +
+      '<div class="note info">멈춰 있던 구간은 빼고 주행 시간 위치를 도로 위 위치로 봅니다(달리는 동안 속도가 일정했다고 가정). 제외한 칸의 지점은 건드리지 않고, 뒤 프레임을 앞으로 당기지도 않습니다.</div>';
+    $('cCommit').textContent = kept + '개 프레임 등록 (' + KIND_LABEL[vidOpts.kind] + ')';
+    $('cReview').hidden = false;
+    showReview();
+    refreshButtons();
+  }
+
+  // ---- big one-at-a-time review of the selected frames ----
+  function showReview() {
+    var tiles = vidResult && vidResult.tiles;
+    if (!tiles || !tiles.length) return;
+    var tile = tiles[reviewIdx], c = tile.cand === null ? null : vidResult.cands[tile.cand];
+    var nodeId = videoNodes()[reviewIdx];
+    var thumb = c && vidResult.thumbs[tile.cand];
+    $('cBig').src = thumb || 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+    $('cPos').textContent = (reviewIdx + 1) + ' / ' + tiles.length;
+    $('cStage').classList.toggle('off', tile.excluded);
+    $('cMark').hidden = !tile.excluded;
+    $('cMark').textContent = c ? '제외됨' : '프레임 없음';
+    $('cToggle').textContent = tile.excluded ? '포함' : '제외';
+    $('cToggle').disabled = !c || busy;
+    $('cPrev').disabled = reviewIdx === 0;
+    $('cNext').disabled = reviewIdx === tiles.length - 1;
+    $('cPlay').textContent = playTimer ? '■ 멈춤' : '훑어보기 ▶';
+    $('cInfo').innerHTML = (nodeId ? '<b>' + nodeId + '</b> ' + esc(address(nodeId, vidRoute.year)) : '<b style="color:var(--danger)">지점 없음(도로 끝)</b>') +
+      (c ? ' · ' + fmtTime(c.t) + ' · 선명도 ' + Math.round(c.sharpness) + (thumb ? '' : ' · 불러오는 중…') : '');
+    var strip = $('cStrip').firstChild;
+    Array.prototype.forEach.call(strip.children, function (el, s) { el.classList.toggle('cur', s === reviewIdx); });
+    var cur = strip.children[reviewIdx];
+    strip.scrollLeft = cur.offsetLeft - (strip.clientWidth - cur.offsetWidth) / 2;
+  }
+  function reviewGo(idx) {
+    if (!vidResult || !vidResult.tiles) return;
+    reviewIdx = Math.max(0, Math.min(vidResult.tiles.length - 1, idx));
+    showReview();
+  }
+  function toggleTile(s) {
+    var tile = vidResult.tiles[s];
+    if (tile.cand === null || busy) return;
+    tile.excluded = !tile.excluded;
+    renderVideo();
+  }
+  function stopPlay() {
+    if (!playTimer) return;
+    clearInterval(playTimer);
+    playTimer = null;
+    playStoppedAt = Date.now();
+    if (vidResult && vidResult.tiles) showReview();
+  }
+  $('cPrev').addEventListener('click', function () { reviewGo(reviewIdx - 1); });
+  $('cNext').addEventListener('click', function () { reviewGo(reviewIdx + 1); });
+  $('cToggle').addEventListener('click', function () { toggleTile(reviewIdx); });
+  $('cPlay').addEventListener('click', function () {
+    if (Date.now() - playStoppedAt < 50) return;   // this very click just stopped a running skim
+    if (reviewIdx >= vidResult.tiles.length - 1) reviewIdx = 0;
+    playTimer = setInterval(function () {
+      if (reviewIdx >= vidResult.tiles.length - 1) { stopPlay(); return; }
+      reviewGo(reviewIdx + 1);
+    }, PLAY_MS);
+    showReview();
+  });
+  // any click or key stops a running skim
+  document.addEventListener('pointerdown', stopPlay, true);
+  document.addEventListener('keydown', function (e) {
+    if (activeTab !== 'video' || !vidResult || !vidResult.tiles) return;
+    if (playTimer) { stopPlay(); e.preventDefault(); return; }
+    if (/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName) || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowLeft') reviewGo(reviewIdx - 1);
+    else if (e.key === 'ArrowRight') reviewGo(reviewIdx + 1);
+    else if (e.key === 'x' || e.key === 'X' || e.key === ' ') {
+      if (e.target.tagName === 'BUTTON') e.target.blur();   // Space must not also press the focused button
+      toggleTile(reviewIdx);
+    }
+    else return;
+    e.preventDefault();
+  });
+
+  $('cStrip').addEventListener('click', function (e) {
+    var el = e.target.closest('.tile'), act = e.target.dataset.act;
+    if (!el || !vidResult || !vidResult.tiles) return;
+    var s = Number(el.dataset.slot), tile = vidResult.tiles[s], win = vidResult.windows[s];
+    reviewIdx = s;
+    if (act === 'toggle') { toggleTile(s); return; }
+    if (act === 'prev' || act === 'next') {
+      var next = win[win.indexOf(tile.cand) + (act === 'prev' ? -1 : 1)];
+      if (next !== undefined && !busy) {
+        tile.cand = next;
+        renderVideo();
+        loadThumbs();
+        return;
+      }
+    }
+    showReview();
+  });
+
+  $('cCommit').addEventListener('click', function () {
+    var nodes = videoNodes(), year = vidRoute.year, travel = vidRoute.heading(), kind = vidOpts.kind;
+    var cands = vidResult.cands;
+    // slot index decides the node: an excluded slot leaves a gap, later frames do not shift
+    var jobs = [];
+    vidResult.tiles.forEach(function (tile, s) {
+      if (!tile.excluded && tile.cand !== null && nodes[s]) jobs.push({ nodeId: nodes[s], t: cands[tile.cand].t });
+    });
+    var done = 0, name = video.file.name;
+    stopPlay();
+    thumbGen++;   // pending thumbnail seeks give way to the commit
+    setBusy(true);
+    enqueue(function () {
+      return jobs.reduce(function (chain, job) {
+        return chain.then(function () {
+          if (cancelRequested) return;
+          setProgress($('cRun2'), done, jobs.length, done + ' / ' + jobs.length + ' 등록 중');
+          return RV.keyframes.grab(vidEl, job.t, kind === 'equirect' ? 4096 : 2048).then(function (canvas) {
+            return RV.photos.add({
+              nodeId: job.nodeId, year: year, file: canvas, kind: kind, heading: travel, hfov: vidOpts.hfov,
+              name: name + ' @' + fmtTime(job.t), source: 'video'
+            });
+          }).then(function () { done++; });
+        });
+      }, Promise.resolve()).then(function () {
+        setProgress($('cRun2'), done, jobs.length, done + '개 프레임 등록' + (cancelRequested ? ' 후 중단' : ' 완료'));
+        $('cResult').innerHTML = done ? '<div class="note ok">' + jobs[0].nodeId + ' → ' + jobs[done - 1].nodeId + ' 구간에 ' + done + '개 프레임을 등록했습니다. ' +
+          '<button class="btn sm" data-goto="' + jobs[0].nodeId + '" data-year="' + year + '">첫 지점 미리보기</button></div>' : '';
+      }, function (err) {
+        $('cResult').innerHTML = '<div class="note bad">' + done + '개 등록 후 실패: ' + esc(err.message) + '</div>';
+      }).then(function () { setBusy(false); renderVideo(); loadThumbs(); });
+    });
+  });
+
+  // ---------- D. overview / management ----------
+  $('statYear').innerHTML = '<option value="all">전체 연도</option>' + RV.VINTAGES.map(function (v) {
+    return '<option value="' + v.year + '">' + esc(v.label) + '</option>';
+  }).join('');
+  $('statYear').addEventListener('change', function () { drawDots(); renderStatus(); });
+  fillRoadSelect($('dRoad'), true);
+  $('dRoad').addEventListener('change', renderStatus);
+
+  function renderStatus() {
+    var year = statYear(), has = registeredNodes(year), totalHave = 0, total = 0;
+    var rows = RV.roads.map(function (road) {
+      var captured = year === 'all' || road.years.indexOf(year) >= 0;
+      var n = captured ? road.nodeIds.length : 0;
+      var have = road.nodeIds.filter(function (id) { return has[id]; }).length;
+      totalHave += have;
+      total += n;
+      return '<tr><td><b>' + esc(road.name) + '</b> <span class="muted">' + road.id + '</span></td><td class="muted">' + road.years.join(', ') + '</td>' +
+        '<td>' + (captured ? have + ' / ' + n + ' 지점' : '<span class="muted">이 연도 촬영 없음</span>') + '</td>' +
+        '<td><div class="bar"><i style="width:' + (n ? have / n * 100 : 0) + '%"></i></div></td></tr>';
+    }).join('');
+    $('dCoverage').innerHTML = '<div class="tablewrap"><table><thead><tr><th>도로</th><th>촬영 연도</th><th>사진 등록 지점</th><th></th></tr></thead><tbody>' + rows +
+      '<tr><td><b>합계</b></td><td></td><td><b>' + totalHave + ' / ' + total + ' 지점</b></td><td><div class="bar"><i style="width:' + (total ? totalHave / total * 100 : 0) + '%"></i></div></td></tr></tbody></table></div>';
+
+    var roadId = $('dRoad').value, all = RV.photos.list();
+    var photos = all.filter(function (m) {
+      return (!roadId || RV.getNode(m.nodeId).roadId === roadId) && (year === 'all' || m.year === year);
+    });
+    $('dClear').disabled = !all.length || busy;
+    $('dExport').disabled = !all.length;
+    if (!photos.length) {
+      $('dList').innerHTML = '<div class="empty">' + (all.length ? '이 조건에 맞는 사진이 없습니다. (전체 ' + all.length + '장)' : '아직 등록된 사진이 없습니다. "사진 등록" 탭에서 시작하세요.') + '</div>';
+      return;
+    }
+    $('dList').innerHTML = '<p class="small muted">' + photos.length + '장 표시 · 전체 ' + all.length + '장 · ' +
+      fmtBytes(all.reduce(function (sum, m) { return sum + m.bytes; }, 0)) + '</p>' +
+      '<div class="tablewrap" style="max-height:480px;overflow-y:auto"><table><thead><tr><th>사진</th><th>지점</th><th>연도</th><th>종류</th><th>방향</th><th>크기</th><th>출처</th><th></th></tr></thead><tbody>' +
+      photos.map(function (m) {
+        var node = RV.getNode(m.nodeId);
+        return '<tr data-id="' + m.id + '"><td><img loading="lazy" src="' + RV.photos.url(m.id) + '" alt="" title="' + esc(m.name) + '"></td>' +
+          '<td><b>' + m.nodeId + '</b> <span class="muted">' + esc(address(m.nodeId, m.year)) + '</span></td><td>' + m.year + '</td><td>' + kindBadge(m.kind) + '</td>' +
+          '<td>' + esc(describeHeading(m.heading, node.heading)) + (m.kind === 'flat' ? ' · 화각 ' + Math.round(m.hfov) + '°' : '') + '</td>' +
+          '<td>' + m.width + '×' + m.height + ' · ' + fmtBytes(m.bytes) + '</td><td>' + (SOURCE_LABEL[m.source] || esc(m.source)) + '</td>' +
+          '<td><button class="btn sm" data-goto="' + m.nodeId + '" data-year="' + m.year + '">지점 보기</button> <button class="btn sm danger" data-act="del">삭제</button></td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+  $('dList').addEventListener('click', function (e) {
+    var tr = e.target.closest('tr[data-id]');
+    if (tr && e.target.dataset.act === 'del') RV.photos.remove(tr.dataset.id);
+  });
+  function statusMessage(cls, text) { $('dMsg').innerHTML = text ? '<div class="note ' + cls + '">' + esc(text) + '</div>' : ''; }
+
+  // "전체 삭제" asks again inline instead of a blocking dialog
+  $('dClearBox').addEventListener('click', function (e) {
+    var box = $('dClearBox');
+    function reset() { box.innerHTML = '<button class="btn danger" id="dClear">전체 삭제</button>'; renderStatus(); }
+    if (e.target.id === 'dClear') {
+      box.innerHTML = '<span class="small" style="color:var(--danger)">등록 사진 ' + RV.photos.list().length + '장을 모두 지울까요?</span> ' +
+        '<button class="btn sm danger" id="dClearYes">모두 삭제</button> <button class="btn sm" id="dClearNo">취소</button>';
+    } else if (e.target.id === 'dClearYes') {
+      RV.photos.clear().then(function () { statusMessage('ok', '등록 사진을 모두 삭제했습니다.'); reset(); });
+    } else if (e.target.id === 'dClearNo') reset();
+  });
+  $('dExport').addEventListener('click', function () {
+    RV.photos.exportAll().then(function (json) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+      a.download = 'roadview-photos-' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+      statusMessage('ok', RV.photos.list().length + '장을 ' + a.download + ' 파일로 내보냈습니다 (' + fmtBytes(json.length) + ').');
+    });
+  });
+  wireInput($('dImport'), function (files) {
+    if (!files[0]) return;
+    statusMessage('info', '가져오는 중…');
+    files[0].text().then(function (json) { return RV.photos.importAll(json); }).then(function (count) {
+      statusMessage('ok', count + '장을 가져왔습니다.');
+    }, function () {
+      statusMessage('bad', '가져오기 실패: 이 화면에서 내보낸 사진 백업 파일(JSON)이 아닙니다.');
+    });
+  });
+
+  // ---------- shared refresh ----------
+  function refreshButtons() {
+    var seqReady = seqItems.length && seqNodes().length && !seqItems.some(function (s) { return !s.auto; });
+    $('bCommit').disabled = busy || !seqReady;
+    $('bClear').disabled = busy || !seqItems.length;
+    $('cAnalyse').disabled = busy || !video.ok;
+    var vidTargets = videoNodes();
+    $('cCommit').disabled = busy || !vidResult || !vidResult.tiles ||
+      !vidResult.tiles.some(function (t, s) { return !t.excluded && t.cand !== null && vidTargets[s]; });
+    var aCommit = $('aCommit');
+    if (aCommit) aCommit.disabled = busy || !staged.some(function (s) { return s.kind; });
+    $('dClear') && ($('dClear').disabled = busy || !RV.photos.list().length);
+  }
+  // bulk commits fire photos_changed once per photo: coalesce the re-render
+  var refreshTimer = null;
+  function refreshAll() {
+    refreshTimer = null;
+    renderTarget();
+    renderSeq();
+    renderVideo();
+    renderStatus();
+    drawDots();
+  }
+  RV.on('photos_changed', function () {
+    if (!refreshTimer) refreshTimer = setTimeout(refreshAll, 60);
+  });
+
+  renderSeqOpts();
+  RV.photos.ready.then(function () {
+    $('storageWarn').hidden = RV.photos.isPersistent();
+    refreshAll();
+  });
+  refreshAll();
+})();
+</script>
+</body>
+</html>

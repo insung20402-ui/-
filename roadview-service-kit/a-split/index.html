@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>모의시 로드뷰 — 시안 A · Split Classic</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root {
+    --bg: #f3f4f6;
+    --surface: #ffffff;
+    --surface-2: #f7f8fa;
+    --border: #dfe3e8;
+    --border-strong: #c5ccd5;
+    --text: #1b2330;
+    --text-2: #56606e;
+    --text-3: #8a93a0;
+    --accent: #1f6feb;
+    --accent-hover: #185bc4;
+    --accent-soft: #e8f0fe;
+    --danger: #d5343c;
+    --danger-soft: #fdecec;
+    --warn: #9a5b00;
+    --warn-soft: #fff4d9;
+    --warn-border: #f0cf7a;
+    --ok: #1a8f4c;
+    --map-coverage: #1f6feb;
+    --map-walker: #f0532d;
+    --map-miss: #d5343c;
+    --pano-bg: #20262e;
+    --shadow: 0 1px 2px rgba(20, 28, 40, .08), 0 4px 14px rgba(20, 28, 40, .10);
+    --radius: 6px;
+    --divider: 7px;
+    --split: 50%;
+    --font: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column;
+    font: 13px/1.45 var(--font); color: var(--text); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; }
+  svg.icon { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- buttons ---- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 9px;
+    border: 1px solid var(--border-strong); border-radius: var(--radius);
+    background: var(--surface); color: var(--text); cursor: pointer; white-space: nowrap;
+    transition: background .12s, border-color .12s, color .12s;
+  }
+  .btn:hover { background: var(--surface-2); border-color: var(--text-3); }
+  .btn:active { background: #eceef2; }
+  .btn.icon-only { width: 28px; padding: 0; justify-content: center; }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--text-2); }
+  .btn.ghost:hover { background: #e9ecf0; color: var(--text); }
+  .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .btn.danger[aria-pressed="true"] { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+  /* ---- top bar ---- */
+  .topbar {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 6px 16px;
+    min-height: 48px; padding: 6px 12px;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .back {
+    display: inline-flex; align-items: center; gap: 3px; padding: 4px 6px; margin-left: -6px;
+    border-radius: var(--radius); color: var(--text-2); text-decoration: none;
+  }
+  .back:hover { background: #e9ecf0; color: var(--text); }
+  .brand h1 { margin: 0; padding-left: 10px; border-left: 1px solid var(--border); font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+  .badge {
+    padding: 1px 7px; border-radius: 10px; background: var(--text); color: #fff;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .place { display: flex; align-items: baseline; gap: 8px; min-width: 0; flex: 1 1 200px; }
+  .place-address { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .place-date { color: var(--text-2); white-space: nowrap; }
+  .tag-fallback {
+    padding: 0 6px; border: 1px solid var(--warn-border); border-radius: 4px;
+    background: var(--warn-soft); color: var(--warn); font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .tools { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; }
+  .field-label { margin-right: 6px; color: var(--text-2); font-size: 12px; }
+
+  .segmented { display: inline-flex; vertical-align: middle; }
+  .segmented button {
+    height: 28px; min-width: 46px; padding: 0 10px; margin-left: -1px;
+    border: 1px solid var(--border-strong); background: var(--surface); cursor: pointer;
+    font-variant-numeric: tabular-nums; position: relative;
+  }
+  .segmented button:first-child { margin-left: 0; border-radius: var(--radius) 0 0 var(--radius); }
+  .segmented button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+  .segmented button:hover:not(:disabled) { background: var(--surface-2); z-index: 1; border-color: var(--text-3); }
+  .segmented button:focus-visible { z-index: 3; }
+  .segmented button[aria-pressed="true"] { z-index: 2; background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .segmented button:disabled { color: var(--text-3); background: var(--surface-2); cursor: not-allowed; }
+  .segmented button.is-missing { text-decoration: line-through; border-style: dashed; border-color: var(--warn-border); z-index: 1; }
+  .segmented button.is-fallback { z-index: 2; background: var(--warn-soft); border-color: var(--warn-border); color: var(--warn); font-weight: 600; }
+
+  .switch { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; user-select: none; }
+  .switch input { position: absolute; opacity: 0; pointer-events: none; }
+  .switch .track {
+    width: 30px; height: 18px; border-radius: 9px; background: var(--border-strong);
+    position: relative; transition: background .15s;
+  }
+  .switch .track::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px;
+    border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .25); transition: transform .15s;
+  }
+  .switch input:checked + .track { background: var(--map-coverage); }
+  .switch input:checked + .track::after { transform: translateX(12px); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- split layout ---- */
+  .split {
+    flex: 1; min-height: 0; display: grid;
+    grid-template-columns: var(--split) var(--divider) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--surface); }
+  .pane-map { order: 1; }
+  .divider { order: 2; }
+  .pane-pano { order: 3; }
+  .split.swapped .pane-map { order: 3; }
+  .split.swapped .pane-pano { order: 1; }
+  .split[data-max] { grid-template-columns: minmax(0, 1fr); }
+  .split[data-max] .divider,
+  .split[data-max="map"] .pane-pano,
+  .split[data-max="pano"] .pane-map { display: none; }
+  .split.resizing { user-select: none; }
+  .split.resizing .pane { pointer-events: none; }
+
+  .divider {
+    position: relative; background: var(--border); cursor: col-resize; touch-action: none;
+    transition: background .12s;
+  }
+  .divider::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 3px; height: 28px;
+    transform: translate(-50%, -50%); border-radius: 2px; background: var(--text-3);
+  }
+  .divider:hover, .divider:focus-visible, .split.resizing .divider { background: var(--accent); outline: none; }
+  .divider:hover::after, .divider:focus-visible::after, .split.resizing .divider::after { background: #fff; }
+
+  .pane-head {
+    display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 6px 0 12px; flex: none;
+    border-bottom: 1px solid var(--border); background: var(--surface-2);
+  }
+  .pane-head h2 { margin: 0; font-size: 13px; font-weight: 700; white-space: nowrap; flex: none; }
+  .pane-hint { color: var(--text-3); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .pane-actions { display: flex; align-items: center; gap: 2px; margin-left: auto; flex: none; }
+  .stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+  .stage > .fill { position: absolute; inset: 0; }
+  #map { isolation: isolate; }
+  #pano { background: var(--pano-bg); }
+
+  /* ---- overlays shared by both panes ---- */
+  .toast {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 5;
+    display: flex; align-items: center; gap: 10px; max-width: calc(100% - 24px);
+    padding: 8px 12px; border-radius: var(--radius); box-shadow: var(--shadow);
+    background: var(--text); color: #fff; font-weight: 500;
+  }
+  .toast[data-kind="miss"] { background: var(--danger); }
+  .toast[data-kind="ok"] { background: var(--ok); }
+  .toast small { display: block; font-weight: 400; opacity: .88; }
+  .toast button {
+    flex: none; height: 24px; padding: 0 8px; border: 1px solid rgba(255, 255, 255, .6); border-radius: 4px;
+    background: transparent; color: #fff; cursor: pointer;
+  }
+  .toast button:hover { background: rgba(255, 255, 255, .18); }
+
+  .legend {
+    position: absolute; left: 10px; bottom: 10px; z-index: 4; padding: 7px 10px;
+    border: 1px solid var(--border); border-radius: var(--radius); background: rgba(255, 255, 255, .94);
+    box-shadow: var(--shadow); font-size: 12px; color: var(--text-2); pointer-events: none;
+  }
+  .legend div { display: flex; align-items: center; gap: 7px; }
+  .legend div + div { margin-top: 3px; }
+  .legend .line { width: 18px; height: 5px; border-radius: 3px; background: var(--map-coverage); opacity: .6; }
+  .legend .dot { width: 10px; height: 10px; margin: 0 4px; border-radius: 50%; background: var(--map-walker); box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--border-strong); }
+  .legend .off { opacity: .45; }
+
+  /* ---- pano overlays ---- */
+  .compass {
+    position: absolute; top: 12px; right: 12px; z-index: 3; display: flex; align-items: center; gap: 8px;
+    padding: 5px 10px 5px 5px; border-radius: 22px; background: rgba(255, 255, 255, .94); box-shadow: var(--shadow);
+    font-weight: 600; font-variant-numeric: tabular-nums; pointer-events: none;
+  }
+  .compass svg { width: 30px; height: 30px; display: block; }
+  .notice {
+    position: absolute; top: 12px; left: 12px; z-index: 3; display: flex; align-items: center; gap: 10px;
+    max-width: calc(100% - 150px); padding: 7px 10px; border: 1px solid var(--warn-border);
+    border-radius: var(--radius); background: var(--warn-soft); color: var(--warn); box-shadow: var(--shadow);
+  }
+  .notice strong { font-weight: 700; }
+  .notice .btn { height: 24px; border-color: var(--warn-border); color: var(--warn); flex: none; }
+  .report-banner {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; background: var(--danger); color: #fff;
+  }
+  .report-banner strong { font-weight: 700; white-space: nowrap; }
+  .report-banner span { flex: 1; min-width: 0; }
+  .report-banner kbd { padding: 0 5px; border: 1px solid rgba(255, 255, 255, .6); border-radius: 3px; font: 11px var(--mono); }
+  .report-banner button {
+    flex: none; height: 26px; padding: 0 10px; border: 1px solid #fff; border-radius: 4px;
+    background: #fff; color: var(--danger); font-weight: 600; cursor: pointer;
+  }
+  .report-banner button:hover { background: var(--danger-soft); }
+  .pane-pano.reporting .stage::after {
+    content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    box-shadow: inset 0 0 0 3px var(--danger);
+  }
+
+  .lod { display: inline-flex; align-items: center; gap: 5px; color: var(--text-3); font-size: 12px; white-space: nowrap; }
+  .lod i { width: 7px; height: 7px; border-radius: 50%; background: var(--warn-border); }
+  .lod[data-lod="high"] i { background: var(--ok); }
+
+  .pane-foot {
+    display: flex; align-items: center; gap: 6px 12px; flex-wrap: wrap; flex: none;
+    padding: 6px 8px; border-top: 1px solid var(--border); background: var(--surface-2);
+  }
+  .move { display: flex; gap: 4px; }
+  .keys { margin-left: auto; color: var(--text-3); font-size: 12px; }
+  .keys kbd {
+    display: inline-block; min-width: 18px; padding: 0 4px; border: 1px solid var(--border-strong);
+    border-bottom-width: 2px; border-radius: 4px; background: var(--surface); color: var(--text-2);
+    font: 11px/16px var(--mono); text-align: center;
+  }
+  .keys span { margin: 0 8px 0 3px; }
+  .keys.active { color: var(--text-2); }
+  .keys.active kbd { border-color: var(--accent); color: var(--accent-hover); }
+
+  /* ---- details drawer ---- */
+  .drawer {
+    flex: none; max-height: 38vh; overflow: auto; display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    border-top: 1px solid var(--border); background: var(--surface);
+  }
+  .drawer section { padding: 10px 14px 12px; min-width: 0; }
+  .drawer section + section { border-left: 1px solid var(--border); }
+  .drawer h3 { margin: 0 0 8px; font-size: 12px; font-weight: 700; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+  .count { padding: 0 6px; border-radius: 9px; background: #e9ecf0; color: var(--text-2); font-size: 11px; font-weight: 600; }
+  .meta { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; margin: 0; }
+  .meta dt { color: var(--text-3); }
+  .meta dd { margin: 0; font: 12px/1.5 var(--mono); overflow-wrap: anywhere; }
+  .meta dd em { font-style: normal; color: var(--accent-hover); font-weight: 600; }
+  .reports { list-style: none; margin: 0; padding: 0; }
+  .reports li + li { margin-top: 4px; }
+  .reports button {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 2px 10px; width: 100%; padding: 6px 8px;
+    border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); text-align: left; cursor: pointer;
+  }
+  .reports button:hover { background: var(--surface-2); border-color: var(--border-strong); }
+  .reports time { color: var(--text-3); font: 12px var(--mono); }
+  .reports .where { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .reports .rev { color: var(--ok); font: 600 12px var(--mono); }
+  .reports .pov { grid-column: 2 / -1; color: var(--text-3); font-size: 12px; }
+  .empty { padding: 14px 10px; border: 1px dashed var(--border-strong); border-radius: var(--radius); color: var(--text-3); text-align: center; }
+  .empty b { display: block; margin-bottom: 2px; color: var(--text-2); font-weight: 600; }
+
+  /* ---- status strip ---- */
+  .status {
+    display: flex; align-items: center; gap: 4px 18px; flex-wrap: wrap; flex: none; min-height: 30px; padding: 2px 6px 2px 12px;
+    border-top: 1px solid var(--border); background: var(--surface); color: var(--text-2); font-size: 12px;
+  }
+  .status b { margin-left: 5px; color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .status .btn { height: 24px; margin-left: auto; font-size: 12px; }
+  .status .btn svg { transition: transform .15s; }
+  .status .btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+  /* ---- stacked layout ---- */
+  @media (max-width: 800px) {
+    .split { grid-template-columns: minmax(0, 1fr); grid-template-rows: var(--split) var(--divider) minmax(0, 1fr); }
+    .split[data-max] { grid-template-rows: minmax(0, 1fr); }
+    .divider { cursor: row-resize; }
+    .divider::after { width: 28px; height: 3px; }
+    .brand h1 { font-size: 14px; }
+    .place { flex-basis: 100%; order: 3; }
+    .tools { margin-left: auto; }
+    .field-label, .pane-hint, .keys, .status .opt { display: none; }
+    .pane-head { height: 34px; }
+    .drawer { grid-template-columns: minmax(0, 1fr); max-height: 30vh; }
+    .drawer section + section { border-left: 0; border-top: 1px solid var(--border); }
+    .notice { max-width: calc(100% - 24px); top: 56px; }
+    .move .btn { padding: 0 7px; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-left" viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></symbol>
+  <symbol id="i-right" viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></symbol>
+  <symbol id="i-left2" viewBox="0 0 16 16"><path d="M8 3 3 8l5 5M13 3 8 8l5 5"/></symbol>
+  <symbol id="i-right2" viewBox="0 0 16 16"><path d="m3 3 5 5-5 5M8 3l5 5-5 5"/></symbol>
+  <symbol id="i-up" viewBox="0 0 16 16"><path d="m3 10 5-5 5 5"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 16 16"><path d="M2 5h11m-3-3 3 3-3 3M14 11H3m3-3-3 3 3 3"/></symbol>
+  <symbol id="i-max" viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M6.5 13.5h-4v-4M13.5 2.5 9 7M2.5 13.5 7 9"/></symbol>
+  <symbol id="i-fit" viewBox="0 0 16 16"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 16 16"><path d="M3.5 14V2.5M3.5 3h8l-1.8 2.8L11.5 8.5h-8"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="brand">
+    <a class="back" href="../index.html" title="시안 비교 페이지로 돌아가기"><svg class="icon"><use href="#i-left"/></svg>시안 비교</a>
+    <h1>모의시 로드뷰</h1>
+    <span class="badge">시안 A</span>
+  </div>
+  <div class="place" aria-live="polite">
+    <span class="place-address" id="address"></span>
+    <span class="place-date" id="photodate"></span>
+    <span class="tag-fallback" id="fallbackTag" hidden>대체 표시</span>
+  </div>
+  <div class="tools">
+    <div>
+      <span class="field-label" id="vintageLabel">과거 사진 보기</span>
+      <span class="segmented" id="vintage" role="group" aria-labelledby="vintageLabel"></span>
+    </div>
+    <label class="switch" title="로드뷰가 촬영된 도로를 지도에 표시합니다">
+      <input type="checkbox" id="coverage" checked>
+      <span class="track"></span>
+      <span>촬영 구간</span>
+    </label>
+  </div>
+</header>
+
+<main class="split" id="split">
+  <section class="pane pane-map" aria-label="지도">
+    <div class="pane-head">
+      <h2>지도</h2>
+      <span class="pane-hint">클릭한 곳에서 반경 50m 안의 가장 가까운 로드뷰로 이동합니다</span>
+      <div class="pane-actions">
+        <button class="btn ghost icon-only" id="fit" title="전체 지도 보기" aria-label="전체 지도 보기"><svg class="icon"><use href="#i-fit"/></svg></button>
+        <button class="btn ghost icon-only" id="swap" title="지도와 로드뷰 위치 바꾸기" aria-label="지도와 로드뷰 위치 바꾸기"><svg class="icon"><use href="#i-swap"/></svg></button>
+        <button class="btn ghost icon-only" data-pane="map" title="지도 크게 보기" aria-label="지도 크게 보기" aria-pressed="false"><svg class="icon"><use href="#i-max"/></svg></button>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="fill" id="map"></div>
+      <div class="toast" id="mapToast" role="status" hidden></div>
+      <div class="legend">
+        <div id="legendCoverage"><span class="line"></span>로드뷰 촬영 구간</div>
+        <div><span class="dot"></span>현재 위치와 시야</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" id="divider" role="separator" tabindex="0" aria-label="지도와 로드뷰 크기 조절"
+       aria-valuemin="20" aria-valuemax="80" aria-valuenow="50" title="드래그해서 크기 조절 · 더블클릭하면 반반으로"></div>
+
+  <section class="pane pane-pano" id="panoPane" aria-label="로드뷰">
+    <div class="pane-head">
+      <h2>로드뷰</h2>
+      <span class="lod" id="lod" data-lod="low" title="파노라마 타일 해상도"><i></i><span>저해상도</span></span>
+      <div class="pane-actions">
+        <button class="btn danger" id="report" aria-pressed="false" title="가려지지 않은 얼굴·번호판을 신고합니다"><svg class="icon"><use href="#i-flag"/></svg><span>블러 누락 신고</span></button>
+        <button class="btn ghost icon-only" data-pane="pano" title="로드뷰 크게 보기" aria-label="로드뷰 크게 보기" aria-pressed="false"><svg class="icon"><use href="#i-max"/></svg></button>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="fill" id="pano"></div>
+      <div class="notice" id="fallbackNotice" role="status" hidden>
+        <span id="fallbackText"></span>
+        <button class="btn" id="fallbackLatest">최신 보기</button>
+      </div>
+      <div class="compass" title="현재 바라보는 방향">
+        <svg viewBox="0 0 30 30" aria-hidden="true">
+          <circle cx="15" cy="15" r="14" fill="#fff" stroke="var(--border-strong)"/>
+          <g id="compassDial" style="transform-origin:15px 15px">
+            <path d="M15 3.5 18.5 15h-7z" fill="var(--danger)"/>
+            <path d="M15 26.5 11.5 15h7z" fill="var(--border-strong)"/>
+          </g>
+        </svg>
+        <span id="compassText"></span>
+      </div>
+      <div class="toast" id="panoToast" role="status" hidden></div>
+      <div class="report-banner" id="reportBanner" hidden>
+        <strong>신고 모드</strong>
+        <span>가려지지 않은 얼굴이나 번호판을 클릭하세요. 드래그로 화면을 돌릴 수 있습니다.</span>
+        <button id="reportCancel">취소 <kbd>Esc</kbd></button>
+      </div>
+    </div>
+    <div class="pane-foot">
+      <div class="move" role="group" aria-label="이동">
+        <button class="btn" data-move="jump-back" title="50m 뒤로 점프 (Shift+↓)"><svg class="icon"><use href="#i-left2"/></svg>50m</button>
+        <button class="btn" data-move="back" title="뒤로 한 칸 (↓)"><svg class="icon"><use href="#i-left"/></svg>뒤로</button>
+        <button class="btn" data-move="forward" title="앞으로 한 칸 (↑)">앞으로<svg class="icon"><use href="#i-right"/></svg></button>
+        <button class="btn" data-move="jump-forward" title="50m 앞으로 점프 (Shift+↑)">50m<svg class="icon"><use href="#i-right2"/></svg></button>
+      </div>
+      <div class="keys" id="keys" title="로드뷰 화면을 클릭한 뒤 사용할 수 있습니다">
+        <kbd>↑</kbd><kbd>↓</kbd><span>이동</span>
+        <kbd>Shift</kbd>+<kbd>↑</kbd><kbd>↓</kbd><span>50m 점프</span>
+        <kbd>←</kbd><kbd>→</kbd><span>회전</span>
+        <kbd>휠</kbd><span>확대</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="drawer" id="drawer" hidden>
+  <section>
+    <h3>파노라마 메타데이터</h3>
+    <dl class="meta" id="meta"></dl>
+  </section>
+  <section>
+    <h3>블러 누락 신고 내역 <span class="count" id="reportCount">0</span></h3>
+    <div class="empty" id="reportEmpty"><b>아직 신고한 내역이 없습니다</b>로드뷰 위의 “블러 누락 신고”를 누르고 가려지지 않은 곳을 클릭하세요.</div>
+    <ul class="reports" id="reports"></ul>
+  </section>
+</div>
+
+<footer class="status">
+  <span>좌표<b id="coords"></b></span>
+  <span>방향<b id="heading"></b></span>
+  <span class="opt">시야각<b id="fov"></b></span>
+  <span class="opt">개인정보 리비전<b id="rev"></b></span>
+  <button class="btn ghost" id="drawerToggle" aria-expanded="false" aria-controls="drawer">상세 정보 · 신고 내역 <span class="count" id="reportCount2">0</span><svg class="icon"><use href="#i-up"/></svg></button>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="../shared/city.js"></script>
+<script src="../shared/reproject.js"></script>
+<script src="../shared/pano-render.js"></script>
+<script src="../shared/viewer.js"></script>
+<script src="../shared/map.js"></script>
+<script src="../shared/photo-store.js"></script>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function cssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+  var YEARS = RV.VINTAGES.map(function (v) { return v.year; });
+  var CARDINALS = ['북', '북동', '동', '남동', '남', '남서', '서', '북서'];
+
+  // ---- deep link: ?node=ew1-012&vintage=2023&heading=90&pitch=0 ----
+  var q = new URLSearchParams(location.search);
+  var startNode = RV.getNode(q.get('node')) ? q.get('node') : 'ew0-008';
+  var startVintage = YEARS.indexOf(Number(q.get('vintage'))) >= 0 ? Number(q.get('vintage')) : 'latest';
+  var startPov = q.get('heading') !== null && isFinite(+q.get('heading'))
+    ? { heading: +q.get('heading'), pitch: +q.get('pitch') || 0 } : undefined;
+
+  var viewer = RV.createViewer($('pano'), { nodeId: startNode, vintage: startVintage, pov: startPov });
+  var map = RV.createMap($('map'), {
+    theme: 'light',
+    colors: { coverage: cssVar('--map-coverage'), walker: cssVar('--map-walker'), miss: cssVar('--map-miss') }
+  }).bindViewer(viewer);
+  // one hook covers divider drag, swap, maximize, drawer and window resize
+  new ResizeObserver(function () { map.invalidateSize(); }).observe($('map'));
+
+  // ---- toasts ----
+  function toast(el, kind, title, detail, action) {
+    el.textContent = '';
+    el.dataset.kind = kind;
+    var body = document.createElement('div');
+    body.textContent = title;
+    if (detail) {
+      var small = document.createElement('small');
+      small.textContent = detail;
+      body.appendChild(small);
+    }
+    el.appendChild(body);
+    if (action) {
+      var btn = document.createElement('button');
+      btn.textContent = action.label;
+      btn.onclick = function () { el.hidden = true; action.run(); };
+      el.appendChild(btn);
+    }
+    el.hidden = false;
+    clearTimeout(el.timer);
+    el.timer = setTimeout(function () { el.hidden = true; }, action ? 6000 : 2800);
+  }
+
+  // ---- location, vintage, metadata ----
+  var vintageButtons = ['latest'].concat(YEARS).map(function (v) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.dataset.vintage = v;
+    b.textContent = v === 'latest' ? '최신' : v;
+    b.onclick = function () { viewer.setVintage(v); };
+    $('vintage').appendChild(b);
+    return b;
+  });
+
+  function renderVintage(year, requested, available) {
+    var reqYear = requested === 'latest' ? null : Number(requested);
+    var missing = reqYear !== null && available.indexOf(reqYear) < 0;
+    vintageButtons.forEach(function (b) {
+      var isLatest = b.dataset.vintage === 'latest';
+      var y = Number(b.dataset.vintage);
+      var has = isLatest || available.indexOf(y) >= 0;
+      b.disabled = !has;
+      b.title = has ? '' : '이 위치에는 ' + y + '년 사진이 없습니다';
+      b.classList.toggle('is-missing', missing && y === reqYear);
+      b.classList.toggle('is-fallback', missing && y === year);
+      b.setAttribute('aria-pressed', String(isLatest ? reqYear === null : !missing && y === reqYear));
+    });
+    $('fallbackTag').hidden = !missing;
+    $('fallbackNotice').hidden = !missing;
+    return missing ? reqYear : null;
+  }
+
+  function metaRow(dl, label, value, strong) {
+    var dt = document.createElement('dt'), dd = document.createElement('dd');
+    dt.textContent = label;
+    dd.textContent = value;
+    if (strong) {
+      var em = document.createElement('em');
+      em.textContent = strong;
+      dd.appendChild(em);
+    }
+    dl.appendChild(dt);
+    dl.appendChild(dd);
+  }
+
+  function renderMeta(m) {
+    var dl = $('meta');
+    var steps = m.links.filter(function (l) { return l.kind === 'step'; }).length;
+    dl.textContent = '';
+    metaRow(dl, '파노라마 ID', m.id);
+    metaRow(dl, '시퀀스', m.sequenceId + ' · ' + m.source);
+    metaRow(dl, '촬영 시각', m.captureTime);
+    metaRow(dl, '투영 · 타일', m.projection + ' · ' + m.tiles.tileSize + 'px · 최대 레벨 ' + m.tiles.maxLevel);
+    metaRow(dl, '타일 URL', m.tiles.template + '  ', '리비전 ' + m.tiles.tileRevision);
+    metaRow(dl, '이동 링크', m.links.length + '개 (한 칸 ' + steps + ' · 50m 점프 ' + (m.links.length - steps) + ')');
+    metaRow(dl, '개인정보', '얼굴 ' + m.privacy.faces + ' · 번호판 ' + m.privacy.plates + ' · ', '리비전 ' + m.privacy.revision);
+    metaRow(dl, '촬영 연도', m.availableYears.join(', '));
+  }
+
+  function renderPano(e) {
+    var m = e.manifest;
+    $('address').textContent = m.address;
+    $('photodate').textContent = m.photodate + ' 촬영';
+    $('coords').textContent = m.position.lat.toFixed(5) + ', ' + m.position.lon.toFixed(5) + ' (±' + m.position.accuracyMeters + 'm)';
+    $('rev').textContent = 'r' + m.privacy.revision;
+    var missingYear = renderVintage(e.year, e.requestedVintage, m.availableYears);
+    if (missingYear !== null) {
+      $('fallbackText').textContent = '';
+      $('fallbackText').append('이 위치에는 ', Object.assign(document.createElement('strong'), { textContent: missingYear + '년' }),
+        ' 사진이 없어 가장 가까운 ', Object.assign(document.createElement('strong'), { textContent: m.photodate }), ' 사진을 표시합니다.');
+    }
+    renderMeta(m);
+  }
+
+  function renderPov(p) {
+    var h = Math.round(p.heading) % 360;
+    var text = CARDINALS[Math.round(p.heading / 45) % 8] + ' ' + h + '°';
+    $('compassDial').style.transform = 'rotate(' + (-p.heading) + 'deg)';
+    $('compassText').textContent = text;
+    $('heading').textContent = text;
+    $('fov').textContent = Math.round(p.fov) + '°';
+  }
+
+  viewer.on('pano_changed', renderPano);
+  viewer.on('pov_changed', renderPov);
+  viewer.on('load', function (e) {
+    $('lod').dataset.lod = e.lod;
+    $('lod').lastElementChild.textContent = e.lod === 'high' ? '고해상도' : '저해상도 불러오는 중';
+  });
+  viewer.on('no_link', function () {
+    toast($('panoToast'), 'info', '이 방향으로는 더 이동할 수 없습니다', '화면을 돌려 다른 방향을 바라본 뒤 다시 시도하세요.');
+  });
+  $('fallbackLatest').onclick = function () { viewer.setVintage('latest'); };
+
+  // the viewer emits its first pano_changed inside createViewer, before listeners exist
+  var s = viewer.getState();
+  renderPano({ year: s.year, requestedVintage: s.vintage, manifest: viewer.getManifest() });
+  renderPov(s);
+
+  // ---- map: coverage toggle, miss feedback ----
+  $('coverage').onchange = function () {
+    map.setCoverageVisible(this.checked);
+    $('legendCoverage').classList.toggle('off', !this.checked);
+  };
+  $('fit').onclick = function () { map.fit(); };
+  map.on('no_coverage', function (e) {
+    toast($('mapToast'), 'miss', '반경 ' + Math.round(e.radiusM) + 'm 안에 로드뷰가 없습니다',
+      $('coverage').checked ? '파란 선으로 표시된 촬영 구간 가까이를 선택해 보세요.' : '“촬영 구간”을 켜면 로드뷰가 있는 도로를 볼 수 있습니다.');
+  });
+
+  // ---- movement buttons ----
+  var MOVES = {
+    'forward': function () { viewer.forward(); },
+    'back': function () { viewer.backward(); },
+    'jump-forward': function () { viewer.jump(0); },
+    'jump-back': function () { viewer.jump(180); }
+  };
+  document.querySelectorAll('[data-move]').forEach(function (b) {
+    b.onclick = function (e) {
+      MOVES[b.dataset.move]();
+      // after a mouse click hand focus to the panorama so the arrow keys keep working
+      if (e.detail > 0) viewer.focus();
+    };
+  });
+  $('pano').addEventListener('focusin', function () { $('keys').classList.add('active'); });
+  $('pano').addEventListener('focusout', function () { $('keys').classList.remove('active'); });
+
+  // ---- blur-miss report flow ----
+  $('report').onclick = function () { viewer.setReportMode(!viewer.isReportMode()); };
+  $('reportCancel').onclick = function () { viewer.setReportMode(false); };
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && viewer.isReportMode()) viewer.setReportMode(false);
+  });
+  viewer.on('report_mode', function (e) {
+    $('panoPane').classList.toggle('reporting', e.active);
+    $('reportBanner').hidden = !e.active;
+    $('report').setAttribute('aria-pressed', String(e.active));
+    $('report').lastElementChild.textContent = e.active ? '신고 취소' : '블러 누락 신고';
+    if (e.active) { $('panoToast').hidden = true; viewer.focus(); }
+  });
+  viewer.on('report_done', function (entry) {
+    renderReports();
+    toast($('panoToast'), 'ok', '신고가 접수되어 해당 위치를 가렸습니다',
+      '개인정보 리비전이 r' + entry.revision + '(으)로 올라가 타일이 새로 발급됩니다.',
+      { label: '내역 보기', run: function () { setDrawer(true); } });
+  });
+
+  function renderReports() {
+    var all = RV.allReports();
+    var list = $('reports');
+    list.textContent = '';
+    $('reportCount').textContent = $('reportCount2').textContent = all.length;
+    $('reportEmpty').hidden = all.length > 0;
+    all.forEach(function (r) {
+      var li = document.createElement('li'), b = document.createElement('button');
+      b.type = 'button';
+      b.title = '신고한 위치와 방향으로 이동';
+      function cell(tag, cls, text) {
+        var n = document.createElement(tag);
+        n.className = cls;
+        n.textContent = text;
+        b.appendChild(n);
+      }
+      cell('time', '', new Date(r.at).toTimeString().slice(0, 8));
+      cell('span', 'where', RV.getManifest(r.nodeId, r.year).address + ' · ' + r.year + '년');
+      cell('span', 'rev', '→ r' + r.revision);
+      cell('span', 'pov', r.nodeId + ' · 방향 ' + Math.round(r.heading) + '° · 기울기 ' + Math.round(r.pitch) + '°');
+      b.onclick = function () {
+        viewer.setPano(r.nodeId, { vintage: r.year, pov: { heading: r.heading, pitch: r.pitch } });
+      };
+      li.appendChild(b);
+      list.appendChild(li);
+    });
+  }
+  renderReports();
+
+  // ---- details drawer ----
+  function setDrawer(open) {
+    $('drawer').hidden = !open;
+    $('drawerToggle').setAttribute('aria-expanded', String(open));
+  }
+  $('drawerToggle').onclick = function () { setDrawer($('drawer').hidden); };
+
+  // ---- split: divider, swap, maximize ----
+  var split = $('split'), divider = $('divider');
+  var stacked = matchMedia('(max-width: 800px)');
+  var splitPct = 50;
+  function setSplit(pct) {
+    splitPct = Math.max(20, Math.min(80, pct));
+    split.style.setProperty('--split', splitPct + '%');
+    divider.setAttribute('aria-valuenow', Math.round(splitPct));
+  }
+  divider.addEventListener('pointerdown', function (e) {
+    divider.setPointerCapture(e.pointerId);
+    split.classList.add('resizing');
+  });
+  divider.addEventListener('pointermove', function (e) {
+    if (!split.classList.contains('resizing')) return;
+    var r = split.getBoundingClientRect();
+    setSplit(100 * (stacked.matches ? (e.clientY - r.top) / r.height : (e.clientX - r.left) / r.width));
+  });
+  function endResize() { split.classList.remove('resizing'); }
+  divider.addEventListener('pointerup', endResize);
+  divider.addEventListener('pointercancel', endResize);
+  divider.addEventListener('dblclick', function () { setSplit(50); });
+  divider.addEventListener('keydown', function (e) {
+    var dec = stacked.matches ? 'ArrowUp' : 'ArrowLeft', inc = stacked.matches ? 'ArrowDown' : 'ArrowRight';
+    if (e.key !== dec && e.key !== inc) return;
+    e.preventDefault();
+    setSplit(splitPct + (e.key === inc ? 5 : -5));
+  });
+
+  $('swap').onclick = function () {
+    split.classList.toggle('swapped');
+    setSplit(100 - splitPct); // each pane keeps its own size
+  };
+  var paneButtons = document.querySelectorAll('[data-pane]');
+  paneButtons.forEach(function (b) {
+    b.onclick = function () {
+      var target = split.dataset.max === b.dataset.pane ? '' : b.dataset.pane;
+      if (target) split.dataset.max = target; else delete split.dataset.max;
+      paneButtons.forEach(function (o) {
+        var on = o.dataset.pane === target;
+        o.setAttribute('aria-pressed', String(on));
+        o.title = on ? '나란히 보기로 돌아가기' : (o.dataset.pane === 'map' ? '지도' : '로드뷰') + ' 크게 보기';
+        o.setAttribute('aria-label', o.title);
+      });
+    };
+  });
+})();
+</script>
+</body>
+</html>

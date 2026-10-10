@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>모의시 로드뷰 — 시안 B · Immersive</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root {
+    --bg: #0b0e12;
+    --glass: rgba(13, 16, 21, 0.66);
+    --glass-strong: rgba(13, 16, 21, 0.86);
+    --glass-hover: rgba(38, 45, 56, 0.78);
+    --line: rgba(255, 255, 255, 0.13);
+    --line-strong: rgba(255, 255, 255, 0.26);
+    --text: #f3f5f8;
+    --muted: #aeb8c6;
+    --faint: #7c8796;
+    --accent: #ffb020;
+    --accent-ink: #1a1203;
+    --coverage: #4ea1ff;
+    --danger: #ff6b6b;
+    --ok: #5bd6a0;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    --radius: 14px;
+    --gap: 16px;
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --font: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.4 var(--font);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- full-bleed panorama + legibility scrims ---- */
+  #pano { position: fixed; inset: 0; }
+  .scrim { position: fixed; left: 0; right: 0; pointer-events: none; z-index: 1; }
+  .scrim-top { top: 0; height: 190px; background: linear-gradient(rgba(5, 7, 10, 0.62), rgba(5, 7, 10, 0)); }
+  .scrim-bottom { bottom: 0; height: 150px; background: linear-gradient(rgba(5, 7, 10, 0), rgba(5, 7, 10, 0.5)); }
+  .report-frame {
+    position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
+    box-shadow: inset 0 0 0 3px var(--danger), inset 0 0 90px rgba(255, 107, 107, 0.28);
+    transition: opacity 0.2s var(--ease);
+  }
+  body.reporting .report-frame { opacity: 1; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { box-shadow: inset 0 0 0 3px var(--danger), inset 0 0 40px rgba(255, 107, 107, 0.16); } }
+
+  .glass {
+    background: var(--glass);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    backdrop-filter: blur(16px) saturate(1.3);
+  }
+
+  /* ---- top HUD ---- */
+  .hud-top {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    padding: var(--gap);
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 360px) 1fr;
+    grid-template-areas: "loc compass actions" "vintage status .";
+    gap: 10px 12px;
+    align-items: start;
+    pointer-events: none;
+  }
+  .hud-top > * { pointer-events: auto; min-width: 0; }
+
+  .loc { grid-area: loc; justify-self: start; display: flex; align-items: stretch; max-width: 100%; }
+  .loc-back {
+    display: grid; place-items: center; width: 42px; flex: none;
+    color: var(--muted); text-decoration: none;
+    border-right: 1px solid var(--line);
+    border-radius: var(--radius) 0 0 var(--radius);
+    transition: background 0.15s, color 0.15s;
+  }
+  .loc-back:hover { background: var(--glass-hover); color: var(--text); }
+  .loc-body { padding: 9px 14px 10px 12px; min-width: 0; }
+  .loc-address { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .loc-meta { display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+  .loc-coords { margin-top: 2px; font: 11.5px var(--mono); color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lod { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--faint); }
+  .lod::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .lod.high::before { background: var(--ok); }
+
+  .compass { grid-area: compass; display: flex; align-items: center; height: 44px; overflow: hidden; }
+  .compass-read { flex: none; width: 88px; padding-left: 14px; display: flex; align-items: baseline; gap: 6px; }
+  .compass-deg { font: 600 15px var(--mono); font-variant-numeric: tabular-nums; }
+  .compass-dir { font-size: 12px; color: var(--accent); font-weight: 600; }
+  .ribbon {
+    position: relative; flex: 1; height: 100%; overflow: hidden;
+    border-left: 1px solid var(--line);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  }
+  .ribbon-strip { position: absolute; top: 0; left: 50%; height: 100%; will-change: transform; }
+  .tick { position: absolute; bottom: 0; width: 1px; height: 6px; background: var(--line-strong); }
+  .tick.mid { height: 10px; background: rgba(255, 255, 255, 0.45); }
+  .tick-label { position: absolute; top: 7px; transform: translateX(-50%); font: 10.5px var(--mono); color: var(--faint); white-space: nowrap; }
+  .tick-label.cardinal { top: 5px; font: 700 12.5px var(--font); color: var(--text); }
+  .ribbon-needle {
+    position: absolute; left: 50%; bottom: 0; width: 2px; height: 14px; margin-left: -1px;
+    background: var(--accent); border-radius: 2px 2px 0 0;
+  }
+
+  .actions { grid-area: actions; justify-self: end; display: flex; align-items: center; gap: 8px; }
+  .badge {
+    padding: 4px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.02em;
+    color: var(--accent); background: rgba(255, 176, 32, 0.14); border: 1px solid rgba(255, 176, 32, 0.4);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    white-space: nowrap;
+  }
+  .icon-btn {
+    position: relative; display: inline-flex; align-items: center; gap: 7px;
+    height: 42px; padding: 0 13px; font-size: 13px; font-weight: 600;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+  }
+  .icon-btn:hover { background: var(--glass-hover); border-color: var(--line-strong); }
+  .icon-btn:active { transform: scale(0.97); }
+  .icon-btn[aria-pressed="true"] { background: var(--danger); border-color: var(--danger); color: #1c0606; }
+  .count {
+    min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+    background: var(--accent); color: var(--accent-ink); font: 700 11px/18px var(--mono); text-align: center;
+  }
+  .count[hidden] { display: none; }
+
+  .vintage { grid-area: vintage; justify-self: start; max-width: 100%; }
+  .vintage-pill { display: inline-flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; max-width: 100%; }
+  .vintage-title { display: inline-flex; align-items: center; gap: 6px; padding: 0 8px 0 9px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .seg {
+    height: 30px; padding: 0 12px; border: 1px solid transparent; border-radius: 999px; background: none;
+    font-size: 12.5px; font-weight: 600; color: var(--muted); white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    transition: background 0.15s, color 0.15s;
+  }
+  .seg:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); color: var(--text); }
+  .seg[aria-pressed="true"] { background: var(--text); color: #0e1116; }
+  .seg.fallback { border-color: var(--accent); color: var(--accent); }
+  .seg:disabled { cursor: not-allowed; text-decoration: line-through; color: var(--faint); border: 1px dashed var(--line-strong); }
+  .vintage-note {
+    display: flex; gap: 7px; align-items: flex-start; margin-top: 8px; padding: 8px 12px; max-width: 320px;
+    font-size: 12.5px; line-height: 1.45; color: #ffe2a8;
+    background: rgba(48, 33, 4, 0.82); border: 1px solid rgba(255, 176, 32, 0.45); border-radius: 10px;
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  }
+  .vintage-note[hidden] { display: none; }
+  .vintage-note svg { flex: none; margin-top: 2px; }
+
+  .status { grid-area: status; justify-self: center; display: grid; gap: 8px; justify-items: center; max-width: 100%; }
+  .banner, .toast {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px 9px 14px;
+    border-radius: 12px; font-size: 13px; font-weight: 600; max-width: 100%;
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    box-shadow: var(--shadow);
+  }
+  .banner { background: rgba(60, 12, 12, 0.88); border: 1px solid var(--danger); color: #ffe3e3; }
+  .banner[hidden], .toast[hidden] { display: none; }
+  .banner small { display: block; font-weight: 400; font-size: 12px; color: #ffbcbc; }
+  .banner button {
+    flex: none; height: 30px; padding: 0 12px; border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 12.5px; font-weight: 600; transition: background 0.15s;
+  }
+  .banner button:hover { background: rgba(255, 255, 255, 0.24); }
+  .toast { padding-right: 14px; background: var(--glass-strong); border: 1px solid var(--line-strong); animation: toast-in 0.22s var(--ease); }
+  .toast.warn { border-color: rgba(255, 176, 32, 0.6); color: #ffe2a8; }
+  .toast.ok { border-color: rgba(91, 214, 160, 0.6); color: #d3f7e6; }
+  @keyframes toast-in { from { opacity: 0; transform: translateY(-6px); } }
+
+  kbd {
+    display: inline-block; min-width: 20px; padding: 1px 5px; border-radius: 5px; text-align: center;
+    font: 600 11px/16px var(--mono); color: var(--text);
+    background: rgba(255, 255, 255, 0.12); border: 1px solid var(--line-strong); border-bottom-width: 2px;
+  }
+
+  /* ---- minimap (bottom-left), expandable ---- */
+  .minimap {
+    position: fixed; left: var(--gap); bottom: var(--gap); z-index: 12;
+    width: 250px; height: 188px; overflow: hidden; padding: 0;
+    transition: width 0.28s var(--ease), height 0.28s var(--ease), border-color 0.15s;
+  }
+  .minimap:hover { border-color: var(--line-strong); }
+  .minimap.open {
+    width: min(780px, calc(100vw - 2 * var(--gap)));
+    height: min(580px, calc(100vh - 2 * var(--gap) - 150px));
+    z-index: 30;
+  }
+  #map { position: absolute; inset: 0; border-radius: inherit; font-family: var(--font); }
+  .map-tools { position: absolute; top: 8px; right: 8px; z-index: 1100; display: flex; gap: 6px; }
+  .map-btn {
+    display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 9px;
+    border-radius: 9px; border: 1px solid var(--line-strong); background: var(--glass-strong);
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    transition: background 0.15s, color 0.15s;
+  }
+  .map-btn:hover { background: var(--glass-hover); color: var(--text); }
+  .map-btn .swatch { width: 14px; height: 4px; border-radius: 2px; background: var(--faint); transition: background 0.15s; }
+  .map-btn[aria-pressed="true"] { color: var(--text); }
+  .map-btn[aria-pressed="true"] .swatch { background: var(--coverage); }
+  .map-hint {
+    position: absolute; left: 10px; bottom: 9px; z-index: 1100; pointer-events: none;
+    padding: 4px 9px; border-radius: 8px; background: var(--glass-strong);
+    font-size: 12px; color: var(--muted); opacity: 0; transition: opacity 0.2s;
+  }
+  .minimap.open .map-hint { opacity: 1; }
+  .icon-collapse { display: none; }
+  .minimap.open .icon-collapse { display: block; }
+  .minimap.open .icon-expand { display: none; }
+
+  /* ---- movement cluster (bottom-right) ---- */
+  .move { position: fixed; right: var(--gap); bottom: var(--gap); z-index: 11; display: flex; align-items: flex-end; gap: 12px; }
+  .keys {
+    display: flex; flex-direction: column; gap: 5px; padding: 10px 12px; border-radius: 12px;
+    font-size: 12px; color: var(--muted);
+    background: rgba(13, 16, 21, 0.5); border: 1px solid var(--line);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  }
+  .keys span { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .pad { display: flex; flex-direction: column; padding: 5px; gap: 3px; border-radius: 18px; }
+  .pad button {
+    display: grid; place-items: center; align-content: center; gap: 1px;
+    width: 52px; height: 46px; border: 0; border-radius: 13px; background: none;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .pad button:hover { background: rgba(255, 255, 255, 0.13); }
+  .pad button:active { transform: scale(0.94); background: rgba(255, 255, 255, 0.2); }
+  .pad button.primary { background: rgba(255, 255, 255, 0.1); height: 52px; }
+  .pad button.primary:hover { background: var(--accent); color: var(--accent-ink); }
+  .pad small { font: 600 10px/1 var(--mono); color: var(--muted); }
+  .pad hr { width: 60%; margin: 1px auto; border: 0; border-top: 1px solid var(--line); }
+
+  /* ---- slide-over sheet ---- */
+  .sheet {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 40;
+    width: min(400px, 100vw); display: flex; flex-direction: column;
+    background: rgba(11, 14, 18, 0.9); border-left: 1px solid var(--line);
+    -webkit-backdrop-filter: blur(22px) saturate(1.2); backdrop-filter: blur(22px) saturate(1.2);
+    box-shadow: -20px 0 50px rgba(0, 0, 0, 0.45);
+    transform: translateX(102%); visibility: hidden;
+    transition: transform 0.3s var(--ease), visibility 0s 0.3s;
+  }
+  .sheet.open { transform: none; visibility: visible; transition: transform 0.3s var(--ease); }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 12px 20px; border-bottom: 1px solid var(--line); }
+  .sheet-head h2 { margin: 0; font-size: 16px; font-weight: 700; }
+  .sheet-close { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 10px; background: none; color: var(--muted); transition: background 0.15s, color 0.15s; }
+  .sheet-close:hover { background: rgba(255, 255, 255, 0.1); color: var(--text); }
+  .sheet-body { flex: 1; overflow-y: auto; padding: 4px 20px 24px; }
+  .sheet h3 { margin: 20px 0 10px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--faint); }
+  .meta { margin: 0; display: grid; grid-template-columns: 92px 1fr; gap: 8px 12px; font-size: 13px; }
+  .meta dt { color: var(--muted); }
+  .meta dd { margin: 0; min-width: 0; font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; }
+  .meta .hl { color: var(--accent); font-weight: 700; }
+  .reports { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .reports li {
+    display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 9px 12px;
+    border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.04); font-size: 12.5px;
+  }
+  .reports .where { font-weight: 600; }
+  .reports .rev { font: 700 12px var(--mono); color: var(--ok); }
+  .reports .sub { grid-column: 1 / -1; font: 11.5px var(--mono); color: var(--faint); }
+  .empty { margin: 0; padding: 14px; border: 1px dashed var(--line-strong); border-radius: 10px; font-size: 13px; color: var(--muted); }
+  .help { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 13px; color: var(--muted); }
+  .help li { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+  /* ---- narrow / phone ---- */
+  @media (max-width: 760px) {
+    :root { --gap: 12px; }
+    .hud-top {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: "loc actions" "compass compass" "vintage vintage" "status status";
+      gap: 8px;
+    }
+    .scrim-top { height: 250px; }
+    .compass { height: 40px; }
+    .loc-address { font-size: 15px; }
+    .icon-btn { padding: 0; width: 42px; justify-content: center; }
+    .icon-btn .label { display: none; }
+    .icon-btn .count { position: absolute; top: -5px; right: -5px; }
+    .vintage-title span { display: none; }
+    .vintage-title { padding: 0 4px 0 8px; }
+    .vintage-note { max-width: none; }
+    .minimap { width: 150px; height: 122px; }
+    .minimap.open { height: min(62vh, calc(100vh - 2 * var(--gap))); }
+    .minimap:not(.open) .map-btn .text { display: none; }
+    .keys { display: none; }
+    .pad button { width: 48px; height: 44px; }
+    .pad button.primary { height: 48px; }
+  }
+  @media (max-width: 1100px) { .keys { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before { transition-duration: 0.01ms !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="pano" aria-label="로드뷰 파노라마"></div>
+<div class="scrim scrim-top"></div>
+<div class="scrim scrim-bottom"></div>
+<div class="report-frame"></div>
+
+<header class="hud-top">
+  <div class="loc glass">
+    <a class="loc-back" href="../index.html" title="시안 비교 페이지로 돌아가기" aria-label="시안 비교 페이지로 돌아가기">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="loc-body">
+      <div class="loc-address" id="address">—</div>
+      <div class="loc-meta">
+        <span id="photodate">—</span>
+        <span class="lod" id="lod" title="파노라마 타일 해상도">저해상도</span>
+      </div>
+      <div class="loc-coords" id="coords">—</div>
+    </div>
+  </div>
+
+  <div class="compass glass" role="img" aria-label="나침반" id="compass">
+    <div class="compass-read"><span class="compass-deg" id="deg">0°</span><span class="compass-dir" id="dir">북</span></div>
+    <div class="ribbon">
+      <div class="ribbon-strip" id="strip"></div>
+      <div class="ribbon-needle"></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <span class="badge">시안 B</span>
+    <button class="icon-btn glass" id="reportBtn" aria-pressed="false" title="블러 누락 신고">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.800-1.200-8-4.500-8-9V6l8-3z"/><path d="M12 8v5M12 16.500v.010"/></svg>
+      <span class="label">블러 누락 신고</span>
+    </button>
+    <button class="icon-btn glass" id="sheetBtn" aria-expanded="false" aria-controls="sheet" title="메타데이터 · 신고 내역">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      <span class="label">상세</span>
+      <span class="count" id="reportCount" hidden>0</span>
+    </button>
+  </div>
+
+  <div class="vintage">
+    <div class="vintage-pill glass" role="group" aria-label="과거 사진 보기">
+      <span class="vintage-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span>과거 사진 보기</span>
+      </span>
+      <span id="vintageSegs" style="display:contents"></span>
+    </div>
+    <div class="vintage-note" id="vintageNote" role="status" hidden>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3L12 4z"/><path d="M12 10v4M12 17v.010"/></svg>
+      <span id="vintageNoteText"></span>
+    </div>
+  </div>
+
+  <div class="status" aria-live="polite">
+    <div class="banner" id="banner" hidden>
+      <div>블러가 누락된 얼굴·번호판을 클릭하세요<small>취소하려면 <kbd>Esc</kbd> 또는 취소 버튼</small></div>
+      <button id="reportCancel">취소</button>
+    </div>
+    <div class="toast" id="toast" hidden></div>
+  </div>
+</header>
+
+<section class="minimap glass" id="minimap" aria-label="지도">
+  <div id="map"></div>
+  <div class="map-tools">
+    <button class="map-btn" id="coverageBtn" aria-pressed="true" title="로드뷰 커버리지 표시">
+      <span class="swatch"></span><span class="text">커버리지</span>
+    </button>
+    <button class="map-btn" id="mapToggle" aria-expanded="false" title="지도 크게 보기">
+      <svg class="icon-expand" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>
+      <svg class="icon-collapse" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10h-6V4M4 14h6v6M14 10l7-7M10 14l-7 7"/></svg>
+    </button>
+  </div>
+  <div class="map-hint">지도를 클릭하면 반경 50m 안의 가장 가까운 로드뷰로 이동합니다</div>
+</section>
+
+<div class="move">
+  <div class="keys" aria-label="키보드 조작">
+    <span><kbd>↑</kbd><kbd>↓</kbd> 전진 · 후진</span>
+    <span><kbd>Shift</kbd>+<kbd>↑</kbd><kbd>↓</kbd> 50m 점핑</span>
+    <span><kbd>←</kbd><kbd>→</kbd> 회전 · 휠 확대</span>
+  </div>
+  <div class="pad glass" role="group" aria-label="이동">
+    <button id="jumpFwd" title="50m 앞으로 점핑 (Shift+↑)" aria-label="50m 앞으로 점핑">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12l6-6 6 6M6 18l6-6 6 6"/></svg>
+      <small>50m</small>
+    </button>
+    <button id="fwd" class="primary" title="전진 (↑)" aria-label="전진">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15l7-7 7 7"/></svg>
+    </button>
+    <hr>
+    <button id="back" title="후진 (↓)" aria-label="후진">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg>
+    </button>
+    <button id="jumpBack" title="50m 뒤로 점핑 (Shift+↓)" aria-label="50m 뒤로 점핑">
+      <small>50m</small>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l6 6 6-6M6 12l6 6 6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<aside class="sheet" id="sheet" aria-label="상세 정보" aria-hidden="true">
+  <div class="sheet-head">
+    <h2>상세 정보</h2>
+    <button class="sheet-close" id="sheetClose" aria-label="닫기">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body">
+    <h3>파노라마 매니페스트</h3>
+    <dl class="meta" id="manifest"></dl>
+    <h3>블러 누락 신고 내역</h3>
+    <div id="reports"></div>
+    <h3>조작법</h3>
+    <ul class="help">
+      <li><kbd>↑</kbd><kbd>↓</kbd> 전진 · 후진 (10m)</li>
+      <li><kbd>Shift</kbd>+<kbd>↑</kbd><kbd>↓</kbd> 50m 점핑</li>
+      <li><kbd>←</kbd><kbd>→</kbd> 회전, 드래그로 둘러보기, 휠로 확대</li>
+      <li>바닥 화살표를 누르면 해당 방향으로 이동</li>
+      <li><kbd>Esc</kbd> 신고 모드 취소 · 패널 닫기</li>
+    </ul>
+  </div>
+</aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="../shared/city.js"></script>
+<script src="../shared/reproject.js"></script>
+<script src="../shared/pano-render.js"></script>
+<script src="../shared/viewer.js"></script>
+<script src="../shared/map.js"></script>
+<script src="../shared/photo-store.js"></script>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  // ---- deep link: ?node=&vintage=&heading=&pitch=&map=open&sheet=open&report=1 ----
+  var q = new URLSearchParams(location.search);
+  var startNode = RV.getNode(q.get('node')) ? q.get('node') : 'ew0-008';
+  var knownYears = RV.VINTAGES.map(function (v) { return v.year; });
+  var startVintage = knownYears.indexOf(Number(q.get('vintage'))) >= 0 ? Number(q.get('vintage')) : 'latest';
+
+  var viewer = RV.createViewer($('pano'), {
+    nodeId: startNode,
+    vintage: startVintage,
+    pov: q.get('heading') ? { heading: +q.get('heading'), pitch: +(q.get('pitch') || 0) } : undefined
+  });
+  var map = RV.createMap($('map'), { theme: 'dark', zoomControl: false }).bindViewer(viewer);
+
+  function seasonLabel(year) { return RV.vintage(year).label; }
+
+  // ---- toast ----
+  var toastTimer = null;
+  function toast(text, kind, ms) {
+    var t = $('toast');
+    t.hidden = true;            // restart the entry animation
+    void t.offsetWidth;
+    t.textContent = text;
+    t.className = 'toast' + (kind ? ' ' + kind : '');
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.hidden = true; }, ms || 2600);
+  }
+
+  // ---- location chip + manifest sheet ----
+  function renderLocation(m) {
+    $('address').textContent = m.address;
+    $('photodate').textContent = m.photodate + ' 촬영';
+    $('coords').textContent = m.position.lat.toFixed(5) + '°N  ' + m.position.lon.toFixed(5) + '°E';
+  }
+  function renderManifest(m) {
+    var steps = m.links.filter(function (l) { return l.kind === 'step'; }).length;
+    var rows = [
+      ['파노라마 ID', m.id],
+      ['시퀀스', m.sequenceId],
+      ['출처', m.source],
+      ['촬영 시각', m.captureTime],
+      ['투영', m.projection + ' · ' + m.tiles.tileSize + 'px · L0–' + m.tiles.maxLevel],
+      ['타일 URL', m.tiles.template],
+      ['타일 리비전', 'r' + m.tiles.tileRevision, 'hl'],
+      ['링크', m.links.length + '개 (이동 ' + steps + ' · 점핑 ' + (m.links.length - steps) + ')'],
+      ['프라이버시', '얼굴 ' + m.privacy.faces + ' · 번호판 ' + m.privacy.plates],
+      ['블러 리비전', 'r' + m.privacy.revision, 'hl'],
+      ['위치 정확도', '±' + m.position.accuracyMeters + 'm']
+    ];
+    var dl = $('manifest');
+    dl.textContent = '';
+    rows.forEach(function (r) {
+      dl.appendChild(el('dt', '', r[0]));
+      dl.appendChild(el('dd', r[2] || '', r[1]));
+    });
+  }
+
+  // ---- vintage pill ----
+  function renderVintage(e) {
+    var requested = e.requestedVintage === 'latest' ? 'latest' : Number(e.requestedVintage);
+    var isFallback = requested !== 'latest' && requested !== e.year;
+    var segs = $('vintageSegs');
+    segs.textContent = '';
+
+    function seg(label, value, pressed) {
+      var b = el('button', 'seg', label);
+      b.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+      b.onclick = function () { viewer.setVintage(value); viewer.focus(); };
+      segs.appendChild(b);
+      return b;
+    }
+    seg('최신', 'latest', requested === 'latest');
+    e.manifest.availableYears.slice().sort().forEach(function (y) {
+      var b = seg(String(y), y, requested === y);
+      b.title = seasonLabel(y);
+      if (isFallback && y === e.year) b.classList.add('fallback');
+    });
+    if (isFallback) {
+      var missing = el('button', 'seg', String(requested));
+      missing.disabled = true;
+      missing.title = '이 지점에는 ' + requested + '년 촬영분이 없습니다';
+      segs.appendChild(missing);
+      $('vintageNoteText').textContent = '이 지점에는 ' + requested + '년 사진이 없어 가장 가까운 '
+        + seasonLabel(e.year) + ' 사진을 표시합니다.';
+    }
+    $('vintageNote').hidden = !isFallback;
+  }
+
+  function onPano(e) {
+    renderLocation(e.manifest);
+    renderManifest(e.manifest);
+    renderVintage(e);
+  }
+  viewer.on('pano_changed', onPano);
+  var s0 = viewer.getState();
+  onPano({ nodeId: s0.nodeId, year: s0.year, requestedVintage: s0.vintage, manifest: viewer.getManifest() });
+
+  // ---- LOD indicator ----
+  viewer.on('load', function (e) {
+    var lod = $('lod');
+    lod.textContent = e.lod === 'high' ? '고해상도' : '저해상도';
+    lod.classList.toggle('high', e.lod === 'high');
+  });
+
+  // ---- compass ribbon ----
+  var PX_PER_DEG = 3;
+  var CARDINALS = ['북', '북동', '동', '남동', '남', '남서', '서', '북서'];
+  (function buildRibbon() {
+    var strip = $('strip');
+    // -180..540 so any heading in 0..360 has a full half-turn of ticks on both sides
+    for (var d = -180; d <= 540; d += 5) {
+      var x = (d + 180) * PX_PER_DEG;
+      var tick = el('i', 'tick' + (d % 15 === 0 ? ' mid' : ''));
+      tick.style.left = x + 'px';
+      strip.appendChild(tick);
+      if (d % 15 !== 0) continue;
+      var deg = ((d % 360) + 360) % 360;
+      var label = deg % 45 === 0 ? el('span', 'tick-label cardinal', CARDINALS[deg / 45]) : el('span', 'tick-label', String(deg));
+      label.style.left = x + 'px';
+      strip.appendChild(label);
+    }
+  })();
+  function renderCompass(heading) {
+    var h = Math.round(heading) % 360;
+    $('deg').textContent = h + '°';
+    $('dir').textContent = CARDINALS[Math.round(heading / 45) % 8];
+    $('strip').style.transform = 'translateX(' + (-(heading + 180) * PX_PER_DEG) + 'px)';
+    $('compass').setAttribute('aria-label', '나침반: ' + h + '도 ' + $('dir').textContent);
+  }
+  viewer.on('pov_changed', function (p) { renderCompass(p.heading); });
+  renderCompass(viewer.getPov().heading);
+
+  // ---- movement ----
+  function bindMove(id, action) {
+    $(id).onclick = function () { action(); viewer.focus(); };
+  }
+  bindMove('fwd', function () { viewer.forward(); });
+  bindMove('back', function () { viewer.backward(); });
+  bindMove('jumpFwd', function () { viewer.jump(0); });
+  bindMove('jumpBack', function () { viewer.jump(180); });
+  viewer.on('no_link', function () { toast('이 방향으로는 더 이동할 수 없습니다', 'warn'); });
+
+  // ---- minimap ----
+  var minimap = $('minimap');
+  function settleMap() {
+    map.invalidateSize();
+    if (minimap.classList.contains('open')) { map.fit(); return; }
+    var node = RV.getNode(viewer.getState().nodeId);
+    map.leaflet.setView([node.lat, node.lon], 17, { animate: false });
+  }
+  function setMapOpen(open) {
+    minimap.classList.toggle('open', open);
+    $('mapToggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+    $('mapToggle').title = open ? '지도 작게 보기' : '지도 크게 보기';
+    settleMap(); // covers the no-transition case; transitionend re-runs it at the final size
+  }
+  minimap.addEventListener('transitionend', function (e) {
+    if (e.target === minimap && e.propertyName === 'width') settleMap();
+  });
+  window.addEventListener('resize', settleMap);
+  $('mapToggle').onclick = function () { setMapOpen(!minimap.classList.contains('open')); };
+  $('coverageBtn').onclick = function () {
+    var show = this.getAttribute('aria-pressed') !== 'true';
+    this.setAttribute('aria-pressed', show ? 'true' : 'false');
+    map.setCoverageVisible(show);
+  };
+  map.on('no_coverage', function (e) {
+    toast('반경 ' + Math.round(e.radiusM) + 'm 안에 로드뷰가 없습니다', 'warn');
+  });
+
+  // ---- blur-miss report flow ----
+  function renderReports() {
+    var all = RV.allReports();
+    var box = $('reports');
+    box.textContent = '';
+    $('reportCount').hidden = all.length === 0;
+    $('reportCount').textContent = all.length;
+    if (!all.length) {
+      box.appendChild(el('p', 'empty', '아직 신고 내역이 없습니다. 상단의 「블러 누락 신고」를 누른 뒤 파노라마에서 위치를 클릭하세요.'));
+      return;
+    }
+    var ul = el('ul', 'reports');
+    all.forEach(function (r) {
+      var li = el('li');
+      li.appendChild(el('span', 'where', RV.getManifest(r.nodeId, r.year).address + ' · ' + r.year));
+      li.appendChild(el('span', 'rev', '→ r' + r.revision));
+      li.appendChild(el('span', 'sub', new Date(r.at).toLocaleTimeString('ko-KR') + ' · ' + r.nodeId
+        + ' · 방위 ' + Math.round(r.heading) + '° / 고도 ' + Math.round(r.pitch) + '°'));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+  }
+  $('reportBtn').onclick = function () {
+    viewer.setReportMode(!viewer.isReportMode());
+    viewer.focus();
+  };
+  $('reportCancel').onclick = function () { viewer.setReportMode(false); viewer.focus(); };
+  viewer.on('report_mode', function (e) {
+    document.body.classList.toggle('reporting', e.active);
+    $('reportBtn').setAttribute('aria-pressed', e.active ? 'true' : 'false');
+    $('banner').hidden = !e.active;
+  });
+  viewer.on('report_done', function (entry) {
+    renderReports();
+    toast('신고 접수 완료 · 블러 재처리됨 (프라이버시 리비전 r' + entry.revision + ')', 'ok', 4200);
+  });
+  renderReports();
+
+  // ---- sheet ----
+  var sheet = $('sheet');
+  function setSheetOpen(open) {
+    sheet.classList.toggle('open', open);
+    sheet.setAttribute('aria-hidden', open ? 'false' : 'true');
+    $('sheetBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) $('sheetClose').focus(); else viewer.focus();
+  }
+  $('sheetBtn').onclick = function () { setSheetOpen(!sheet.classList.contains('open')); };
+  $('sheetClose').onclick = function () { setSheetOpen(false); };
+
+  // Esc outside the canvas (the viewer already handles it, and marks it handled, when focused)
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || e.defaultPrevented) return;
+    if (viewer.isReportMode()) viewer.setReportMode(false);
+    else if (sheet.classList.contains('open')) setSheetOpen(false);
+    else if (minimap.classList.contains('open')) setMapOpen(false);
+  });
+
+  // ---- initial state ----
+  settleMap();
+  viewer.focus();
+  if (q.get('map') === 'open') setMapOpen(true);
+  if (q.get('sheet') === 'open') setSheetOpen(true);
+  if (q.get('report') === '1') viewer.setReportMode(true);
+})();
+</script>
+</body>
+</html>

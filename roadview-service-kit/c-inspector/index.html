@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로드뷰 인스펙터 — 시안 C</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root {
+    --paper: #f1eee6;
+    --panel: #faf8f3;
+    --panel-2: #ebe7dd;
+    --ink: #1f1d18;
+    --ink-2: #554f43;
+    --ink-3: #736c5d;
+    --rule: #dbd5c7;
+    --rule-strong: #c2baa8;
+    --accent: #0d6b5f;
+    --accent-strong: #09544a;
+    --accent-soft: #d9eae5;
+    --on-accent: #ffffff;
+    --warn: #8a5200;
+    --warn-soft: #f5e8cc;
+    --danger: #b42318;
+    --danger-soft: #f8dfda;
+    --stage: #15171a;
+    --on-stage: #f3f1ea;
+    --sans: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --radius: 4px;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: grid; grid-template-rows: 44px minmax(0, 1fr);
+    background: var(--paper); color: var(--ink);
+    font: 13px/1.45 var(--sans); font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .mono { font-family: var(--mono); font-size: 12px; }
+
+  /* ---- top bar ---- */
+  .top {
+    display: flex; align-items: center; gap: 12px; padding: 0 14px;
+    background: var(--ink); color: var(--on-stage); min-width: 0;
+  }
+  .top a.back {
+    color: var(--on-stage); text-decoration: none; font-size: 12px; opacity: .78;
+    padding: 4px 8px 4px 6px; border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius);
+    white-space: nowrap;
+  }
+  .top a.back:hover { opacity: 1; border-color: rgba(255,255,255,.5); }
+  .top a.back:focus-visible, .top .top-id:focus-visible { outline-color: #7fd1c4; }
+  .top h1 { font-size: 14px; font-weight: 650; margin: 0; letter-spacing: -.01em; white-space: nowrap; }
+  .badge {
+    font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 2px 7px; border-radius: 3px;
+    background: var(--accent); color: var(--on-accent); white-space: nowrap;
+  }
+  .top .sub { font-size: 12px; opacity: .6; white-space: nowrap; }
+  .top .top-id { margin-left: auto; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+  /* ---- workbench grid ---- */
+  .bench {
+    display: grid; min-height: 0;
+    grid-template-columns: 296px minmax(0, 1fr) 376px;
+    grid-template-areas: "map stage insp";
+  }
+  .col-map { grid-area: map; display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--rule-strong); background: var(--panel); }
+  .col-stage { grid-area: stage; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .col-insp { grid-area: insp; display: flex; flex-direction: column; min-height: 0; min-width: 0; border-left: 1px solid var(--rule-strong); background: var(--panel); }
+
+  .head {
+    display: flex; align-items: center; gap: 10px; flex: none;
+    height: 36px; padding: 0 12px; border-bottom: 1px solid var(--rule);
+  }
+  .head h2, .eyebrow {
+    margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--ink-2); text-transform: uppercase;
+  }
+  .head .spacer { flex: 1; }
+
+  /* ---- map column ---- */
+  .switch { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); cursor: pointer; }
+  .switch input { accent-color: var(--accent); margin: 0; width: 14px; height: 14px; }
+  .select {
+    height: 24px; padding: 0 4px; font-size: 12px; background: var(--panel);
+    border: 1px solid var(--rule-strong); border-radius: var(--radius);
+  }
+  .select:hover { border-color: var(--ink-3); }
+  .map-wrap { position: relative; flex: 1; min-height: 220px; }
+  #map { position: absolute; inset: 0; }
+  .map-msg {
+    position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 500;
+    padding: 7px 10px; border-radius: var(--radius); font-size: 12px; font-weight: 600;
+    background: var(--danger); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  }
+  .map-hint { position: absolute; left: 8px; top: 8px; z-index: 450; margin-left: 40px;
+    font-size: 11px; color: var(--ink-2); background: rgba(250,248,243,.88); padding: 3px 7px; border-radius: 3px; pointer-events: none; }
+  .leaflet-container { font-family: var(--sans); }
+
+  .loc { flex: none; border-top: 1px solid var(--rule-strong); padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 12px; }
+  .loc .addr { font-size: 15px; font-weight: 650; letter-spacing: -.01em; margin: 2px 0 0; }
+  .loc .date { color: var(--ink-2); margin: 2px 0 0; }
+  .compass { width: 56px; height: 56px; }
+  .compass circle { fill: var(--panel); stroke: var(--rule-strong); }
+  .compass text { font: 700 9px var(--sans); fill: var(--ink-3); text-anchor: middle; }
+  .compass .needle { fill: var(--accent); transform-origin: 28px 28px; }
+  .kv { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 12px; margin: 0; }
+  .kv dt { color: var(--ink-3); font-size: 12px; white-space: nowrap; }
+  .kv dd { margin: 0; font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+
+  /* ---- stage ---- */
+  .stage { position: relative; flex: 1; min-height: 220px; display: flex; gap: 2px; background: var(--stage); }
+  .pane { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
+  .pane-view { position: absolute; inset: 0; }
+  .pane-tag, .lod {
+    position: absolute; top: 10px; display: inline-flex; align-items: center; gap: 7px; pointer-events: none;
+    padding: 4px 9px 4px 4px; border-radius: 3px; font-size: 12px; font-weight: 600;
+    background: rgba(21,23,26,.78); color: var(--on-stage); backdrop-filter: blur(4px);
+  }
+  .pane-tag { left: 10px; }
+  .pane-tag .side { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 2px; font: 700 11px var(--mono); background: var(--accent); color: var(--on-accent); }
+  .pane[data-side="B"] .pane-tag .side { background: var(--on-stage); color: var(--ink); }
+  .pane-tag .fallback { color: #ffcf7a; font-weight: 600; }
+  .lod { right: 10px; padding-left: 9px; font-weight: 500; }
+  .lod .bars { display: inline-flex; gap: 2px; }
+  .lod .bars i { width: 10px; height: 4px; border-radius: 1px; background: rgba(255,255,255,.28); }
+  .lod .bars i.on { background: #7fd1c4; }
+  .lod[data-lod="low"] { color: #ffcf7a; }
+
+  .stage.is-report { outline: 3px dashed var(--danger); outline-offset: -3px; }
+  .report-banner {
+    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 5;
+    display: flex; align-items: center; gap: 12px; max-width: calc(100% - 24px);
+    padding: 8px 8px 8px 14px; border-radius: var(--radius);
+    background: var(--danger); color: #fff; font-size: 13px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  }
+  .report-banner button { background: #fff; color: var(--danger); border: 0; border-radius: 3px; padding: 4px 10px; font-weight: 700; white-space: nowrap; }
+  .report-banner button:hover { background: var(--danger-soft); }
+  .toast {
+    position: absolute; left: 50%; top: 48px; transform: translateX(-50%); z-index: 6; max-width: calc(100% - 24px);
+    padding: 8px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 600;
+    background: var(--on-stage); color: var(--ink); box-shadow: 0 4px 16px rgba(0,0,0,.35); border-left: 4px solid var(--ink-3);
+  }
+  .toast[data-kind="ok"] { border-left-color: var(--accent); }
+  .toast[data-kind="warn"] { border-left-color: #d08700; }
+
+  /* ---- control bar ---- */
+  .controls {
+    flex: none; display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap;
+    padding: 8px 12px; background: var(--panel); border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule);
+  }
+  .group { display: inline-flex; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px;
+    background: var(--panel); border: 1px solid var(--rule-strong); border-radius: var(--radius);
+    font-size: 12.5px; font-weight: 600; white-space: nowrap;
+  }
+  .btn:hover { background: var(--panel-2); border-color: var(--ink-3); }
+  .btn:active { background: var(--rule); }
+  .btn svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .group .btn { border-radius: 0; margin-left: -1px; }
+  .group .btn:first-child { border-radius: var(--radius) 0 0 var(--radius); margin-left: 0; }
+  .group .btn:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+  .group .btn:hover, .group .btn:focus-visible { position: relative; z-index: 1; }
+  .btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn[aria-pressed="true"]:hover { background: var(--accent-strong); }
+  .btn.danger { color: var(--danger); border-color: #dcaaa3; }
+  .btn.danger:hover { background: var(--danger-soft); border-color: var(--danger); }
+  .btn.danger[aria-pressed="true"] { background: var(--danger); border-color: var(--danger); color: #fff; }
+  .keys { flex: 1; min-width: 0; color: var(--ink-3); font-size: 12px; display: flex; flex-wrap: wrap; gap: 2px 10px; }
+  .keys span { white-space: nowrap; }
+  kbd {
+    display: inline-block; min-width: 18px; padding: 0 4px; margin-right: 1px; text-align: center;
+    font: 11px/16px var(--mono); color: var(--ink-2);
+    background: var(--panel); border: 1px solid var(--rule-strong); border-bottom-width: 2px; border-radius: 3px;
+  }
+
+  /* ---- timeline ---- */
+  .timeline { flex: none; padding: 10px 14px 12px; background: var(--paper); }
+  .tl-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 2px; }
+  .tl-head .now { margin-left: auto; color: var(--ink-2); font-size: 12px; text-align: right; }
+  .tl-head .now b { color: var(--ink); font-weight: 650; }
+  .tl-notice {
+    margin: 6px 0 0; padding: 6px 10px; border-radius: var(--radius); font-size: 12.5px;
+    background: var(--warn-soft); color: var(--warn); border-left: 3px solid #d08700;
+  }
+  .tl-notice b { font-weight: 700; }
+  .tl-row { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: start; gap: 0 12px; margin-top: 8px; }
+  .tl-side {
+    display: inline-grid; place-items: center; width: 22px; height: 22px; margin-top: 14px; border-radius: 2px;
+    font: 700 11px var(--mono); background: var(--accent); color: var(--on-accent);
+  }
+  .tl-row[data-side="B"] .tl-side { background: var(--ink); color: var(--on-stage); }
+  .tl-latest {
+    height: 28px; margin-top: 11px; justify-self: start; padding: 0 12px; border-radius: 14px; font-size: 12.5px; font-weight: 650;
+    background: var(--panel); border: 1px solid var(--rule-strong);
+  }
+  .tl-latest:hover { border-color: var(--ink-3); background: var(--panel-2); }
+  .tl-latest.is-on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .tl-row[data-side="B"] .tl-latest.is-on { background: var(--ink); border-color: var(--ink); color: var(--on-stage); }
+  .tl-track { position: relative; height: 74px; margin: 0 52px 0 44px; }
+  .tl-track::before { content: ""; position: absolute; left: -44px; right: -52px; top: 25px; height: 2px; background: var(--rule-strong); }
+  .tl-tick { position: absolute; top: 14px; width: 1px; height: 12px; background: var(--rule-strong); }
+  .tl-tick span { position: absolute; top: -14px; left: -1px; font: 10px var(--mono); color: var(--ink-3); }
+  .tl-stop {
+    position: absolute; top: 12px; transform: translateX(-50%); width: 104px; padding: 4px 0 2px;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    background: none; border: 0; border-radius: var(--radius); text-align: center;
+  }
+  .tl-stop .dot { width: 20px; height: 20px; border-radius: 50%; background: var(--panel); border: 2px solid var(--ink-2); box-shadow: 0 0 0 3px var(--paper); }
+  .tl-stop .lbl { margin-top: 4px; font-size: 12.5px; font-weight: 650; white-space: nowrap; }
+  .tl-stop .st { font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+  .tl-stop:hover:not(:disabled) .dot { border-color: var(--accent); background: var(--accent-soft); }
+  .tl-stop.is-shown .dot { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--accent-soft); }
+  .tl-stop.is-shown .st { color: var(--accent-strong); font-weight: 650; }
+  .tl-row[data-side="B"] .tl-stop.is-shown .dot { background: var(--ink); border-color: var(--ink); box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--rule-strong); }
+  .tl-row[data-side="B"] .tl-stop.is-shown .st { color: var(--ink); }
+  .tl-stop.is-fallback .st { color: var(--warn); }
+  .tl-stop:disabled { cursor: not-allowed; }
+  .tl-stop:disabled .dot { border: 2px dashed var(--rule-strong); background: transparent; }
+  .tl-stop:disabled .lbl { color: var(--ink-3); text-decoration: line-through; font-weight: 500; }
+  .tl-stop.is-requested:disabled .dot { border-color: #d08700; background: var(--warn-soft); }
+  .tl-stop.is-requested:disabled .st { color: var(--warn); font-weight: 650; }
+
+  /* ---- inspector ---- */
+  .tabs { display: flex; flex: none; border-bottom: 1px solid var(--rule-strong); background: var(--panel-2); }
+  .tab {
+    flex: 1; height: 36px; padding: 0 4px; background: none; border: 0; border-right: 1px solid var(--rule);
+    border-bottom: 2px solid transparent; font-size: 12.5px; font-weight: 600; color: var(--ink-2); white-space: nowrap;
+  }
+  .tab:last-child { border-right: 0; }
+  .tab:hover { color: var(--ink); background: var(--panel); }
+  .tab[aria-selected="true"] { color: var(--accent-strong); background: var(--panel); border-bottom-color: var(--accent); }
+  .tab:focus-visible { outline-offset: -2px; }
+  .tab .count { font: 11px var(--mono); color: var(--ink-3); margin-left: 3px; }
+  .capture-line { flex: none; padding: 7px 12px; border-bottom: 1px solid var(--rule); color: var(--ink-2); font-size: 12px; display: flex; gap: 8px; align-items: baseline; }
+  .capture-line b { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+  .panel { flex: 1; min-height: 0; overflow: auto; padding: 12px; }
+  .panel h3 { margin: 16px 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--ink-2); text-transform: uppercase; }
+  .panel h3:first-child { margin-top: 0; }
+  .panel p.note { margin: 0 0 10px; color: var(--ink-2); font-size: 12.5px; }
+
+  .meta { display: grid; grid-template-columns: 92px minmax(0, 1fr); margin: 0; border-top: 1px solid var(--rule); }
+  .meta dt, .meta dd { padding: 5px 0; border-bottom: 1px solid var(--rule); }
+  .meta dt { color: var(--ink-3); font-size: 12px; }
+  .meta dd { margin: 0; font-family: var(--mono); font-size: 12px; overflow-wrap: anywhere; }
+  .meta dd em { font-style: normal; color: var(--accent-strong); font-weight: 600; }
+  details.raw { margin-top: 12px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--paper); }
+  details.raw summary { padding: 7px 10px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--ink-2); }
+  details.raw summary:hover { color: var(--ink); }
+  details.raw pre { margin: 0; padding: 10px; border-top: 1px solid var(--rule); font: 11px/1.5 var(--mono); overflow: auto; max-height: 340px; }
+
+  .rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+  .row {
+    display: grid; align-items: center; gap: 2px 10px; width: 100%; padding: 7px 6px;
+    background: none; border: 0; border-bottom: 1px solid var(--rule); text-align: left;
+  }
+  .row:hover { background: var(--accent-soft); }
+  .row .main { font-weight: 600; }
+  .row .sub2 { color: var(--ink-3); font-size: 12px; }
+  .row .num { font-family: var(--mono); font-size: 12px; text-align: right; white-space: nowrap; }
+  .link-row { grid-template-columns: 26px minmax(0, 1fr) auto; }
+  .link-row .arrow { grid-row: span 2; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: var(--panel-2); color: var(--ink-2); }
+  .link-row:hover .arrow { background: var(--accent); color: var(--on-accent); }
+  .link-row .arrow svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .chip { display: inline-block; padding: 0 5px; border-radius: 2px; font-size: 11px; font-weight: 700; background: var(--panel-2); color: var(--ink-2); vertical-align: 1px; }
+  .chip.jump { background: var(--warn-soft); color: var(--warn); }
+  .chip.ok { background: var(--accent-soft); color: var(--accent-strong); }
+  .log-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .empty { padding: 14px 6px; color: var(--ink-3); font-size: 12.5px; border-bottom: 1px solid var(--rule); }
+
+  .confirm { margin: 10px 0 0; padding: 8px 10px; border-radius: var(--radius); background: var(--accent-soft); color: var(--accent-strong); border-left: 3px solid var(--accent); font-size: 12.5px; }
+  .confirm b { font-family: var(--mono); }
+  .panel .btn.wide { width: 100%; justify-content: center; height: 34px; }
+  .rev { display: flex; align-items: baseline; gap: 8px; margin: 0 0 10px; }
+  .rev strong { font: 650 26px/1 var(--mono); letter-spacing: -.02em; }
+  .rev span { color: var(--ink-2); font-size: 12.5px; }
+
+  table.cov { width: 100%; border-collapse: collapse; }
+  .cov th { text-align: left; font-size: 11px; font-weight: 700; color: var(--ink-3); padding: 0 6px 5px; border-bottom: 1px solid var(--rule-strong); white-space: nowrap; }
+  .cov td { padding: 7px 6px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  .cov th.r, .cov td.r { text-align: right; }
+  .cov td.r { font-family: var(--mono); font-size: 12px; }
+  .cov tbody tr { cursor: pointer; }
+  .cov tbody tr:hover { background: var(--accent-soft); }
+  .cov tbody tr.is-current td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+  .cov tbody tr.is-current .name { color: var(--accent-strong); }
+  .cov .name { font-weight: 650; }
+  .cov .rid { font: 11px var(--mono); color: var(--ink-3); margin-left: 4px; }
+  .yr { display: inline-block; width: 26px; margin-right: 3px; padding: 1px 0; text-align: center; border-radius: 2px; font: 600 10.5px var(--mono); }
+  .yr.on { background: var(--accent); color: var(--on-accent); }
+  .yr.off { color: var(--ink-3); box-shadow: inset 0 0 0 1px var(--rule-strong); opacity: .7; }
+  .cov .ago { color: var(--ink-3); font-size: 11.5px; margin-left: 4px; }
+
+  /* ---- medium: map moves above the inspector ---- */
+  @media (max-width: 1180px) {
+    .bench {
+      grid-template-columns: minmax(0, 1fr) 340px;
+      grid-template-rows: auto minmax(0, 1fr);
+      grid-template-areas: "stage map" "stage insp";
+    }
+    .col-map { border-right: 0; border-left: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); }
+    .map-wrap { flex: none; height: 200px; min-height: 0; }
+    .loc { padding: 10px 12px; }
+    .compass { width: 44px; height: 44px; }
+  }
+
+  /* ---- narrow: single scrolling column ---- */
+  @media (max-width: 900px) {
+    html, body { height: auto; }
+    body { display: block; }
+    .top { height: 44px; position: sticky; top: 0; z-index: 1000; }
+    .top .sub, .top .top-id { display: none; }
+    .bench { display: flex; flex-direction: column; }
+    .col-stage { order: 1; }
+    .col-map { order: 2; border: 0; border-top: 1px solid var(--rule-strong); }
+    .col-insp { order: 3; border: 0; border-top: 1px solid var(--rule-strong); }
+    .stage { flex: none; height: 62vw; min-height: 250px; }
+    .stage.is-compare { flex-direction: column; height: 124vw; }
+    .map-wrap { height: 260px; }
+    .panel { overflow: visible; }
+    .keys { flex-basis: 100%; order: 3; }
+    .tl-head { flex-wrap: wrap; }
+    .tl-row { grid-template-columns: auto minmax(0, 1fr); }
+    .tl-side, .tl-latest { margin-top: 0; align-self: center; }
+    .tl-track { grid-column: 1 / -1; }
+    .tl-stop { width: 92px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="back" href="../index.html">&larr; 시안 비교</a>
+  <h1>로드뷰 인스펙터</h1>
+  <span class="badge">시안 C</span>
+  <span class="sub">Timeline Inspector</span>
+  <span class="top-id mono" id="topId"></span>
+</header>
+
+<main class="bench">
+
+  <!-- map column -->
+  <section class="col-map" aria-label="지도">
+    <div class="head">
+      <h2>지도</h2>
+      <span class="spacer"></span>
+      <label class="switch"><input type="checkbox" id="covToggle" checked> 커버리지</label>
+      <select class="select" id="covYear" aria-label="커버리지 촬영 연도"></select>
+    </div>
+    <div class="map-wrap">
+      <div id="map"></div>
+      <div class="map-hint">지도를 클릭하거나 마커를 끌어 이동</div>
+      <div class="map-msg" id="mapMsg" role="status" hidden></div>
+    </div>
+    <div class="loc">
+      <div>
+        <div class="eyebrow">현재 위치</div>
+        <p class="addr" id="locAddr"></p>
+        <p class="date" id="locDate"></p>
+      </div>
+      <svg class="compass" viewBox="0 0 56 56" role="img" aria-label="나침반">
+        <circle cx="28" cy="28" r="26"/>
+        <text x="28" y="12">N</text>
+        <path class="needle" id="needle" d="M28 9 L33 30 L28 27 L23 30 Z"/>
+      </svg>
+      <dl class="kv">
+        <dt>좌표</dt><dd id="locCoord"></dd>
+        <dt>방향</dt><dd id="locHeading"></dd>
+        <dt>시야</dt><dd id="locView"></dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- stage column -->
+  <section class="col-stage" aria-label="파노라마">
+    <div class="stage" id="stage">
+      <div class="pane" data-side="A">
+        <div class="pane-view" id="panoA"></div>
+        <div class="pane-tag" id="tagA"></div>
+        <div class="lod" id="lodA"></div>
+      </div>
+      <div class="pane" data-side="B" id="paneB" hidden>
+        <div class="pane-view" id="panoB"></div>
+        <div class="pane-tag" id="tagB"></div>
+        <div class="lod" id="lodB"></div>
+      </div>
+      <div class="report-banner" id="reportBanner" hidden>
+        <span>신고 모드 — 가려지지 않은 얼굴·번호판 위치를 클릭하세요</span>
+        <button type="button" id="reportCancel">취소 (Esc)</button>
+      </div>
+      <div class="toast" id="toast" role="status" hidden></div>
+    </div>
+
+    <div class="controls">
+      <div class="group" role="group" aria-label="이동">
+        <button class="btn" type="button" id="btnJumpBack" title="50 m 뒤로 점프 (Shift+↓)">
+          <svg viewBox="0 0 12 12"><path d="M2 2l4 4 4-4M2 6.5l4 4 4-4"/></svg>50 m 뒤
+        </button>
+        <button class="btn" type="button" id="btnBack" title="뒤로 한 칸 (↓)">
+          <svg viewBox="0 0 12 12"><path d="M2 4l4 4 4-4"/></svg>뒤로
+        </button>
+        <button class="btn" type="button" id="btnFwd" title="앞으로 한 칸 (↑)">
+          <svg viewBox="0 0 12 12"><path d="M2 8l4-4 4 4"/></svg>앞으로
+        </button>
+        <button class="btn" type="button" id="btnJumpFwd" title="50 m 앞으로 점프 (Shift+↑)">
+          <svg viewBox="0 0 12 12"><path d="M2 10l4-4 4 4M2 5.5l4-4 4 4"/></svg>50 m 앞
+        </button>
+      </div>
+      <div class="keys" aria-label="키보드 단축키">
+        <span><kbd>↑</kbd><kbd>↓</kbd> 이동</span>
+        <span><kbd>Shift</kbd>+<kbd>↑</kbd><kbd>↓</kbd> 50 m 점프</span>
+        <span><kbd>←</kbd><kbd>→</kbd> 회전</span>
+        <span>휠 확대 · 파노라마를 클릭한 뒤 사용</span>
+      </div>
+      <button class="btn" type="button" id="btnCompare" aria-pressed="false">시점 비교</button>
+      <button class="btn danger" type="button" id="btnReport" aria-pressed="false">블러 누락 신고</button>
+    </div>
+
+    <div class="timeline" aria-label="촬영 시점 타임라인">
+      <div class="tl-head">
+        <span class="eyebrow">과거 사진 보기 · 촬영 시점</span>
+        <span class="now" id="tlNow"></span>
+      </div>
+      <div id="tlNotices"></div>
+      <div id="tlRows"></div>
+    </div>
+  </section>
+
+  <!-- inspector column -->
+  <aside class="col-insp" aria-label="인스펙터">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" type="button" data-tab="meta" aria-selected="true">메타데이터</button>
+      <button class="tab" role="tab" type="button" data-tab="links" aria-selected="false">링크<span class="count" id="linkCount"></span></button>
+      <button class="tab" role="tab" type="button" data-tab="privacy" aria-selected="false">프라이버시<span class="count" id="reportCount"></span></button>
+      <button class="tab" role="tab" type="button" data-tab="coverage" aria-selected="false">커버리지</button>
+    </div>
+    <div class="capture-line"><span>대상 캡처</span><b id="captureId"></b><span id="captureSide"></span></div>
+
+    <div class="panel" role="tabpanel" data-panel="meta">
+      <dl class="meta" id="metaList"></dl>
+      <details class="raw">
+        <summary>원본 매니페스트 JSON</summary>
+        <pre id="metaJson"></pre>
+      </details>
+    </div>
+
+    <div class="panel" role="tabpanel" data-panel="links" hidden>
+      <p class="note">이 노드에서 이동할 수 있는 내비게이션 링크입니다. 행을 누르면 해당 파노라마로 이동합니다.</p>
+      <ul class="rows" id="linkList"></ul>
+    </div>
+
+    <div class="panel" role="tabpanel" data-panel="privacy" hidden>
+      <h3>현재 캡처</h3>
+      <div class="rev"><strong id="privRev"></strong><span id="privState"></span></div>
+      <button class="btn danger wide" type="button" id="btnReport2" aria-pressed="false">블러 누락 신고</button>
+      <p class="note" style="margin-top:8px">버튼을 누른 뒤 파노라마에서 가려지지 않은 얼굴·번호판을 클릭하면 블러가 추가되고 리비전이 올라갑니다. 취소는 Esc.</p>
+      <div class="confirm" id="privConfirm" hidden></div>
+      <h3>신고 기록</h3>
+      <ul class="rows" id="reportList"></ul>
+    </div>
+
+    <div class="panel" role="tabpanel" data-panel="coverage" hidden>
+      <p class="note">도로(촬영 시퀀스)별 수집 현황입니다. 행을 누르면 그 도로의 첫 노드로 이동합니다.</p>
+      <table class="cov">
+        <thead><tr><th>도로</th><th class="r">길이</th><th>촬영 회차</th><th>최신 촬영</th></tr></thead>
+        <tbody id="covBody"></tbody>
+      </table>
+    </div>
+  </aside>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="../shared/city.js"></script>
+<script src="../shared/reproject.js"></script>
+<script src="../shared/pano-render.js"></script>
+<script src="../shared/viewer.js"></script>
+<script src="../shared/map.js"></script>
+<script src="../shared/photo-store.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  var COMPASS = ['북', '북동', '동', '남동', '남', '남서', '서', '북서'];
+  function compass(deg) { return COMPASS[Math.round(deg / 45) % 8]; }
+  var SEASONS = { spring: '봄', summer: '여름', autumn: '가을', winter: '겨울' };
+  function vintageOf(year) {
+    return RV.VINTAGES.filter(function (v) { return v.year === year; })[0];
+  }
+  function roadOf(node) {
+    return RV.roads.filter(function (r) { return r.id === node.roadId; })[0];
+  }
+  function parseVintage(v) {
+    return RV.VINTAGES.some(function (x) { return x.year === Number(v); }) ? Number(v) : 'latest';
+  }
+
+  // ---- deep-link params: ?node=&vintage=&heading=&pitch=&compare=A,B&tab= ----
+  var q = new URLSearchParams(location.search);
+  var compareParam = q.get('compare') ? q.get('compare').split(',').map(parseVintage) : null;
+  var startNode = RV.getNode(q.get('node')) ? q.get('node') : 'ew1-018';
+  var startPov = { heading: q.get('heading') !== null ? Number(q.get('heading')) : 135, pitch: Number(q.get('pitch') || 0) };
+
+  var viewerA = RV.createViewer($('panoA'), {
+    nodeId: startNode,
+    vintage: compareParam ? compareParam[0] : parseVintage(q.get('vintage')),
+    pov: startPov
+  });
+  var viewerB = null;          // exists only while compare mode is on
+  var lod = { A: 'low', B: 'low' };
+
+  var css = getComputedStyle(document.documentElement);
+  function token(name) { return css.getPropertyValue(name).trim(); }
+  var map = RV.createMap($('map'), {
+    theme: 'light', radiusM: 50, showCoverage: true,
+    colors: {
+      bg: '#e9e5db', block: '#e3ded2', road: '#fbfaf6', building: '#d3ccbe', buildingStroke: '#bab2a1',
+      park: '#cddabd', coverage: token('--accent'), walker: '#c2410c', label: token('--ink-2'), miss: token('--danger')
+    }
+  }).bindViewer(viewerA);
+
+  // ---- toast + map message ----
+  var toastTimer = null, mapMsgTimer = null;
+  function toast(text, kind) {
+    var el = $('toast');
+    el.textContent = text;
+    el.dataset.kind = kind || '';
+    el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.hidden = true; }, 4500);
+  }
+  map.on('no_coverage', function (e) {
+    var year = $('covYear').value;
+    var el = $('mapMsg');
+    el.textContent = '반경 ' + Math.round(e.radiusM) + ' m 안에 ' + (year === 'latest' ? '' : year + '년 ') + '로드뷰가 없습니다';
+    el.hidden = false;
+    clearTimeout(mapMsgTimer);
+    mapMsgTimer = setTimeout(function () { el.hidden = true; }, 3200);
+  });
+  map.on('pick', function () { $('mapMsg').hidden = true; });
+
+  // ---- coverage layer controls ----
+  var covYear = $('covYear');
+  covYear.add(new Option('전체 연도', 'latest'));
+  RV.VINTAGES.forEach(function (v) { covYear.add(new Option(v.year + '년만', v.year)); });
+  covYear.onchange = function () { map.setCoverageYear(covYear.value === 'latest' ? 'latest' : Number(covYear.value)); };
+  $('covToggle').onchange = function () { map.setCoverageVisible(this.checked); };
+
+  // ---- location card ----
+  function renderLocation() {
+    var m = viewerA.getManifest();
+    $('topId').textContent = m.id + ' · ' + m.sequenceId;
+    $('locAddr').textContent = m.address;
+    $('locDate').textContent = m.photodate + ' 촬영';
+    $('locCoord').textContent = m.position.lat.toFixed(6) + ', ' + m.position.lon.toFixed(6);
+  }
+  function renderPov(p) {
+    $('needle').style.transform = 'rotate(' + p.heading + 'deg)';
+    $('locHeading').textContent = compass(p.heading) + ' ' + Math.round(p.heading) % 360 + '°';
+    $('locView').textContent = '피치 ' + Math.round(p.pitch) + '° · 화각 ' + Math.round(p.fov) + '°';
+  }
+
+  // ---- pane tags + LOD ----
+  function isFallback(s) { return s.vintage !== 'latest' && Number(s.vintage) !== s.year; }
+  function renderPaneTag(side, viewer) {
+    var s = viewer.getState();
+    $('tag' + side).innerHTML =
+      '<span class="side">' + side + '</span><span>' + esc(vintageOf(s.year).label) + '</span>' +
+      (isFallback(s) ? '<span class="fallback">대체 표시</span>' : '');
+  }
+  function renderLod(side) {
+    var high = lod[side] === 'high';
+    var el = $('lod' + side);
+    el.dataset.lod = lod[side];
+    el.innerHTML = '<span class="bars"><i class="on"></i><i class="' + (high ? 'on' : '') + '"></i></span>' +
+      (high ? '고해상도' : '저해상도 → 고해상도 로딩');
+  }
+
+  // ---- timeline ----
+  var tMin = Math.min.apply(null, RV.VINTAGES.map(function (v) { return v.year; }));
+  var tMax = Math.max.apply(null, RV.VINTAGES.map(function (v) { return v.year; })) + 1;
+  function tPos(t) { return ((t - tMin) / (tMax - tMin) * 100).toFixed(2) + '%'; }
+
+  function timelineRow(side, viewer) {
+    var s = viewer.getState();
+    var node = RV.getNode(s.nodeId);
+    var road = roadOf(node);
+    var html = '<div class="tl-row" data-side="' + side + '">' +
+      '<span class="tl-side" title="' + (side === 'A' ? '왼쪽 화면' : '오른쪽 화면') + '">' + side + '</span>' +
+      '<button type="button" class="tl-latest' + (s.vintage === 'latest' ? ' is-on' : '') + '" data-side="' + side +
+      '" data-vintage="latest" aria-pressed="' + (s.vintage === 'latest') + '">최신</button>' +
+      '<div class="tl-track">';
+    for (var y = tMin; y <= tMax; y++) {
+      html += '<i class="tl-tick" style="left:' + tPos(y) + '"><span>' + y + '</span></i>';
+    }
+    RV.VINTAGES.forEach(function (v) {
+      var missing = node.years.indexOf(v.year) < 0;
+      var shown = v.year === s.year;
+      var requested = s.vintage !== 'latest' && Number(s.vintage) === v.year;
+      var status, title = v.label + ' 촬영분 보기';
+      if (missing) {
+        status = requested ? '요청됨 · 미촬영' : '미촬영';
+        title = road.name + ' 구간은 ' + v.label + '에 촬영되지 않았습니다';
+      } else if (shown) {
+        status = s.vintage === 'latest' ? '표시 중 · 최신' : (requested ? '표시 중' : '대체 표시 중');
+      } else {
+        status = SEASONS[v.season] || '';
+      }
+      html += '<button type="button" class="tl-stop' + (shown ? ' is-shown' : '') + (requested ? ' is-requested' : '') +
+        (shown && isFallback(s) ? ' is-fallback' : '') + '" style="left:' + tPos(v.year + v.month / 12) + '"' +
+        ' data-side="' + side + '" data-vintage="' + v.year + '" title="' + esc(title) + '"' +
+        (missing ? ' disabled' : '') + ' aria-pressed="' + shown + '">' +
+        '<span class="dot"></span><span class="lbl">' + esc(v.label) + '</span><span class="st">' + status + '</span></button>';
+    });
+    return html + '</div></div>';
+  }
+
+  function fallbackNotice(side, viewer) {
+    var s = viewer.getState();
+    if (!isFallback(s)) return '';
+    var road = roadOf(RV.getNode(s.nodeId));
+    return '<p class="tl-notice">' + (viewerB ? '<b>' + side + '</b> · ' : '') +
+      '요청한 <b>' + esc(vintageOf(Number(s.vintage)).label) + '</b> 촬영분이 ' + esc(road.name) +
+      ' 구간에 없어, 가장 가까운 <b>' + esc(vintageOf(s.year).label) + '</b> 촬영분을 대신 표시합니다.</p>';
+  }
+
+  function renderTimeline() {
+    var a = viewerA.getState();
+    var now = (viewerB ? 'A ' : '표시 중 ') + '<b>' + esc(vintageOf(a.year).label) + '</b>';
+    var notices = fallbackNotice('A', viewerA);
+    var rows = timelineRow('A', viewerA);
+    if (viewerB) {
+      var b = viewerB.getState();
+      now += ' · B <b>' + esc(vintageOf(b.year).label) + '</b>';
+      notices += fallbackNotice('B', viewerB);
+      if (a.year === b.year) {
+        notices += '<p class="tl-notice">양쪽 화면이 같은 촬영분입니다' +
+          (RV.getNode(a.nodeId).years.length < 2 ? ' — 이 지점은 촬영 회차가 1개뿐이라 비교할 과거 사진이 없습니다.' : '. 타임라인에서 다른 시점을 고르세요.') + '</p>';
+      }
+      rows += timelineRow('B', viewerB);
+    }
+    $('tlNow').innerHTML = now;
+    $('tlNotices').innerHTML = notices;
+    $('tlRows').innerHTML = rows;
+    renderPaneTag('A', viewerA);
+    if (viewerB) renderPaneTag('B', viewerB);
+  }
+
+  $('tlRows').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-vintage]');
+    if (!btn || btn.disabled) return;
+    var v = btn.dataset.vintage === 'latest' ? 'latest' : Number(btn.dataset.vintage);
+    (btn.dataset.side === 'B' ? viewerB : viewerA).setVintage(v);
+  });
+
+  // ---- inspector: metadata ----
+  function renderMeta() {
+    var m = viewerA.getManifest();
+    var rows = [
+      ['파노라마 ID', m.id],
+      ['노드', m.nodeId],
+      ['시퀀스', m.sequenceId],
+      ['소스', m.source],
+      ['촬영 시각', m.captureTime],
+      ['촬영 시점', m.photodate],
+      ['보유 연도', m.availableYears.join(' · ')],
+      ['주소', m.address],
+      ['위치', m.position.lat.toFixed(6) + ', ' + m.position.lon.toFixed(6) + ' (±' + m.position.accuracyMeters + ' m)'],
+      ['촬영 자세', 'heading ' + m.pose.heading + '° · pitch ' + m.pose.pitch + '° · roll ' + m.pose.roll + '°'],
+      ['투영', m.projection],
+      ['타일 템플릿', esc(m.tiles.template).replace('/' + m.tiles.tileRevision + '/', '/<em>' + m.tiles.tileRevision + '</em>/'), true],
+      ['타일', m.tiles.tileSize + ' px · 최대 레벨 ' + m.tiles.maxLevel + ' · 리비전 r' + m.tiles.tileRevision],
+      ['링크', m.links.length + '개'],
+      ['프라이버시', '얼굴 ' + m.privacy.faces + ' · 번호판 ' + m.privacy.plates + ' · r' + m.privacy.revision]
+    ];
+    $('metaList').innerHTML = rows.map(function (r) {
+      return '<dt>' + r[0] + '</dt><dd>' + (r[2] ? r[1] : esc(r[1])) + '</dd>';
+    }).join('');
+    $('metaJson').textContent = JSON.stringify(m, null, 2);
+    $('captureId').textContent = m.id;
+    $('captureSide').textContent = viewerB ? '(A 화면 기준)' : '';
+  }
+
+  // ---- inspector: links ----
+  function renderLinks() {
+    var node = RV.getNode(viewerA.getState().nodeId);
+    $('linkCount').textContent = node.links.length;
+    $('linkList').innerHTML = node.links.map(function (l) {
+      var target = RV.getManifest(l.target, viewerA.getState().vintage);
+      return '<li><button type="button" class="row link-row" data-target="' + l.target + '">' +
+        '<span class="arrow" style="transform:rotate(' + l.heading + 'deg)"><svg viewBox="0 0 12 12"><path d="M6 10V2M2.5 5.5L6 2l3.5 3.5"/></svg></span>' +
+        '<span class="main"><span class="chip' + (l.kind === 'jump' ? ' jump' : '') + '">' + (l.kind === 'jump' ? '점프' : '한 칸') + '</span> ' +
+        '<span class="mono">' + l.target + '</span></span>' +
+        '<span class="num">' + compass(l.heading) + ' ' + Math.round(l.heading) + '°</span>' +
+        '<span class="sub2">' + esc(target.address) + '</span>' +
+        '<span class="num">' + l.distanceMeters.toFixed(0) + ' m</span>' +
+        '</button></li>';
+    }).join('');
+  }
+  $('linkList').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-target]');
+    if (btn) viewerA.setPano(btn.dataset.target);
+  });
+
+  // ---- inspector: privacy ----
+  function renderPrivacy() {
+    var m = viewerA.getManifest();
+    var s = viewerA.getState();
+    var here = RV.getReports(s.nodeId, s.year).length;
+    $('privRev').textContent = 'r' + m.privacy.revision;
+    $('privState').textContent = '얼굴 ' + m.privacy.faces + ' · 번호판 ' + m.privacy.plates + ' · 이 캡처 신고 ' + here + '건';
+    var all = RV.allReports();
+    $('reportCount').textContent = all.length || '';
+    $('reportList').innerHTML = all.length ? all.map(function (r, i) {
+      return '<li><button type="button" class="row log-row" data-report="' + i + '" title="이 캡처와 신고 방향으로 이동">' +
+        '<span class="main mono">P-' + r.nodeId + '-' + r.year + '</span>' +
+        '<span class="num"><span class="chip ok">r' + (r.revision - 1) + ' → r' + r.revision + '</span></span>' +
+        '<span class="sub2">' + new Date(r.at).toLocaleTimeString('ko-KR') + ' · ' + esc(vintageOf(r.year).label) + '</span>' +
+        '<span class="num">' + compass(r.heading) + ' ' + Math.round(r.heading) + '° / ' + Math.round(r.pitch) + '°</span>' +
+        '</button></li>';
+    }).join('') : '<li class="empty">아직 접수된 신고가 없습니다.</li>';
+  }
+  $('reportList').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-report]');
+    if (!btn) return;
+    var r = RV.allReports()[Number(btn.dataset.report)];
+    viewerA.setPano(r.nodeId, { vintage: r.year });
+    // setPano ignores pov/vintage changes when the capture is already shown, so apply and re-render explicitly
+    viewerA.setPov({ heading: r.heading, pitch: r.pitch });
+    renderAll();
+  });
+
+  function toggleReport() {
+    var on = !viewerA.isReportMode();
+    viewerA.setReportMode(on);
+    if (viewerB) viewerB.setReportMode(on);
+    if (on) viewerA.focus();
+  }
+  function onReportMode(other) {
+    return function (e) {
+      // leaving report mode on one side (report filed or Esc) ends it on the other side too
+      var o = other();
+      if (!e.active && o && o.isReportMode()) o.setReportMode(false);
+      var active = viewerA.isReportMode();
+      $('stage').classList.toggle('is-report', active);
+      $('reportBanner').hidden = !active;
+      ['btnReport', 'btnReport2'].forEach(function (id) {
+        $(id).setAttribute('aria-pressed', active);
+        $(id).textContent = active ? '신고 취소' : '블러 누락 신고';
+      });
+    };
+  }
+  function onReportDone(entry) {
+    var msg = '신고 접수 완료 — P-' + entry.nodeId + '-' + entry.year + ' 프라이버시 리비전 r' + (entry.revision - 1) + ' → r' + entry.revision;
+    toast(msg + ' · 블러 적용됨', 'ok');
+    var box = $('privConfirm');
+    box.innerHTML = '신고가 접수되어 블러를 추가했습니다.<br><b>P-' + entry.nodeId + '-' + entry.year + '</b> 리비전 <b>r' +
+      (entry.revision - 1) + ' → r' + entry.revision + '</b> · 타일 URL이 새 리비전으로 바뀌었습니다.';
+    box.hidden = false;
+  }
+  $('btnReport').onclick = toggleReport;
+  $('btnReport2').onclick = toggleReport;
+  $('reportCancel').onclick = toggleReport;
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && viewerA.isReportMode()) viewerA.setReportMode(false);
+  });
+  RV.on('privacy_changed', renderPrivacy);
+
+  // ---- inspector: coverage ----
+  function monthsAgo(v) {
+    var now = new Date();
+    var n = (now.getFullYear() - v.year) * 12 + now.getMonth() - v.month;
+    return n <= 0 ? '이번 달' : n + '개월 전';
+  }
+  function renderCoverage() {
+    var current = RV.getNode(viewerA.getState().nodeId).roadId;
+    $('covBody').innerHTML = RV.coverage().map(function (c) {
+      var latest = vintageOf(Math.max.apply(null, c.years));
+      return '<tr tabindex="0" data-road="' + c.roadId + '"' + (c.roadId === current ? ' class="is-current"' : '') + '>' +
+        '<td><span class="name">' + esc(c.name) + '</span><span class="rid">' + c.roadId + '</span></td>' +
+        '<td class="r">' + Math.round(c.lengthM) + ' m</td>' +
+        '<td>' + RV.VINTAGES.map(function (v) {
+          var on = c.years.indexOf(v.year) >= 0;
+          return '<span class="yr ' + (on ? 'on' : 'off') + '" title="' + v.label + (on ? ' 촬영' : ' 미촬영') + '">' + String(v.year).slice(2) + '</span>';
+        }).join('') + '</td>' +
+        '<td>' + esc(latest.label) + '<span class="ago">' + monthsAgo(latest) + '</span></td></tr>';
+    }).join('');
+  }
+  function goRoad(e) {
+    var tr = e.target.closest('[data-road]');
+    if (!tr || (e.type === 'keydown' && e.key !== 'Enter')) return;
+    var road = RV.roads.filter(function (r) { return r.id === tr.dataset.road; })[0];
+    viewerA.setPano(road.nodeIds[0]);
+  }
+  $('covBody').addEventListener('click', goRoad);
+  $('covBody').addEventListener('keydown', goRoad);
+
+  // ---- tabs ----
+  function selectTab(name) {
+    if (!document.querySelector('.panel[data-panel="' + name + '"]')) return;
+    document.querySelectorAll('.tab').forEach(function (t) { t.setAttribute('aria-selected', t.dataset.tab === name); });
+    document.querySelectorAll('.panel').forEach(function (p) { p.hidden = p.dataset.panel !== name; });
+  }
+  document.querySelector('.tabs').addEventListener('click', function (e) {
+    var t = e.target.closest('.tab');
+    if (t) selectTab(t.dataset.tab);
+  });
+
+  // ---- movement buttons ----
+  function moveBtn(id, fn) {
+    $(id).onclick = function () { fn(); viewerA.focus(); };
+  }
+  moveBtn('btnFwd', function () { viewerA.forward(); });
+  moveBtn('btnBack', function () { viewerA.backward(); });
+  moveBtn('btnJumpFwd', function () { viewerA.jump(0); });
+  moveBtn('btnJumpBack', function () { viewerA.jump(180); });
+  function onNoLink() { toast('이 방향으로는 더 이동할 수 없습니다. 시선을 도로 방향으로 돌려 보세요.', 'warn'); }
+
+  // ---- compare mode: second viewer locked to the same node and POV ----
+  function samePov(p, r) {
+    return Math.abs(p.heading - r.heading) < 0.01 && Math.abs(p.pitch - r.pitch) < 0.01 && Math.abs(p.fov - r.fov) < 0.01;
+  }
+  function setCompare(on, vintageB) {
+    if (on === !!viewerB) return;
+    $('stage').classList.toggle('is-compare', on);
+    $('paneB').hidden = !on;
+    $('btnCompare').setAttribute('aria-pressed', on);
+    if (!on) {
+      viewerB.destroy();
+      viewerB = null;
+    } else {
+      var a = viewerA.getState();
+      if (vintageB === undefined) {
+        // default: the oldest other capture of this node
+        var others = RV.getNode(a.nodeId).years.filter(function (y) { return y !== a.year; });
+        vintageB = others.length ? Math.min.apply(null, others) : a.year;
+      }
+      lod.B = 'low';
+      viewerB = RV.createViewer($('panoB'), { nodeId: a.nodeId, vintage: vintageB, pov: viewerA.getPov() });
+      // B -> A; identical values are skipped, so the echo from A dies out
+      viewerB.on('pov_changed', function (p) { if (!samePov(p, viewerA.getPov())) viewerA.setPov(p); });
+      viewerB.on('pano_changed', function (e) {
+        if (e.nodeId !== viewerA.getState().nodeId) viewerA.setPano(e.nodeId);
+        renderTimeline();
+      });
+      viewerB.on('load', function (e) { lod.B = e.lod; renderLod('B'); });
+      viewerB.on('no_link', onNoLink);
+      viewerB.on('report_mode', onReportMode(function () { return viewerA; }));
+      viewerB.on('report_done', onReportDone);
+      if (viewerA.isReportMode()) viewerB.setReportMode(true);
+      renderLod('B');
+    }
+    renderTimeline();
+    renderMeta();
+  }
+  $('btnCompare').onclick = function () { setCompare(!viewerB); };
+
+  // ---- viewer A events ----
+  function renderAll() {
+    renderLocation();
+    renderPov(viewerA.getPov());
+    renderTimeline();
+    renderMeta();
+    renderLinks();
+    renderPrivacy();
+    renderCoverage();
+  }
+  viewerA.on('pano_changed', function (e) {
+    if (viewerB) viewerB.setPano(e.nodeId);   // B keeps its own vintage
+    renderAll();
+  });
+  viewerA.on('pov_changed', function (p) {
+    renderPov(p);
+    if (viewerB && !samePov(p, viewerB.getPov())) viewerB.setPov(p);
+  });
+  viewerA.on('load', function (e) { lod.A = e.lod; renderLod('A'); });
+  viewerA.on('no_link', onNoLink);
+  viewerA.on('report_mode', onReportMode(function () { return viewerB; }));
+  viewerA.on('report_done', onReportDone);
+
+  renderLod('A');
+  renderAll();
+  if (q.get('tab')) selectTab(q.get('tab'));
+  if (compareParam) setCompare(true, compareParam[1]);
+  map.invalidateSize();
+  // the wide layout gives the map a tall, narrow column: zoom in around the current node instead of
+  // showing the whole city as a thumbnail (the engine pans the map to follow the walker)
+  var mapEl = $('map');
+  if (mapEl.clientHeight > mapEl.clientWidth * 1.3) {
+    var n0 = RV.getNode(viewerA.getState().nodeId);
+    map.leaflet.setView([n0.lat, n0.lon], map.leaflet.getZoom() + 1.5, { animate: false });
+  }
+})();
+</script>
+</body>
+</html>
