@@ -360,6 +360,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="../shared/city.js"></script>
+<script src="../shared/privacy-blur.js"></script>
+<script src="../shared/exif.js"></script>
 <script src="../shared/reproject.js"></script>
 <script src="../shared/pano-render.js"></script>
 <script src="../shared/viewer.js"></script>
@@ -584,6 +586,14 @@
         item.width = size.width;
         item.height = size.height;
         item.auto = item.kind = RV.photos.guessKind(size.width, size.height);
+        return window.RVExif.read(file).then(function (ex) {
+          item.exif = ex;
+          if (ex.projection === 'equirectangular') item.auto = item.kind = 'equirect';
+          var f = window.RVExif.hfov(ex, size.width, size.height);
+          if (f) { item.hfov = clampFov(Math.round(f)); item.hfovFromExif = true; }
+          // wide phone lenses bend straight lines; a mild barrel correction is the safer default
+          item.k1 = item.hfov > 80 ? -0.08 : 0;
+        });
       }, function () { item.error = true; }).then(renderStaged);
     });
     renderStaged(fileList.length && !files.length ? '이미지 파일이 아닙니다.' : '');
@@ -617,7 +627,7 @@
         body = '<span class="small muted">' + s.width + '×' + s.height + ' · 자동 인식: ' + KIND_LABEL[s.auto] + '</span>' +
           '<div class="ctl"><select data-act="kind" title="사진 종류"><option value="equirect"' + (s.kind === 'equirect' ? ' selected' : '') +
           '>360° 파노라마</option><option value="flat"' + (s.kind === 'flat' ? ' selected' : '') + '>일반 사진</option></select>' +
-          (s.kind === 'flat' ? relButtons(s.rel, 'rel') + '<label class="small muted">화각 <input type="number" data-act="fov" min="20" max="140" value="' + s.hfov + '">°</label>' : '') +
+          (s.kind === 'flat' ? relButtons(s.rel, 'rel') + '<label class="small muted">화각 <input type="number" data-act="fov" min="20" max="140" value="' + s.hfov + '">°' + (s.hfovFromExif ? ' (EXIF)' : '') + '</label>' + '<label class="small muted">왜곡 k1 <input type="number" data-act="k1" min="-0.5" max="0.5" step="0.01" value="' + (s.k1 || 0) + '"></label>' : '') +
           '</div>';
       }
       return '<li data-key="' + s.key + '"><img class="thumb" src="' + s.url + '" alt=""><div><div class="row" style="justify-content:space-between">' +
@@ -644,7 +654,8 @@
     var act = e.target.dataset.act, item = stagedOf(e.target);
     if (!item) return;
     if (act === 'kind') item.kind = e.target.value;
-    if (act === 'fov') item.hfov = clampFov(e.target.value);
+    if (act === 'fov') { item.hfov = clampFov(e.target.value); item.hfovFromExif = false; }
+    if (act === 'k1') item.k1 = Math.max(-0.5, Math.min(0.5, parseFloat(e.target.value) || 0));
     renderStaged();
   });
 
@@ -657,7 +668,7 @@
         setProgress($('aRun'), done, todo.length, done + ' / ' + todo.length + ' 등록 중');
         return RV.photos.add({
           nodeId: node.id, year: year, file: s.file, kind: s.kind, name: s.name, source: s.source,
-          heading: s.kind === 'flat' ? node.heading + s.rel : undefined, hfov: s.hfov
+          heading: s.kind === 'flat' ? node.heading + s.rel : undefined, hfov: s.hfov, k1: s.k1
         });
       }).then(function (meta) {
         last = meta;

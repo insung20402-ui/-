@@ -41,7 +41,7 @@
   function meta(rec) {
     return {
       id: rec.id, nodeId: rec.nodeId, year: rec.year, kind: rec.kind,
-      heading: rec.heading, hfov: rec.hfov, pitch: rec.pitch, roll: rec.roll, source: rec.source, name: rec.name,
+      heading: rec.heading, hfov: rec.hfov, pitch: rec.pitch, roll: rec.roll, k1: rec.k1, k2: rec.k2, source: rec.source, name: rec.name,
       width: rec.width, height: rec.height, bytes: rec.blob.size, createdAt: rec.createdAt
     };
   }
@@ -51,7 +51,7 @@
     var shots = Object.keys(records).map(function (id) { return records[id]; })
       .filter(function (r) { return r.nodeId === nodeId && r.year === year; })
       .sort(function (p, q) { return p.createdAt < q.createdAt ? -1 : 1; })
-      .map(function (r) { return { img: r.img, kind: r.kind, heading: r.heading, hfov: r.hfov, pitch: r.pitch, roll: r.roll }; });
+      .map(function (r) { return { img: r.img, kind: r.kind, heading: r.heading, hfov: r.hfov, pitch: r.pitch, roll: r.roll, k1: r.k1, k2: r.k2 }; });
     RV.setNodePhotos(nodeId, year, shots);
   }
 
@@ -90,8 +90,12 @@
       c.width = Math.round(src.width * scale);
       c.height = Math.round(src.height * scale);
       c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
-      return new Promise(function (resolve) {
-        c.toBlob(function (blob) { resolve({ blob: blob, width: c.width, height: c.height }); }, 'image/jpeg', 0.85);
+      // ordinary photos get faces masked before they are ever stored
+      var masked = kind === 'flat' && root.RVPrivacy ? root.RVPrivacy.blurFaces(c) : Promise.resolve({ faces: 0 });
+      return masked.then(function (m) {
+        return new Promise(function (resolve) {
+          c.toBlob(function (blob) { resolve({ blob: blob, width: c.width, height: c.height, faces: m.faces }); }, 'image/jpeg', 0.85);
+        });
       });
     });
   }
@@ -118,6 +122,8 @@
         hfov: kind === 'flat' ? (input.hfov || 65) : 360,
         pitch: kind === 'flat' ? Math.max(-60, Math.min(60, input.pitch || 0)) : 0,
         roll: kind === 'flat' ? Math.max(-45, Math.min(45, input.roll || 0)) : 0,
+        k1: kind === 'flat' ? Math.max(-0.5, Math.min(0.5, input.k1 || 0)) : 0,
+        k2: kind === 'flat' ? Math.max(-0.5, Math.min(0.5, input.k2 || 0)) : 0,
         source: input.source || 'upload', name: input.name || '',
         width: p.width, height: p.height, blob: p.blob, createdAt: new Date().toISOString()
       };
@@ -131,7 +137,7 @@
         return tx('readwrite', function (s) {
           return s.put({
             id: rec.id, nodeId: rec.nodeId, year: rec.year, kind: rec.kind, heading: rec.heading,
-            hfov: rec.hfov, pitch: rec.pitch, roll: rec.roll, source: rec.source, name: rec.name, width: rec.width, height: rec.height,
+            hfov: rec.hfov, pitch: rec.pitch, roll: rec.roll, k1: rec.k1, k2: rec.k2, source: rec.source, name: rec.name, width: rec.width, height: rec.height,
             blob: rec.blob, createdAt: rec.createdAt
           });
         });
@@ -167,11 +173,13 @@
     if (patch.heading !== undefined) rec.heading = RV.norm360(patch.heading);
     if (patch.hfov !== undefined && rec.kind === 'flat') rec.hfov = Math.max(20, Math.min(140, patch.hfov));
     if (patch.pitch !== undefined && rec.kind === 'flat') rec.pitch = Math.max(-60, Math.min(60, patch.pitch));
+    if (patch.k1 !== undefined && rec.kind === 'flat') rec.k1 = Math.max(-0.5, Math.min(0.5, patch.k1));
+    if (patch.k2 !== undefined && rec.kind === 'flat') rec.k2 = Math.max(-0.5, Math.min(0.5, patch.k2));
     if (patch.roll !== undefined && rec.kind === 'flat') rec.roll = Math.max(-45, Math.min(45, patch.roll));
     return tx('readwrite', function (s) {
       return s.put({
         id: rec.id, nodeId: rec.nodeId, year: rec.year, kind: rec.kind, heading: rec.heading,
-        hfov: rec.hfov, pitch: rec.pitch, roll: rec.roll, source: rec.source, name: rec.name, width: rec.width, height: rec.height,
+        hfov: rec.hfov, pitch: rec.pitch, roll: rec.roll, k1: rec.k1, k2: rec.k2, source: rec.source, name: rec.name, width: rec.width, height: rec.height,
         blob: rec.blob, createdAt: rec.createdAt
       });
     }).then(function () {

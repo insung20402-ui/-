@@ -272,7 +272,7 @@
 <li><strong>위치와 방향을 파일에서 읽는다.</strong> 모의는 사람이 도로·방향·시작 지점을 고르고, 360° 사진의 가운데가 진행 방향이라고 가정한다. 실제로는 EXIF GPS와 촬영 시각, GPano XMP의 heading을 읽어 자동 배정하고 <span class="tag src">보고서</span>, 사람은 결과만 고친다. 이 가정이 틀리면 모든 사진이 옆을 본다.</li>
 <li><strong>촬영 시각이 촬영분을 정한다.</strong> 모의는 기존 연도(2023·2025·2026) 중 하나에만 넣을 수 있다. 실제로는 사진의 촬영 시각으로 새 촬영분이 만들어져야 한다.</li>
 <li><strong>중복 방지.</strong> 같은 백업을 두 번 가져오면 일반 사진이 중복 등록된다 <span class="tag ok">검증</span>. 파일 체크섬으로 같은 파일을 걸러낸다.</li>
-<li><strong>일반 사진의 한계.</strong> 일반 사진은 렌즈 보정 없이 해당 방향에 붙여 넣기만 한다. 화각도 사람이 입력한다(기본 65°). 서비스에서는 360° 사진만 로드뷰로 쓰고, 일반 사진은 별도의 "현장 사진" 레이어로 분리하는 편이 낫다.</li>
+<li><strong>일반 사진의 한계.</strong> 일반 사진은 <code>shared/reproject.js</code>가 직선(rectilinear) 렌즈 모델로 구면에 다시 투영한다(화각·기울기·롤 반영, 가장자리 페더링). 렌즈 왜곡 보정은 하지 않고, 화각은 사람이 입력한다(기본 65°). 화각은 <code>shared/exif.js</code>가 EXIF 35mm 환산 초점거리에서 자동으로 채우고(<code>(EXIF)</code> 표시), 값이 없으면 사람이 입력한다. 렌즈 왜곡은 <code>k1</code>(방사 왜곡 계수)로 보정하며 광각(80° 초과)은 기본 -0.08을 쓴다. 기종별 정확한 계수는 렌즈 보정 DB가 있어야 한다. 서비스에서는 360° 사진만 로드뷰로 쓰고, 일반 사진은 별도의 "현장 사진" 레이어로 분리하는 편이 낫다.</li>
 <li><strong>인증과 권한.</strong> 모의 백오피스에는 로그인이 없다. 등록·삭제·전체 삭제에 권한과 감사 기록을 붙인다.</li>
 <li><strong>폰 사용성.</strong> 420px 폭 레이아웃은 확인했지만 실제 폰 카메라 촬영과 드래그&amp;드롭은 시험하지 않았다 <span class="tag warn">미검증</span>.</li>
 </ul>
@@ -370,6 +370,64 @@ tests/                         데이터 계층과 키프레임 로직 테스트
 <li>연습용 사진과 영상(약 19MB)은 용량 때문에 키트에서 뺐다. 원본 프로젝트의 <code>samples/</code>에 있고, <code>node samples/make/make.mjs</code>로 다시 만들 수 있다.</li>
 <li>라이선스: three.js는 MIT, Leaflet은 BSD-2-Clause다. 배포 전에 실제 사용하는 버전의 라이선스 파일을 다시 확인한다.</li>
 </ul>
+<h2 id="_8">부록. 이번 개선에서 추가된 것과 남은 것</h2>
+<div class="scroll"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>상태</th>
+<th>파일</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>직선 렌즈 → 구면 재투영, 롤·기울기</td>
+<td>구현, 테스트</td>
+<td><code>shared/reproject.js</code></td>
+</tr>
+<tr>
+<td>방사 왜곡(k1, k2) 보정</td>
+<td>구현, 테스트</td>
+<td><code>shared/reproject.js</code></td>
+</tr>
+<tr>
+<td>EXIF 화각, GPS, 360° 표시(GPano) 읽기</td>
+<td>구현, 테스트</td>
+<td><code>shared/exif.js</code></td>
+</tr>
+<tr>
+<td>타일 피라미드 생성, revision 포함 경로, 보이는 타일 계산</td>
+<td>구현, 테스트</td>
+<td><code>shared/tiles.js</code></td>
+</tr>
+<tr>
+<td>타일 서버(조회·업로드, 불변 캐시)</td>
+<td>참조 구현</td>
+<td><code>server/tile-server.js</code></td>
+</tr>
+<tr>
+<td>얼굴 블러</td>
+<td>브라우저 <code>FaceDetector</code>가 있을 때만</td>
+<td><code>shared/privacy-blur.js</code></td>
+</tr>
+<tr>
+<td>번호판 블러</td>
+<td><strong>미구현.</strong> 브라우저 API가 없어 서버 모델이 필요하다</td>
+<td>-</td>
+</tr>
+<tr>
+<td>뷰어가 타일을 직접 받아 그리기</td>
+<td><strong>미구현.</strong> <code>tiles.visible()</code>로 받을 타일을 정하고 텍스처를 합치는 로더가 남았다</td>
+<td><code>viewer.js</code></td>
+</tr>
+<tr>
+<td>실제 360° 촬영본</td>
+<td>코드로 해결할 수 없다. 장비와 촬영이 필요하다</td>
+<td>-</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>FaceDetector</code>는 Chrome 일부 환경에서만 켜져 있어 얼굴 블러를 신뢰할 수 없다. 공개 서비스는 서버 쪽 검출 모델과 검수 큐를 반드시 둔다.</p>
 </main>
 </body>
 </html>

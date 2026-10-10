@@ -26,6 +26,14 @@
   // Focal length in source pixels from the horizontal field of view.
   function focalPx(iw, hfov) { return (iw / 2) / Math.tan(hfov * D2R / 2); }
 
+  // Brown-Conrady radial model. (x, y) are ideal coordinates in focal lengths; the
+  // lens bent the photo, so the pixel lives at the distorted position. k1 < 0 is
+  // barrel (wide phone lenses), k1 > 0 pincushion.
+  function distort(x, y, k1, k2) {
+    var r2 = x * x + y * y, g = 1 + k1 * r2 + k2 * r2 * r2;
+    return g;
+  }
+
   // Where does the world direction (bearing, pitch) land in the source photo?
   // Returns {x, y} in source pixels, or null when it is behind the camera.
   function project(bearing, pitch, iw, ih, shot) {
@@ -37,7 +45,8 @@
     var fp = focalPx(iw, shot.hfov);
     var x = (d[0] * b.right[0] + d[1] * b.right[1] + d[2] * b.right[2]) / z;
     var y = (d[0] * b.up[0] + d[1] * b.up[1] + d[2] * b.up[2]) / z;
-    return { x: iw / 2 + x * fp, y: ih / 2 - y * fp };
+    var g = distort(x, y, shot.k1 || 0, shot.k2 || 0);
+    return { x: iw / 2 + x * g * fp, y: ih / 2 - y * g * fp };
   }
 
   // Blend one photo into `dst` (RGBA, W x W/2). `src` is RGBA iw x ih.
@@ -46,7 +55,7 @@
   function reprojectInto(dst, W, src, iw, ih, shot) {
     var H = W / 2, ppd = W / 360;
     var b = basis(shot.heading, shot.pitch || 0, shot.roll || 0);
-    var fp = focalPx(iw, shot.hfov);
+    var fp = focalPx(iw, shot.hfov), k1 = shot.k1 || 0, k2 = shot.k2 || 0;
     var feather = Math.max(2, Math.min(iw, ih) * 0.05);
     var hv = Math.atan((ih / 2) / fp) / D2R;                 // half vertical fov
     var hh = shot.hfov / 2;
@@ -67,8 +76,11 @@
         var dx = Math.sin(bear) * cp, dy = sp, dz = Math.cos(bear) * cp;
         var z = dx * b.f[0] + dy * b.f[1] + dz * b.f[2];
         if (z <= 1e-6) continue;
-        var sx = iw / 2 + (dx * b.right[0] + dy * b.right[1] + dz * b.right[2]) / z * fp;
-        var sy = ih / 2 - (dx * b.up[0] + dy * b.up[1] + dz * b.up[2]) / z * fp;
+        var ux = (dx * b.right[0] + dy * b.right[1] + dz * b.right[2]) / z;
+        var uy = (dx * b.up[0] + dy * b.up[1] + dz * b.up[2]) / z;
+        var dg = k1 || k2 ? distort(ux, uy, k1, k2) : 1;
+        var sx = iw / 2 + ux * dg * fp;
+        var sy = ih / 2 - uy * dg * fp;
         if (sx < 0 || sy < 0 || sx > iw - 1 || sy > ih - 1) continue;
         var edge = Math.min(sx, iw - 1 - sx, sy, ih - 1 - sy);
         var a = edge >= feather ? 1 : edge / feather;

@@ -436,7 +436,7 @@
         var tctx = tc.getContext('2d');
         tctx.drawImage(s.img, 0, 0, tw, th);
         root.RVReproject.reprojectInto(out.data, W, tctx.getImageData(0, 0, tw, th).data, tw, th,
-          { heading: heading(s), hfov: s.hfov || 65, pitch: s.pitch || 0, roll: s.roll || 0 });
+          { heading: heading(s), hfov: s.hfov || 65, pitch: s.pitch || 0, roll: s.roll || 0, k1: s.k1 || 0, k2: s.k2 || 0 });
       });
       ctx.putImageData(out, 0, 0);
     }
