@@ -5,34 +5,37 @@
    "id": "corridor",
    "title": "복도 (가로 영상)",
    "video": "/root/.claude/uploads/4759cb7a-e87b-5a28-b614-25ea0e85da34/7c1aa41f-KakaoTalk_20261009_163751057.mp4",
-   "fps": 2,
+   "fps": 6,
    "type": "walk",
-   "people": "none"
+   "people": "none",
+   "max_w": 1024
   },
   {
    "id": "corridor2",
    "title": "복도 (세로 영상)",
    "video": "/root/.claude/uploads/4759cb7a-e87b-5a28-b614-25ea0e85da34/82da95eb-KakaoTalk_20261009_164106298.mp4",
-   "fps": 2,
+   "fps": 6,
    "type": "walk",
-   "max_w": 1280,
+   "max_w": 1024,
    "people": "none"
   },
   {
    "id": "office1",
    "title": "교무실 둘러보기 1",
    "video": "/root/.claude/uploads/4759cb7a-e87b-5a28-b614-25ea0e85da34/a9141b80-KakaoTalk_20261009_163652161.mp4",
-   "fps": 4,
+   "fps": 10,
    "type": "pan",
-   "people": "none"
+   "people": "none",
+   "max_w": 1024
   },
   {
    "id": "office2",
    "title": "교무실 둘러보기 2",
    "video": "/root/.claude/uploads/4759cb7a-e87b-5a28-b614-25ea0e85da34/04adf1e6-KakaoTalk_20261009_163656800.mp4",
-   "fps": 4,
+   "fps": 10,
    "type": "pan",
-   "people": "none"
+   "people": "none",
+   "max_w": 1024
   }
  ]
 }

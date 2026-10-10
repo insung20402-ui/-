@@ -5,32 +5,41 @@ const NAMES = { corridor2: '복도', corridor: '복도', office1: '교무실', o
 const $ = id => document.getElementById(id);
 const all = (window.TOURS || {}).tours || [];
 const tours = IDS.map(id => all.find(t => t.id === id)).filter(Boolean);
-let tour, idx = 0, front = 'a', walking = null, panX = 0, busy = false;
+let tour, idx = -1, front = 'a', walking = null, panX = 0, busy = false;
+const route = [], starts = {};
+tours.forEach(t => { starts[t.id] = route.length; for (let i = 0; i < t.count; i++) route.push([t, i]); });
+const TOTAL = route.length;
 const cache = {};
 const url = (t, i) => `frames/${t.id}/${String(i).padStart(3, '0')}.${t.ext}`;
 const load = (t, i) => cache[url(t, i)] ||= Object.assign(new Image(), { src: url(t, i) });
 
-function show(i, dir = 1) {
-  i = Math.max(0, Math.min(tour.count - 1, i));
-  if (i === idx && $('a').src) return false;
-  idx = i;
+function show(g, dir = 1) {
+  g = Math.max(0, Math.min(TOTAL - 1, g));
+  if (g === idx && $('a').src) return false;
+  idx = g;
+  const [t, i] = route[g];
+  if (t !== tour) { tour = t; $('place').textContent = NAMES[t.id]; markTabs(); }
   const next = front === 'a' ? 'b' : 'a', n = $(next), f = $(front);
-  n.src = url(tour, idx);
-  // 이동 느낌: 새 장면이 살짝 커진 상태에서 제자리로 / 이전 장면은 살짝 확대되며 사라짐
+  n.src = url(t, i);
   n.style.transition = 'none';
-  n.style.transform = `translateX(${panX}px) scale(${dir > 0 ? 1.06 : 0.96})`;
+  n.style.transform = `translateX(${panX}px) scale(${dir > 0 ? 1.03 : 0.97})`;
   n.getBoundingClientRect();
   n.style.transition = '';
   n.style.opacity = 1; n.style.transform = `translateX(${panX}px) scale(1)`;
-  f.style.opacity = 0; f.style.transform = `translateX(${panX}px) scale(${dir > 0 ? 1.12 : 0.9})`;
+  f.style.opacity = 0; f.style.transform = `translateX(${panX}px) scale(${dir > 0 ? 1.06 : 0.94})`;
   front = next;
-  for (let d = 1; d <= 3; d++) { if (idx + d < tour.count) load(tour, idx + d); if (idx - d >= 0) load(tour, idx - d); }
-  const p = tour.count > 1 ? idx / (tour.count - 1) : 0;
-  $('dot').style.left = `calc(${p * 100}% * (1 - 22px / 100%))`;
-  $('dot').style.left = `${6 + p * ($('path').clientWidth - 12 - 12)}px`;
-  $('done').style.width = `${p * ($('path').clientWidth - 12)}px`;
-  $('count').textContent = `${idx + 1}/${tour.count}`;
+  for (let d = 1; d <= 8; d++) for (const k of [g + d, g - d]) if (k >= 0 && k < TOTAL) load(...route[k]);
+  const p = TOTAL > 1 ? g / (TOTAL - 1) : 0, W = $('path').clientWidth - 12;
+  $('dot').style.left = `${6 + p * (W - 12)}px`;
+  $('done').style.width = `${p * W}px`;
+  $('count').textContent = `${Math.round(p * 100)}%`;
   return true;
+}
+function markTabs() {
+  document.querySelectorAll('#tabs .btn').forEach(b => {
+    const on = tour && b.dataset.id === tour.id;
+    b.style.background = on ? '#fee500' : ''; b.style.color = on ? '#191919' : '';
+  });
 }
 function setPan(x) {
   const lim = $('rv').clientWidth * 0.06;
@@ -38,23 +47,17 @@ function setPan(x) {
   for (const id of ['a', 'b']) { const e = $(id); if (e.style.opacity === '1') e.style.transform = `translateX(${panX}px) scale(1)`; }
 }
 function go(dir) { return show(idx + dir, dir); }
+const STEP_MS = 170;
 function startWalk(dir) {
   stopWalk(); go(dir);
-  walking = setInterval(() => { if (!go(dir)) stopWalk(); }, 420);
+  walking = setInterval(() => { if (!go(dir)) stopWalk(); }, STEP_MS);
 }
 function stopWalk() { clearInterval(walking); walking = null; }
 
 function setTour(t) {
-  stopWalk(); tour = t; idx = -1; panX = 0;
-  $('place').textContent = NAMES[t.id];
-  document.querySelectorAll('#tabs .btn').forEach(b => b.style.background = b.dataset.id === t.id ? '#fee500' : '', 0);
-  document.querySelectorAll('#tabs .btn').forEach(b => b.style.color = b.dataset.id === t.id ? '#191919' : '');
-  $('a').removeAttribute('src'); $('b').removeAttribute('src');
-  front = 'b'; $('a').style.opacity = 0; $('b').style.opacity = 0;
-  show(0);
-  const end = t.type === 'pan' ? ['왼쪽', '오른쪽'] : ['입구', '끝'];
-  $('s').textContent = end[0]; $('e').textContent = end[1];
+  stopWalk(); panX = 0; show(starts[t.id], 1);
 }
+$('s').textContent = '입구'; $('e').textContent = '끝';
 
 // 마우스/터치: 바닥 마커 + 클릭 이동 + 드래그로 둘러보기
 const rv = $('rv'), marker = $('marker');
@@ -110,6 +113,6 @@ tours.forEach(t => {
   b.onclick = () => setTour(t); $('tabs').appendChild(b);
 });
 setTimeout(() => $('hint').style.opacity = 0, 5000);
-addEventListener('resize', () => show(idx, 0) || 0);
-if (tours.length) setTour(tours[0]);
+addEventListener('resize', () => { const g = idx; idx = -1; show(g, 0); });
+if (tours.length) { front = 'b'; show(0, 1); }
 })();

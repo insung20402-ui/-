@@ -74,7 +74,7 @@ for t in cfg["tours"]:
         n = hide_people(fr, t.get("people", "body"), t.get("manual_mask", []))
         if n: print("  가림:", t["id"], k, n)
         blurred += n
-        cv2.imwrite(os.path.join(d, f"{k:03d}.jpg"), fr, [cv2.IMWRITE_JPEG_QUALITY, 82])
+        cv2.imwrite(os.path.join(d, f"{k:03d}.jpg"), fr, [cv2.IMWRITE_JPEG_QUALITY, 74])
     print(f'{t["id"]}: {len(cands)}장 중 {len(keep)}장 사용, 가린 영역 {blurred}곳')
     tours.append({"id": t["id"], "title": t["title"], "type": t.get("type", "walk"),
                   "count": len(keep), "ext": "jpg"})
