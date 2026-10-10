@@ -25,19 +25,21 @@
    "id": "office1",
    "title": "교무실 둘러보기 1",
    "video": "/root/.claude/uploads/4759cb7a-e87b-5a28-b614-25ea0e85da34/a9141b80-KakaoTalk_20261009_163652161.mp4",
-   "fps": 15,
+   "fps": 20,
    "type": "pan",
    "people": "none",
-   "max_w": 1280
+   "max_w": 1280,
+   "stabilize": true
   },
   {
    "id": "office2",
    "title": "교무실 둘러보기 2",
    "video": "/root/.claude/uploads/4759cb7a-e87b-5a28-b614-25ea0e85da34/04adf1e6-KakaoTalk_20261009_163656800.mp4",
-   "fps": 15,
+   "fps": 20,
    "type": "pan",
    "people": "none",
-   "max_w": 1280
+   "max_w": 1280,
+   "stabilize": true
   }
  ]
 }

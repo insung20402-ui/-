@@ -6,6 +6,7 @@ import json, sys, os, cv2, numpy as np
 
 cfg = json.load(open(sys.argv[1]))
 OUT = cfg.get("out", "site")
+tours = []
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 face = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
@@ -46,9 +47,15 @@ def hide_people(img, mode, manual):
         pixelate(img, (int(fx * W), int(fy * H), int(fw * W), int(fh * H)), 0, 10); n += 1
     return n
 
-tours = []
+import subprocess
 for t in cfg["tours"]:
     d = os.path.join(OUT, "frames", t["id"]); os.makedirs(d, exist_ok=True)
+    if t.get("stabilize"):  # 손떨림 보정 후 그대로 사용 (tools/stabilize.py)
+        subprocess.run([sys.executable, "-I", os.path.join(os.path.dirname(os.path.abspath(__file__)), "stabilize.py"),
+                        t["video"], d, str(t.get("fps", 20)), str(t.get("max_w", 1280))], check=True)
+        n = len([f for f in os.listdir(d) if f.endswith(".jpg")])
+        tours.append({"id": t["id"], "title": t["title"], "type": t.get("type", "pan"), "count": n, "ext": "jpg"})
+        continue
     for f in os.listdir(d): os.remove(os.path.join(d, f))
     cap = cv2.VideoCapture(t["video"])
     fps = cap.get(cv2.CAP_PROP_FPS); total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))

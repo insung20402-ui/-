@@ -43,14 +43,19 @@ function stopWalk() { clearInterval(walking); walking = null; }
 function startWalk(dir) { stopWalk(); go(dir); walking = setInterval(() => { if (!go(dir)) stopWalk(); }, 900); }
 
 /* ---- 교감실: 돌려보기 ---- */
-function showPano() {
-  const i = Math.round(Math.max(0, Math.min(pano.count - 1, pf)));
-  const n = $('a'); n.src = url(pano, i); $('b').style.opacity = 0; n.style.opacity = 1; n.style.transition = 'none';
-  n.style.transform = 'none'; progress(i / (pano.count - 1), `${Math.round(i / (pano.count - 1) * 100)}%`);
+let pa = -1, pb = -1;
+function showPano() {                 // 두 프레임을 비율대로 섞어서 프레임 사이도 부드럽게
+  const x = Math.max(0, Math.min(pano.count - 1, pf)), i = Math.floor(x), fr = x - i, j = Math.min(i + 1, pano.count - 1);
+  const A = $('a'), B = $('b');
+  if (pa !== i) { A.src = url(pano, i); pa = i; }
+  if (pb !== j) { B.src = url(pano, j); pb = j; }
+  for (const e of [A, B]) { e.style.transition = 'none'; e.style.transform = 'none'; }
+  A.style.opacity = 1; B.style.opacity = i === j ? 0 : fr;
+  progress(x / (pano.count - 1), `${Math.round(x / (pano.count - 1) * 100)}%`);
 }
 function loop() {
   if (view !== 'pano') return;
-  if (auto) { pf += 0.28; if (pf >= pano.count - 1) auto = false; }
+  if (auto) { pf += 0.2; if (pf >= pano.count - 1) auto = false; }
   else if (Math.abs(vel) > 0.01 && !down) { pf += vel; vel *= 0.93; }
   pf = Math.max(0, Math.min(pano.count - 1, pf));
   showPano(); raf = requestAnimationFrame(loop);
@@ -69,7 +74,7 @@ function setView(v) {
   });
   panX = 0;
   if (isWalk) { idx = -1; front = 'b'; for (const k of ['a', 'b']) { $(k).style.opacity = 0; $(k).style.transition = ''; } go(1); }
-  else { pf = 0; vel = 0; auto = true; raf = requestAnimationFrame(loop); }
+  else { pf = 0; vel = 0; auto = true; pa = pb = -1; raf = requestAnimationFrame(loop); }
 }
 
 /* ---- 포인터 ---- */
