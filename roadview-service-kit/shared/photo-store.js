@@ -122,7 +122,7 @@
         hfov: kind === 'flat' ? (input.hfov || 65) : 360,
         pitch: kind === 'flat' ? Math.max(-60, Math.min(60, input.pitch || 0)) : 0,
         roll: kind === 'flat' ? Math.max(-45, Math.min(45, input.roll || 0)) : 0,
-        k1: kind === 'flat' ? Math.max(-0.5, Math.min(0.5, input.k1 || 0)) : 0,
+        k1: kind === 'flat' ? Math.max(-0.5, Math.min(0.5, input.k1 !== undefined ? input.k1 : ((input.hfov || 65) > 80 ? -0.08 : 0))) : 0,
         k2: kind === 'flat' ? Math.max(-0.5, Math.min(0.5, input.k2 || 0)) : 0,
         source: input.source || 'upload', name: input.name || '',
         width: p.width, height: p.height, blob: p.blob, createdAt: new Date().toISOString()

@@ -45,3 +45,9 @@ test('barrel distortion k1<0 pulls edge samples inward, k1=0 matches the pure mo
   assert.ok(b.x < a.x && b.x > 320);
   assert.ok(Math.abs(R.project(0, 0, 640, 480, { ...shot, k1: -0.1 }).x - 320) < 1e-9);
 });
+
+test('strong barrel distortion cannot fold back into mirrored samples', () => {
+  // k1=-0.1 stops being monotonic at r^2 = 1/(3*0.1); beyond that the direction must not project
+  assert.equal(R.project(80, 0, 640, 480, { heading: 0, hfov: 90, k1: -0.1 }), null);
+  assert.ok(R.project(40, 0, 640, 480, { heading: 0, hfov: 90, k1: -0.1 }));
+});

@@ -34,6 +34,17 @@
     return g;
   }
 
+  // Largest ideal radius r^2 for which the distortion curve r*g(r) still increases.
+  // Beyond it the polynomial folds back and would paint mirrored garbage into the photo.
+  function maxR2(k1, k2) {
+    if (!k1 && !k2) return Infinity;
+    for (var r = 0.01; r < 50; r += 0.01) {
+      var r2 = r * r;
+      if (1 + 3 * k1 * r2 + 5 * k2 * r2 * r2 <= 0) return (r - 0.01) * (r - 0.01);
+    }
+    return Infinity;
+  }
+
   // Where does the world direction (bearing, pitch) land in the source photo?
   // Returns {x, y} in source pixels, or null when it is behind the camera.
   function project(bearing, pitch, iw, ih, shot) {
@@ -45,6 +56,7 @@
     var fp = focalPx(iw, shot.hfov);
     var x = (d[0] * b.right[0] + d[1] * b.right[1] + d[2] * b.right[2]) / z;
     var y = (d[0] * b.up[0] + d[1] * b.up[1] + d[2] * b.up[2]) / z;
+    if (x * x + y * y > maxR2(shot.k1 || 0, shot.k2 || 0)) return null;
     var g = distort(x, y, shot.k1 || 0, shot.k2 || 0);
     return { x: iw / 2 + x * g * fp, y: ih / 2 - y * g * fp };
   }
@@ -55,18 +67,24 @@
   function reprojectInto(dst, W, src, iw, ih, shot) {
     var H = W / 2, ppd = W / 360;
     var b = basis(shot.heading, shot.pitch || 0, shot.roll || 0);
-    var fp = focalPx(iw, shot.hfov), k1 = shot.k1 || 0, k2 = shot.k2 || 0;
+    var fp = focalPx(iw, shot.hfov), k1 = shot.k1 || 0, k2 = shot.k2 || 0, rmax2 = maxR2(k1, k2);
     var feather = Math.max(2, Math.min(iw, ih) * 0.05);
-    var hv = Math.atan((ih / 2) / fp) / D2R;                 // half vertical fov
-    var hh = shot.hfov / 2;
-    var wide = hh > 80 || hv > 80;                           // too wide for a safe column window
-    var span = Math.min(180, Math.max(hh, hv) * 1.5 + Math.abs(shot.roll || 0) + 5);
-    var cx0 = Math.floor(norm360(shot.heading - 90 - span) * ppd);
-    var ncols = wide ? W : Math.min(W, Math.ceil(span * 2 * ppd) + 1);
-    var pLo = (shot.pitch || 0) - Math.max(hv, hh) * 1.5 - 5, pHi = (shot.pitch || 0) + Math.max(hv, hh) * 1.5 + 5;
-    var y0 = Math.max(0, Math.floor((90 - Math.min(90, pHi)) * ppd));
-    var y1 = Math.min(H - 1, Math.ceil((90 - Math.max(-90, pLo)) * ppd));
-    if (wide) { y0 = 0; y1 = H - 1; cx0 = 0; }
+    // Footprint = cone around the optical axis through the photo's corners. With lens
+    // distortion the corner sits at a larger ideal radius, so solve r*g(r) = corner radius.
+    var rd = Math.hypot(iw / 2, ih / 2) / fp, rIdeal = rd;
+    if (k1 || k2) {
+      var lim = Math.sqrt(rmax2), r = 0;
+      while (r < lim && r * distort(r, 0, k1, k2) < rd) r += 0.005;
+      rIdeal = Math.min(r, lim);
+    }
+    var radius = Math.atan(rIdeal) / D2R + 1;                 // degrees
+    var tilt = shot.pitch || 0;
+    var full = radius >= 89 || Math.abs(tilt) + radius >= 90;  // footprint covers a pole: spans all longitudes
+    var span = full ? 180 : Math.asin(Math.min(1, Math.sin(radius * D2R) / Math.cos(tilt * D2R))) / D2R + 1;
+    var cx0 = full ? 0 : Math.floor(norm360(shot.heading - 90 - span) * ppd);
+    var ncols = full ? W : Math.min(W, Math.ceil(span * 2 * ppd) + 2);
+    var y0 = Math.max(0, Math.floor((90 - Math.min(90, tilt + radius)) * ppd));
+    var y1 = Math.min(H - 1, Math.ceil((90 - Math.max(-90, tilt - radius)) * ppd));
 
     for (var j = y0; j <= y1; j++) {
       var pitch = (90 - (j + 0.5) / ppd) * D2R, cp = Math.cos(pitch), sp = Math.sin(pitch);
@@ -78,6 +96,7 @@
         if (z <= 1e-6) continue;
         var ux = (dx * b.right[0] + dy * b.right[1] + dz * b.right[2]) / z;
         var uy = (dx * b.up[0] + dy * b.up[1] + dz * b.up[2]) / z;
+        if (ux * ux + uy * uy > rmax2) continue;
         var dg = k1 || k2 ? distort(ux, uy, k1, k2) : 1;
         var sx = iw / 2 + ux * dg * fp;
         var sy = ih / 2 - uy * dg * fp;

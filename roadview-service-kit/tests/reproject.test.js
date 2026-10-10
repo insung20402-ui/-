@@ -40,3 +40,23 @@ test('reprojectInto paints the facing sector and leaves the rest untouched', () 
   assert.equal(at(180, 0), 0, 'opposite side untouched');
   assert.ok(at(28, 0) > 0 && at(28, 0) < 255, 'feathered edge is a partial blend');
 });
+
+test('column/row window never clips the visible footprint (brute-force comparison)', () => {
+  const W = 720, H = 360, iw = 80, ih = 60;
+  const src = new Uint8ClampedArray(iw * ih * 4).fill(255);
+  const shots = [
+    { heading: 10, hfov: 65 }, { heading: 200, hfov: 120, pitch: 20 }, { heading: 350, hfov: 90, roll: 25 },
+    { heading: 90, hfov: 140, pitch: -30, k1: -0.08 }, { heading: 0, hfov: 30, pitch: 50, roll: -40 }
+  ];
+  shots.forEach((shot) => {
+    const dst = new Uint8ClampedArray(W * H * 4);
+    R.reprojectInto(dst, W, src, iw, ih, shot);
+    let missed = 0;
+    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+      const p = R.project((i + 0.5) / 2 + 90, 90 - (j + 0.5) / 2, iw, ih, shot);
+      // well inside the photo (beyond the feather band) => must be painted
+      if (p && p.x > 6 && p.x < iw - 7 && p.y > 6 && p.y < ih - 7 && dst[(j * W + i) * 4] < 200) missed++;
+    }
+    assert.equal(missed, 0, JSON.stringify(shot));
+  });
+});
