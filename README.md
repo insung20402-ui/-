@@ -2,7 +2,7 @@
 
 영상 -> 프레임 -> 웹 로드뷰.
 
-- 뷰어: `site/index.html` (`python3 -m http.server -d site` 로 열기)
+- 뷰어: `site/portrait.html`(세로), `site/landscape.html`(가로) — 더블클릭으로 열림. `site/index.html`에서 선택
 - 프레임 재생성: `python3 tools/build_frames.py tools/tours.config.json`
 - `tools/tours.config.json` 옵션: `fps`(초당 프레임), `people`(`none`/`face`/`body`),
   `manual_mask`(가릴 영역 `[x,y,w,h]` 비율), `drop`(제외할 프레임 번호)
