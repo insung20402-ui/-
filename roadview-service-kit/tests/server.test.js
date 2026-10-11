@@ -157,7 +157,40 @@ test('video tours: frames then manifest; unknown revs and missing frames are ref
   assert.equal((await call('GET', '/tours/school/r1/001.jpg')).status, 404);
   assert.equal((await call('GET', '/tours/school/r2/001.jpg')).status, 200);
   assert.equal(JSON.parse((await call('GET', '/api/tours')).body).tours[0].type, 'walk');
-  assert.equal((await call('GET', '/tours/school/..%2f/000.jpg')).status, 404);
+  assert.ok([400, 404].includes((await call('GET', '/tours/school/..%2f/000.jpg')).status));
   assert.equal((await call('DELETE', '/api/tours/school', null, auth)).status, 200);
   assert.equal(JSON.parse((await call('GET', '/api/tours')).body).tours.length, 0);
+});
+
+test('malformed URLs get an error response and never crash the server', { skip }, async () => {
+  const net = require('node:net');
+  const raw = (line) => new Promise((resolve) => {
+    const c = net.connect(server.address().port, '127.0.0.1', () => c.write(line + ' HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n'));
+    let out = ''; c.on('data', (d) => { out += d; }); c.on('close', () => resolve(out.split('\r\n')[0])); c.on('error', () => resolve('error'));
+  });
+  for (const u of ['/%00', '/%E0%A4%A', '/live/%00.js', '/api/nodes/%00', '/tours/a/b/%00', '/api/tours/%2e%2e/frames/1']) {
+    const status = await raw('GET ' + u);
+    assert.match(status, /HTTP\/1\.1 (400|404)/, u + ' -> ' + status);
+  }
+  assert.equal((await call('GET', '/api/health')).status, 200, 'still alive');
+});
+
+test('private files are never served, even when the data dir sits inside the served folder', { skip }, async () => {
+  const { createServer } = require('../server/index.js');
+  const inner = path.join(__dirname, '..', '.tmp-data-' + process.pid);
+  const s2 = createServer({ dataDir: inner, staticDir: path.join(__dirname, '..'), token: 'zzz' });
+  await new Promise((r) => s2.listen(0, '127.0.0.1', r));
+  const get = (u) => new Promise((resolve) => http.get('http://127.0.0.1:' + s2.address().port + u, (res) => { res.resume(); resolve(res.statusCode); }));
+  try {
+    for (const u of ['/' + path.basename(inner) + '/roadview.db', '/' + path.basename(inner) + '/token', '/Dockerfile', '/.env.example', '/docker-compose.yml', '/server/package.json', '/tests/graph.test.js', '/.gitignore']) {
+      assert.equal(await get(u), 404, u);
+    }
+    assert.equal(await get('/tour/index.html'), 200);
+    assert.equal(await get('/README.md'), 200);
+  } finally { await new Promise((r) => s2.close(r)); fs.rmSync(inner, { recursive: true, force: true }); }
+});
+
+test('tour frame numbers above 999 are refused (file names are 3 digits)', { skip }, async () => {
+  assert.equal((await call('PUT', '/api/tours/big/frames/1000?rev=r1', await solid(8, 8, [1, 2, 3]), auth)).status, 404);
+  assert.equal((await call('PUT', '/api/tours/big', JSON.stringify({ title: 'x', type: 'walk', count: 1000, rev: 'r1' }), auth)).status, 400);
 });

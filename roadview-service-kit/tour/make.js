@@ -22,6 +22,7 @@
     file = $('file').files[0]; frames = null; $('outBox').hidden = true;
     if (!file) return;
     var v = $('vid'); v.src = URL.createObjectURL(file);
+    v.onerror = function () { $('vbox').hidden = true; $('optBox').hidden = true; alert('이 브라우저가 읽을 수 없는 영상입니다. MP4(H.264) 또는 WebM 영상을 올려 주세요.'); };
     v.onloadedmetadata = function () {
       duration = isFinite(v.duration) ? v.duration : 0;
       $('end').value = duration.toFixed(1); $('start').value = 0;

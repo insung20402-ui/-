@@ -24,7 +24,7 @@
           (function (i) {
             var im = imgOf(t.url(i));
             var fin = function () { done++; if (tk === token) hint('불러오는 중 ' + done + '/' + n); if (done >= n) resolve(); else pump(); };
-            if (im.complete) fin(); else { im.onload = im.onerror = fin; }
+            if (im.complete) fin(); else { im.addEventListener('load', fin, { once: true }); im.addEventListener('error', fin, { once: true }); }
           })(next++);
         }
       }
@@ -101,7 +101,7 @@
     $('arrows').style.display = t.type === 'walk' ? '' : 'none';
     $('s').textContent = t.type === 'walk' ? '입구' : '시작'; $('e').textContent = t.type === 'walk' ? '끝' : (t.loop ? '한 바퀴' : '끝');
     var first = imgOf(t.url(0));
-    return new Promise(function (r) { if (first.complete) r(); else first.onload = first.onerror = r; }).then(function () {
+    return new Promise(function (r) { if (first.complete) r(); else { first.addEventListener('load', r, { once: true }); first.addEventListener('error', r, { once: true }); } }).then(function () {
       if (tk !== token) return;
       if (first.naturalWidth) rv.style.setProperty('--ar', first.naturalWidth / first.naturalHeight);
       return preload(t, tk);
@@ -143,6 +143,7 @@
     marker.textContent = z.y > z.h * 0.86 ? '▼' : '▲';
   });
   rv.addEventListener('pointerleave', function () { marker.classList.remove('on'); });
+  root.addEventListener('pointercancel', function () { down = null; rv.classList.remove('drag'); });
   root.addEventListener('pointerup', function (e) {
     if (!down) return;
     var z = zone(e); rv.classList.remove('drag'); down = null;

@@ -72,6 +72,23 @@ function createServer(opts) {
     w.on('error', (e) => finish({ ok: false, error: String(e.message || e) }));
     w.on('exit', (c) => finish({ ok: false, error: 'worker exited ' + c }));
   }
+  // frames uploaded for a tour that was never published (browser closed mid-upload) are removed after an hour
+  function sweepTours() {
+    const old = (f) => Date.now() - fs.statSync(f).mtimeMs > 3600e3;
+    for (const id of fs.readdirSync(tourDir)) {
+      const dir = path.join(tourDir, id);
+      let cur = null;
+      try { cur = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8')).rev; } catch (e) { /* unpublished */ }
+      for (const d of fs.readdirSync(dir)) {
+        if (d === 'manifest.json' || d === cur) continue;
+        if (old(path.join(dir, d))) fs.rmSync(path.join(dir, d), { recursive: true, force: true });
+      }
+      if (!cur && !fs.readdirSync(dir).length) fs.rmSync(dir, { recursive: true, force: true });
+    }
+  }
+  try { sweepTours(); } catch (e) { console.error('sweep failed', e.message); }
+  const sweeper = setInterval(() => { try { sweepTours(); } catch (e) { /* ignore */ } }, 3600e3); sweeper.unref();
+
   // anything left pending/rendering from a previous run gets queued again
   db.list().forEach((n) => { if (n.render.status !== 'done') enqueue(n); });
 
@@ -112,6 +129,7 @@ function createServer(opts) {
   async function api(req, res, url) {
     const p = url.pathname, m = req.method;
     let mm;
+    if (/%/.test(p)) return send(res, 400, { error: 'bad path' });          // ids are plain [A-Za-z0-9_-]
     if (p === '/api/health') return send(res, 200, { ok: true });
     if (p === '/api/nodes' && m === 'GET') return send(res, 200, db.list(), { 'Cache-Control': 'no-cache' });
     if (p === '/api/nodes/near' && m === 'GET') {
@@ -168,7 +186,7 @@ function createServer(opts) {
       }).filter(Boolean).sort((a, b) => (a.order || 0) - (b.order || 0) || String(a.created).localeCompare(String(b.created)));
       return send(res, 200, { tours: list }, { 'Cache-Control': 'no-cache' });
     }
-    if ((mm = /^\/api\/tours\/([^/]+)\/frames\/(\d{1,4})$/.exec(p)) && m === 'PUT') {
+    if ((mm = /^\/api\/tours\/([^/]+)\/frames\/(\d{1,3})$/.exec(p)) && m === 'PUT') {
       const id = mm[1], n = +mm[2], rev = url.searchParams.get('rev') || '';
       if (!ID.test(id) || !ID.test(rev)) return send(res, 400, { error: 'bad id or rev' });
       if (!authed(req)) return send(res, 401, { error: 'token required' });
@@ -190,7 +208,7 @@ function createServer(opts) {
       if (m === 'PUT') {
         let b; try { b = JSON.parse((await readBody(req, MAX_JSON)).toString('utf8')); } catch (e) { return send(res, e.status || 400, { error: 'bad json' }); }
         const rev = String(b.rev || ''), count = b.count | 0;
-        if (!ID.test(rev) || count < 1 || count > 2000) return send(res, 400, { error: 'bad rev or count' });
+        if (!ID.test(rev) || count < 1 || count > 999) return send(res, 400, { error: 'bad rev or count' });
         for (let i = 0; i < count; i++) if (!fs.existsSync(path.join(tourDir, id, rev, String(i).padStart(3, '0') + '.jpg'))) return send(res, 400, { error: 'missing frame ' + i });
         const prev = (() => { try { return JSON.parse(fs.readFileSync(path.join(tourDir, id, 'manifest.json'), 'utf8')); } catch (e) { return null; } })();
         const man = { id, title: String(b.title || id).slice(0, 80), type: b.type === 'pan' ? 'pan' : 'walk', count, ext: 'jpg', rev,
@@ -213,24 +231,36 @@ function createServer(opts) {
     return send(res, 404, { error: 'unknown endpoint' });
   }
 
+  // only the front-end folders are public; server code, tests, data (token, db), dotfiles and Docker files are not
+  const PUBLIC_DIRS = new Set(['live', 'shared', 'tour', 'backoffice', 'a-split', 'b-immersive', 'c-inspector', 'docs']);
+  const PUBLIC_FILES = new Set(['index.html', 'README.md']);
   function serveStatic(req, res, url) {
-    let rel = decodeURIComponent(url.pathname);
+    let rel;
+    try { rel = decodeURIComponent(url.pathname); } catch (e) { return send(res, 400, 'bad url'); }
+    if (rel.indexOf('\0') >= 0) return send(res, 400, 'bad url');
     if (rel === '/') { res.writeHead(302, { Location: '/live/index.html' }); return res.end(); }
     const file = path.join(staticDir, path.normalize(rel));
-    if (!file.startsWith(staticDir + path.sep) || /(^|[\\/])(server|tests|node_modules)([\\/]|$)/.test(path.relative(staticDir, file))) return send(res, 404, 'not found');
+    const parts = path.relative(staticDir, file).split(path.sep);
+    const top = parts[0];
+    const allowed = file.startsWith(staticDir + path.sep) && !parts.some((x) => x.startsWith('.')) &&
+      (parts.length === 1 ? PUBLIC_FILES.has(top) : PUBLIC_DIRS.has(top)) && !(file === dataDir || file.startsWith(dataDir + path.sep));
+    if (!allowed) return send(res, 404, 'not found');
     fs.stat(file, (err, st) => {
       if (err || !st.isFile()) return send(res, 404, 'not found');
       res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
-      fs.createReadStream(file).pipe(res);
+      fs.createReadStream(file).on('error', () => res.destroy()).pipe(res);
     });
   }
 
   const server = http.createServer((req, res) => {
+    try { handle(req, res); } catch (e) { console.error(e); if (!res.headersSent) send(res, 500, 'server error'); else res.destroy(); }
+  });
+  function handle(req, res) {
     let url; try { url = new URL(req.url, 'http://x'); } catch (e) { return send(res, 400, 'bad url'); }
     res.setHeader('X-Content-Type-Options', 'nosniff');
     const run = url.pathname.startsWith('/api/') || url.pathname.startsWith('/pano/') || url.pathname.startsWith('/tours/') ? api(req, res, url) : (req.method === 'GET' || req.method === 'HEAD' ? serveStatic(req, res, url) : send(res, 405, 'method not allowed'));
     if (run && run.catch) run.catch((e) => { console.error(e); if (!res.headersSent) send(res, 500, { error: 'server error' }); });
-  });
+  }
   server.roadview = { db, token, idle: () => new Promise((r) => { const t = setInterval(() => { if (!running && !queue.length) { clearInterval(t); r(); } }, 50); }) };
   server.on('close', () => db.close());
   return server;
