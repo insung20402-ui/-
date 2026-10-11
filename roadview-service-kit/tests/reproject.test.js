@@ -60,3 +60,19 @@ test('column/row window never clips the visible footprint (brute-force compariso
     assert.equal(missed, 0, JSON.stringify(shot));
   });
 });
+
+test('smartBackdrop fills every pixel, keeps photo colours near the photo and never goes black', () => {
+  const W = 360, iw = 80, ih = 60;
+  const src = new Uint8ClampedArray(iw * ih * 4);
+  for (let y = 0; y < ih; y++) for (let x = 0; x < iw; x++) {
+    const o = (y * iw + x) * 4; src[o] = 200; src[o + 1] = 40; src[o + 2] = 40; src[o + 3] = 255;   // red photo
+  }
+  const dst = new Uint8ClampedArray(W * (W / 2) * 4);
+  R.smartBackdrop(dst, W, [{ src, iw, ih, shot: { heading: 0, hfov: 60 } }]);
+  const px = (b, p) => { const o = (Math.floor(90 - p) * W + ((Math.floor(b) + 270) % 360)) * 4; return [dst[o], dst[o + 1], dst[o + 2], dst[o + 3]]; };
+  assert.ok(px(35, 0)[0] > 150 && px(35, 0)[1] < 90, 'just outside the photo continues its colour');
+  assert.ok(px(180, 0)[0] > 90, 'behind the camera is not black');
+  for (let i = 3; i < dst.length; i += 4) assert.equal(dst[i], 255);
+  const seamL = px(269, 0)[0], seamR = px(271, 0)[0];
+  assert.ok(Math.abs(seamL - seamR) < 25, 'no hard seam at the texture wrap');
+});
