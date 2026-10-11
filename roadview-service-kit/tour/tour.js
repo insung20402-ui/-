@@ -55,6 +55,7 @@
       canvas = document.createElement('canvas'); canvas.id = 'gl';
       rv.insertBefore(canvas, rv.firstChild);
       gl = new root.TourWarper(canvas);
+      canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); disableGL(); });
     } catch (e) { glFailed = true; gl = null; if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas); }
     return !!gl;
   }
@@ -76,13 +77,21 @@
     var x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0, w, h);
     return (grays[key] = root.TourFlow.gray(x.getImageData(0, 0, w, h).data, w, h));
   }
-  function computePair(t, i) {
+  // one small unit of work per call: a pair takes ~8 steps of a few milliseconds each
+  var tasks = {};
+  function stepPair(t, i) {
     var key = t.id + ':' + i;
-    if (flows[key]) return;
-    var a = grayOf(t.id, i), b = grayOf(t.id, i + 1);
-    var pr = root.TourFlow.estimatePair(a, b);
-    flows[key] = { A: root.TourWarper.field(pr.ab), B: root.TourWarper.field(pr.ba) };
+    if (flows[key]) return true;
+    var k = tasks[key] || (tasks[key] = { n: 0 });
+    if (k.n === 0) { k.a = grayOf(t.id, i); k.n = 1; return false; }
+    if (k.n === 1) { k.b = grayOf(t.id, i + 1); k.task = root.TourFlow.pairTask(k.a, k.b); k.n = 2; return false; }
+    if (k.n - 2 < k.task.steps.length) { k.task.steps[k.n - 2](); k.n++; return false; }
+    var pr = k.task.result();
+    flows[key] = { A: root.TourWarper.field(pr.ab), B: root.TourWarper.field(pr.ba), at: performance.now() };
+    delete tasks[key];
+    return true;
   }
+  function computePair(t, i) { while (!stepPair(t, i)) { /* run to completion */ } }
   function queuePairs(t, around) {
     flowQueue = [];
     for (var i = 0; i < t.count - 1; i++) flowQueue.push(i);
@@ -91,7 +100,13 @@
   }
   function pumpFlows(t, tk) {
     if (tk !== token || !flowQueue.length) return;
-    try { computePair(t, flowQueue.shift()); wake(); } catch (e) { disableGL(); return; }
+    try {
+      var cur = flowQueue[0];
+      if (stepPair(t, cur)) {
+        flowQueue.shift();
+        if (cur === Math.min(t.count - 2, Math.floor(Math.max(0, wpos)))) wake();     // redraw only if it is the pair on screen
+      }
+    } catch (e) { disableGL(); return; }
     flowTimer = setTimeout(function () { pumpFlows(t, tk); }, 0);
   }
 
@@ -100,13 +115,21 @@
     var n = tour.count, p = Math.min(n - 1, Math.max(0, wpos)), i = Math.min(n - 2, Math.floor(p)), f = n > 1 ? p - i : 0;
     if (n < 2) i = 0;
     var fl = flows[tour.id + ':' + i];
-    var w = rv.clientWidth || 1, h = rv.clientHeight || 1;
+    if (!fl && n > 1 && flowQueue[0] !== i && flowQueue.length) {            // the viewer got ahead of the background work
+      var at = flowQueue.indexOf(i); if (at > 0) { flowQueue.splice(at, 1); flowQueue.unshift(i); }
+    }
+    var w = rv.clientWidth || 1, gain = 1;
     try {
-      gl.render(imgOf(tour.url(i)), n > 1 ? imgOf(tour.url(i + 1)) : null, fl && fl.A, fl && fl.B, f, [panX / w, 0]);
+      gain = fl ? Math.min(1, (performance.now() - fl.at) / 300) : 0;           // fade a late estimate in
+      gl.render(imgOf(tour.url(i)), n > 1 ? imgOf(tour.url(i + 1)) : null, fl && fl.A, fl && fl.B, f, [panX / w, 0], gain);
     } catch (e) { disableGL(); return; }
     progress(n > 1 ? p / (n - 1) : 0, (Math.round(p) + 1) + '/' + n);
     $('fwd').style.opacity = Math.round(wtarget) >= n - 1 && !holding ? 0.35 : 1;
     $('bck').style.opacity = Math.round(wtarget) <= 0 && !holding ? 0.35 : 1;
+  }
+  function fadingIn() {                      // a motion estimate for the visible pair was computed less than 300 ms ago
+    var n = tour.count, i = Math.min(n - 2, Math.floor(Math.max(0, wpos))), fl = i >= 0 && flows[tour.id + ':' + i];
+    return !!fl && performance.now() - fl.at < 320;
   }
   function wake() { if (gl && tour && tour.type === 'walk' && !walkRaf) { lastT = 0; walkRaf = requestAnimationFrame(walkTick); } }
   function walkTick(now) {
@@ -122,7 +145,7 @@
     }
     drawWalk();
     idx = Math.round(wtarget);
-    if (Math.abs(wtarget - wpos) > 0.0008 || down) walkRaf = requestAnimationFrame(walkTick);
+    if (Math.abs(wtarget - wpos) > 0.0008 || down || fadingIn()) walkRaf = requestAnimationFrame(walkTick);
   }
 
   // ---- CSS fallback (same look as before) ----
@@ -304,7 +327,7 @@
     return select(tours.filter(function (t) { return t.id === want; })[0] || tours[0]);
   }).then(function () {
     root.TourApp = { tours: function () { return tours; }, tour: function () { return tour; }, select: select, go: go,
-      state: function () { return { idx: idx, pos: wpos, target: wtarget, pf: pf, auto: auto, smooth: !!gl, flows: Object.keys(flows).length }; }, ready: true };
+      state: function () { return { idx: idx, pos: wpos, target: wtarget, pf: pf, auto: auto, smooth: !!gl, flows: Object.keys(flows).length, queue: flowQueue.length, tasks: Object.keys(tasks).length }; }, ready: true };
     root.dispatchEvent(new Event('tour-ready'));
   });
 })(window);

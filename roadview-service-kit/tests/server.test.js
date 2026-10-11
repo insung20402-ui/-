@@ -178,7 +178,7 @@ test('malformed URLs get an error response and never crash the server', { skip }
 test('private files are never served, even when the data dir sits inside the served folder', { skip }, async () => {
   const { createServer } = require('../server/index.js');
   const inner = path.join(__dirname, '..', '.tmp-data-' + process.pid);
-  const s2 = createServer({ dataDir: inner, staticDir: path.join(__dirname, '..'), token: 'zzz' });
+  const s2 = createServer({ dataDir: inner, staticDir: path.join(__dirname, '..'), token: 'zzz-long-token-123' });
   await new Promise((r) => s2.listen(0, '127.0.0.1', r));
   const get = (u) => new Promise((resolve) => http.get('http://127.0.0.1:' + s2.address().port + u, (res) => { res.resume(); resolve(res.statusCode); }));
   try {
@@ -193,4 +193,68 @@ test('private files are never served, even when the data dir sits inside the ser
 test('tour frame numbers above 999 are refused (file names are 3 digits)', { skip }, async () => {
   assert.equal((await call('PUT', '/api/tours/big/frames/1000?rev=r1', await solid(8, 8, [1, 2, 3]), auth)).status, 404);
   assert.equal((await call('PUT', '/api/tours/big', JSON.stringify({ title: 'x', type: 'walk', count: 1000, rev: 'r1' }), auth)).status, 400);
+});
+
+test('a weak or example token is refused at start-up', { skip }, () => {
+  const { createServer } = require('../server/index.js');
+  for (const bad of ['abc', 'change-me-to-a-long-random-string']) {
+    assert.throws(() => createServer({ dataDir: fs.mkdtempSync(path.join(os.tmpdir(), 'rv-weak-')), staticDir: __dirname, token: bad }), /too weak/);
+  }
+});
+
+test('renders of old revisions and of deleted nodes do not pile up on disk', { skip }, async () => {
+  const panoDir = path.join(dir, 'pano', 'n-eq');
+  const eqNode = JSON.parse((await call('GET', '/api/nodes/n-eq')).body);
+  eqNode.shots[0].heading = 90;
+  await call('PUT', '/api/nodes/n-eq', JSON.stringify(eqNode), auth);
+  await server.roadview.idle();
+  assert.deepEqual(fs.readdirSync(panoDir).sort(), ['2-high.jpg', '2-low.jpg'], 'only the current revision stays');
+  // delete while a render is queued: nothing may be left behind afterwards
+  eqNode.shots[0].heading = 180;
+  await call('PUT', '/api/nodes/n-eq', JSON.stringify(eqNode), auth);
+  await call('DELETE', '/api/nodes/n-eq', null, auth);
+  await server.roadview.idle();
+  await new Promise((r) => setTimeout(r, 200));
+  assert.equal(fs.existsSync(panoDir), false);
+});
+
+test('abandoned uploads are swept after an hour; referenced and recent files stay', { skip }, async () => {
+  const old = (f) => { const t = Date.now() / 1000 - 7200; fs.utimesSync(f, t, t); };
+  assert.equal((await call('PUT', '/api/blobs/b-orphan', await solid(16, 16, [1, 1, 1]), auth)).status, 200);
+  assert.equal((await call('PUT', '/api/blobs/b-fresh', await solid(16, 16, [2, 2, 2]), auth)).status, 200);
+  assert.equal((await call('PUT', '/api/blobs/b-used', await solid(16, 16, [3, 3, 3]), auth)).status, 200);
+  await call('PUT', '/api/nodes/n-used', JSON.stringify({ id: 'n-used', lat: 36, lon: 127, shots: [{ id: 'b-used', kind: 'flat', hfov: 60 }] }), auth);
+  await server.roadview.idle();
+  old(path.join(dir, 'blobs', 'b-orphan.jpg')); old(path.join(dir, 'blobs', 'b-used.jpg'));
+  // an unpublished tour upload, and a published one
+  await call('PUT', '/api/tours/half/frames/0?rev=r9', await solid(16, 16, [4, 4, 4]), auth);
+  old(path.join(dir, 'tours', 'half', 'r9')); old(path.join(dir, 'tours', 'half', 'r9', '000.jpg'));
+  await call('PUT', '/api/tours/whole/frames/0?rev=r1', await solid(16, 16, [5, 5, 5]), auth);
+  await call('PUT', '/api/tours/whole', JSON.stringify({ title: 'w', type: 'walk', count: 1, rev: 'r1' }), auth);
+  old(path.join(dir, 'tours', 'whole', 'r1'));
+  server.roadview.sweep();
+  assert.equal(fs.existsSync(path.join(dir, 'blobs', 'b-orphan.jpg')), false, 'orphan blob removed');
+  assert.equal(fs.existsSync(path.join(dir, 'blobs', 'b-fresh.jpg')), true, 'recent blob kept');
+  assert.equal(fs.existsSync(path.join(dir, 'blobs', 'b-used.jpg')), true, 'referenced blob kept');
+  assert.equal(fs.existsSync(path.join(dir, 'tours', 'half')), false, 'unpublished tour removed');
+  assert.equal(fs.existsSync(path.join(dir, 'tours', 'whole', 'r1', '000.jpg')), true, 'published tour kept');
+});
+
+test('a render that never finishes is cut off and the queue keeps working', { skip }, async () => {
+  const { createServer } = require('../server/index.js');
+  const d2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rv-to-'));
+  const s2 = createServer({ dataDir: d2, staticDir: __dirname, token: 'timeout-token-123', renderTimeoutMs: 1 });
+  await new Promise((r) => s2.listen(0, '127.0.0.1', r));
+  const port = s2.address().port, h = { Authorization: 'Bearer timeout-token-123' };
+  const c2 = (m, u, b, hh) => new Promise((res, rej) => { const rq = http.request('http://127.0.0.1:' + port + u, { method: m, headers: hh || {} }, (r) => { const ch = []; r.on('data', (x) => ch.push(x)); r.on('end', () => res({ status: r.statusCode, body: Buffer.concat(ch) })); }); rq.on('error', rej); if (b) rq.write(b); rq.end(); });
+  try {
+    await c2('PUT', '/api/blobs/x1', await solid(64, 64, [9, 9, 9]), h);
+    for (const id of ['t1', 't2']) await c2('PUT', '/api/nodes/' + id, JSON.stringify({ id, lat: 37, lon: 127, shots: [{ id: 'x1', kind: 'flat' }] }), h);
+    await s2.roadview.idle();
+    for (const id of ['t1', 't2']) {
+      const n = JSON.parse((await c2('GET', '/api/nodes/' + id)).body);
+      assert.equal(n.render.status, 'error', id + ' ' + JSON.stringify(n.render));
+    }
+    assert.equal((await c2('GET', '/api/health')).status, 200);
+  } finally { await new Promise((r) => s2.close(r)); fs.rmSync(d2, { recursive: true, force: true }); }
 });

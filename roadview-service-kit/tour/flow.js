@@ -41,8 +41,8 @@
   // Walking forward makes the picture expand about a focus point. Find the zoom s and focus (cx, cy) (fractions of the
   // frame) that best explain B as a magnified A, so block matching only has to find what the model misses.
   function zoomModel(A, B) {
-    var a = A, b = B, shrink = 0;
-    while (a.w > 80) { a = downsample(a); b = downsample(b); shrink++; }
+    var a = A, b = B;
+    while (a.w > 80) { a = downsample(a); b = downsample(b); }
     var w = a.w, h = a.h, best = null, base = 0, n = 0;
     function cost(s, fx, fy) {
       var cx = fx * w, cy = fy * h, sum = 0, cnt = 0;
@@ -74,13 +74,24 @@
   // Flow both ways. Walking forward is mostly expansion, so we also try starting from the best-fitting zoom (it
   // reaches far larger steps) and keep whichever variant agrees with itself: following A->B and then B->A should lead
   // back to where you started. Mismatches on repeating textures fail that test.
-  function estimatePair(A, B, opts) {
+  // The same computation as a list of small steps, so a player can run one per timer tick and never block the UI.
+  function pairTask(A, B, opts) {
     opts = opts || {};
-    var plain = { ab: estimate(A, B, opts), ba: estimate(B, A, opts) };
-    var zm = zoomModel(A, B);
-    if (zm.s === 1) return plain;
-    var withModel = { ab: estimate(A, B, Object.assign({}, opts, { model: zm })), ba: estimate(B, A, Object.assign({}, opts, { model: { s: 1 / zm.s, fx: zm.fx, fy: zm.fy } })) };
-    return inconsistency(A, withModel) < inconsistency(A, plain) ? withModel : plain;
+    var st = { plain: {}, model: {}, zm: null, out: null };
+    var steps = [
+      function () { st.plain.ab = estimate(A, B, opts); },
+      function () { st.plain.ba = estimate(B, A, opts); },
+      function () { st.zm = zoomModel(A, B); if (st.zm.s === 1) st.out = st.plain; },
+      function () { if (!st.out) st.model.ab = estimate(A, B, Object.assign({}, opts, { model: st.zm })); },
+      function () { if (!st.out) st.model.ba = estimate(B, A, Object.assign({}, opts, { model: { s: 1 / st.zm.s, fx: st.zm.fx, fy: st.zm.fy } })); },
+      function () { if (!st.out) st.out = inconsistency(A, st.model) < inconsistency(A, st.plain) ? st.model : st.plain; }
+    ];
+    return { steps: steps, result: function () { return st.out; } };
+  }
+  function estimatePair(A, B, opts) {
+    var t = pairTask(A, B, opts);
+    t.steps.forEach(function (f) { f(); });
+    return t.result();
   }
   function inconsistency(A, pair) {
     var F = pair.ab, total = 0, n = 0;
@@ -197,7 +208,7 @@
     }
     F.dx = filt(filt(dx, true), false); F.dy = filt(filt(dy, true), false);
     var px = polyFit(F, F.dx, ok), py = polyFit(F, F.dy, ok), mix = F.mix === undefined ? 0.3 : F.mix;
-    if (px && py) for (var k = 0; k < F.dx.length; k++) { F.dx[k] = F.dx[k] * (1 - mix) + px[k] * mix; F.dy[k] = F.dy[k] * (1 - mix) + py[k] * mix; }
+    if (px && py) for (var m = 0; m < F.dx.length; m++) { F.dx[m] = F.dx[m] * (1 - mix) + px[m] * mix; F.dy[m] = F.dy[m] * (1 - mix) + py[m] * mix; }
     return F;
   }
 
@@ -218,6 +229,6 @@
     return { data: g, w: w, h: h };
   }
 
-  var api = { zoomModel: zoomModel, estimatePair: estimatePair, estimate: estimate, sample: sample, gray: gray, downsample: downsample };
+  var api = { zoomModel: zoomModel, pairTask: pairTask, estimatePair: estimatePair, estimate: estimate, sample: sample, gray: gray, downsample: downsample };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.TourFlow = api;
 })(typeof window !== 'undefined' ? window : globalThis);

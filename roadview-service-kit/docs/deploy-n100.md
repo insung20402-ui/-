@@ -11,7 +11,7 @@ git clone https://github.com/insung20402-ui/- roadview && cd roadview
 git checkout claude/relaxed-brahmagupta-eiy6gu
 cd roadview-service-kit
 mkdir -p data && cp .env.example .env
-nano .env                          # ADMIN_TOKEN을 긴 임의 문자열로
+nano .env                          # ADMIN_TOKEN을 12자 이상 임의 문자열로 (짧거나 예시 그대로면 서버가 시작을 거부한다)
 PUID=$(id -u) PGID=$(id -g) docker compose up -d --build
 ```
 
@@ -54,6 +54,7 @@ ADMIN_TOKEN=... DATA_DIR=./data node server/index.js
 
 ## 5. 아직 안 된 것
 
+- 보기는 로그인 없이 열려 있다. 올린 사진 원본도 주소를 알면 누구나 볼 수 있으니, 외부에 열 때는 접근 제한(Tailscale, Cloudflare Access)을 함께 쓴다.
 - 번호판·얼굴 자동 블러(검출 모델 추가 필요). 공개 전에는 반드시 필요하다.
 - 타일 방식 전송. 지금은 4096×2048 한 장을 받는다.
 - 사용자별 계정. 지금은 토큰 하나를 아는 사람이 모두 올리고 지울 수 있다.

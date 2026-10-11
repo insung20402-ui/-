@@ -4,3 +4,6 @@ data
 .git
 tests
 *.zip
+.env
+.env.*
+!.env.example

@@ -75,3 +75,14 @@ test('zoomModel finds the zoom and ignores pure shifts', () => {
   const shifted = warp(A, (x, y) => [x - 6, y]);
   assert.equal(F.zoomModel(A, shifted).s === 1 || F.zoomModel(A, shifted).s < 1.08, true);
 });
+
+test('pairTask run step by step gives exactly the same answer as estimatePair', () => {
+  const A = texture(256, 144, 33), B = warp(A, (x, y) => [128 + (x - 128) / 1.15, 72 + (y - 72) / 1.15]);
+  const whole = F.estimatePair(A, B);
+  const t = F.pairTask(A, B);
+  t.steps.forEach((s) => s());
+  const part = t.result();
+  assert.deepEqual(Array.from(part.ab.dx), Array.from(whole.ab.dx));
+  assert.deepEqual(Array.from(part.ba.dy), Array.from(whole.ba.dy));
+  assert.ok(t.steps.length >= 5, 'work is split into several small steps');
+});

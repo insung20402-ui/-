@@ -135,8 +135,11 @@
     nodes = nodes.filter(function (x) { return x.id !== id; });
     if (!n) return Promise.resolve();
     if (remote) {
-      n.shots.forEach(function (sh) { delete images[sh.id]; });
-      return authFetch('/api/nodes/' + encodeURIComponent(id), { method: 'DELETE' });
+      // only forget the node once the server agrees (a refused or cancelled token must not make it vanish locally)
+      return authFetch('/api/nodes/' + encodeURIComponent(id), { method: 'DELETE' }).then(function (r) {
+        if (!r.ok) { nodes.push(n); throw new Error(r.status === 401 ? '삭제 권한(토큰)이 없습니다' : '서버 오류 ' + r.status); }
+        n.shots.forEach(function (sh) { delete images[sh.id]; });
+      }, function (e) { nodes.push(n); throw e; });
     }
     return Promise.all([tx('nodes', 'readwrite', function (s) { return s.delete(id); })].concat(n.shots.map(function (sh) {
       delete blobs[sh.id]; delete images[sh.id];

@@ -61,7 +61,7 @@
     S.removeNode(node.id).then(function () {
       rebuild();
       if (near) go(near.id); else { current = null; viewer.clear(); map.setCurrent(null); renderInfo(null); }
-    });
+    }, function (err) { rebuild(); toast('삭제하지 못했습니다: ' + err.message, 5000); });
   }
 
   function go(id, pov) {

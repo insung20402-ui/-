@@ -35,6 +35,9 @@ function createServer(opts) {
 
   // write token: from options/env, else generated once and kept in the data dir
   let token = opts.token || '';
+  if (token && (token.length < 12 || token === 'change-me-to-a-long-random-string')) {
+    throw new Error('ADMIN_TOKEN is too weak: use at least 12 random characters (for example: openssl rand -base64 24)');
+  }
   if (!token) {
     const f = path.join(dataDir, 'token');
     if (fs.existsSync(f)) token = fs.readFileSync(f, 'utf8').trim();
@@ -53,6 +56,14 @@ function createServer(opts) {
     db.setRender(node.id, node.rev, { status: 'pending', rev: node.rev });
     pump();
   }
+  // keep only the renders of the node's current revision; remove everything if the node was deleted meanwhile
+  function tidyPano(id) {
+    const dir = path.join(panoDir, id), cur = db.get(id);
+    try {
+      if (!cur) { fs.rmSync(dir, { recursive: true, force: true }); return; }
+      for (const f of fs.readdirSync(dir)) if (!f.startsWith(cur.rev + '-')) fs.rmSync(path.join(dir, f), { force: true });
+    } catch (e) { /* nothing rendered */ }
+  }
   function pump() {
     if (running || !queue.length) return;
     const job = queue.shift(), node = db.get(job.id);
@@ -61,9 +72,12 @@ function createServer(opts) {
     const w = new Worker(path.join(__dirname, 'render-worker.js'), {
       workerData: { node, blobDir, outDir: path.join(panoDir, node.id), rev: node.rev } });
     let done = false;
+    // a stuck worker (corrupt or huge image) must not block every later render
+    const timer = setTimeout(() => { w.terminate(); finish({ ok: false, error: 'render timed out' }); }, opts.renderTimeoutMs || 180000);
     const finish = (res) => {
-      if (done) return; done = true; running = false;
+      if (done) return; done = true; running = false; clearTimeout(timer);
       db.setRender(node.id, node.rev, res.ok ? { status: 'done', rev: node.rev, ms: res.ms } : { status: 'error', rev: node.rev, error: res.error });
+      tidyPano(node.id);
       if (!res.ok) console.error('render failed', node.id, res.error);
       if (opts.onRender) opts.onRender(node.id, res);
       pump();
@@ -77,6 +91,7 @@ function createServer(opts) {
     const old = (f) => Date.now() - fs.statSync(f).mtimeMs > 3600e3;
     for (const id of fs.readdirSync(tourDir)) {
       const dir = path.join(tourDir, id);
+      if (!fs.statSync(dir).isDirectory()) continue;
       let cur = null;
       try { cur = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8')).rev; } catch (e) { /* unpublished */ }
       for (const d of fs.readdirSync(dir)) {
@@ -86,8 +101,17 @@ function createServer(opts) {
       if (!cur && !fs.readdirSync(dir).length) fs.rmSync(dir, { recursive: true, force: true });
     }
   }
-  try { sweepTours(); } catch (e) { console.error('sweep failed', e.message); }
-  const sweeper = setInterval(() => { try { sweepTours(); } catch (e) { /* ignore */ } }, 3600e3); sweeper.unref();
+  // images uploaded for a node that was never saved (upload failed half way) are removed after an hour
+  function sweepBlobs() {
+    const used = new Set(); db.list().forEach((n) => n.shots.forEach((sh) => used.add(sh.id + '.jpg')));
+    for (const f of fs.readdirSync(blobDir)) {
+      const file = path.join(blobDir, f);
+      if (!used.has(f) && Date.now() - fs.statSync(file).mtimeMs > 3600e3) fs.rmSync(file, { force: true });
+    }
+  }
+  function sweepAll() { try { sweepTours(); } catch (e) { console.error('tour sweep failed', e.message); } try { sweepBlobs(); } catch (e) { console.error('blob sweep failed', e.message); } }
+  sweepAll();
+  const sweeper = setInterval(sweepAll, 3600e3); sweeper.unref();
 
   // anything left pending/rendering from a previous run gets queued again
   db.list().forEach((n) => { if (n.render.status !== 'done') enqueue(n); });
@@ -261,7 +285,7 @@ function createServer(opts) {
     const run = url.pathname.startsWith('/api/') || url.pathname.startsWith('/pano/') || url.pathname.startsWith('/tours/') ? api(req, res, url) : (req.method === 'GET' || req.method === 'HEAD' ? serveStatic(req, res, url) : send(res, 405, 'method not allowed'));
     if (run && run.catch) run.catch((e) => { console.error(e); if (!res.headersSent) send(res, 500, { error: 'server error' }); });
   }
-  server.roadview = { db, token, idle: () => new Promise((r) => { const t = setInterval(() => { if (!running && !queue.length) { clearInterval(t); r(); } }, 50); }) };
+  server.roadview = { db, token, sweep: sweepAll, idle: () => new Promise((r) => { const t = setInterval(() => { if (!running && !queue.length) { clearInterval(t); r(); } }, 50); }) };
   server.on('close', () => db.close());
   return server;
 }
@@ -271,7 +295,8 @@ module.exports = { createServer };
 if (require.main === module) {
   const dataDir = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
   const port = +process.env.PORT || 8080;
-  const server = createServer({ dataDir, staticDir: path.join(__dirname, '..'), token: process.env.ADMIN_TOKEN });
+  let server;
+  try { server = createServer({ dataDir, staticDir: path.join(__dirname, '..'), token: process.env.ADMIN_TOKEN }); } catch (e) { console.error(e.message); process.exit(1); }
   server.listen(port, process.env.HOST || '0.0.0.0', () => {
     console.log('roadview on :' + port + '  data: ' + dataDir);
     console.log('write token: ' + server.roadview.token + (process.env.ADMIN_TOKEN ? '' : '   (generated; stored in ' + path.join(dataDir, 'token') + ')'));

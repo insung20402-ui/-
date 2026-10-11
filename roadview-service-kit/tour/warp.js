@@ -86,14 +86,15 @@
   };
 
   // f in [0, 1]: 0 shows A, 1 shows B. fieldA bends A toward B, fieldB bends B back toward A.
-  Warper.prototype.render = function (A, B, fieldA, fieldB, f, pan) {
-    var gl = this.gl; pan = pan || [0, 0];
+  // gain in [0, 1] scales the bending, so a motion estimate that arrives late can be faded in instead of popping.
+  Warper.prototype.render = function (A, B, fieldA, fieldB, f, pan, gain) {
+    var gl = this.gl; pan = pan || [0, 0]; gain = gain === undefined ? 1 : gain;
     this.resize();
     gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
     if (f <= 0.0005 || !B) { this.layer(A, null, 0, 1, pan); return; }
     if (f >= 0.9995) { this.layer(B, null, 0, 1, pan); return; }
-    this.layer(A, fieldA, f, 1 - f, pan);
-    this.layer(B, fieldB, 1 - f, f, pan);
+    this.layer(A, fieldA, f * gain, 1 - f, pan);
+    this.layer(B, fieldB, (1 - f) * gain, f, pan);
   };
 
   Warper.prototype.destroy = function () { this.tex.forEach(function (t) { this.gl.deleteTexture(t); }, this); this.tex.clear(); };
