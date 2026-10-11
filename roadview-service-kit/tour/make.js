@@ -11,10 +11,10 @@
   function syncType() {
     var pan = type() === 'pan';
     $('angleBox').hidden = !pan; $('loopBox').hidden = !pan;
-    $('count').value = pan ? Math.min(150, Math.max(24, Math.round(duration * 8))) : Math.min(40, Math.max(6, Math.round(duration / 1.5)));
+    $('count').value = pan ? Math.min(150, Math.max(24, Math.round(duration * 8))) : Math.min(80, Math.max(8, Math.round(duration / 0.6)));
     $('tip').textContent = pan
       ? '돌려보기는 프레임이 많을수록 부드럽습니다(90~150장 권장). 천천히 일정한 속도로 돌며 찍은 영상이 좋습니다.'
-      : '걷기는 한 걸음에 한 프레임입니다. 영상 길이 1.5초당 한 장이 기본이고, 촘촘할수록 이동이 자연스럽지만 한 번에 이동하는 거리는 짧아집니다.';
+      : '걷기는 프레임 사이를 움직임에 맞춰 자동으로 이어 주므로 0.5~1초에 한 장이면 부드럽습니다. 프레임 사이가 너무 멀면(장면이 완전히 바뀌면) 이어 붙이기가 흐릿해집니다.';
   }
   document.querySelectorAll('input[name=type]').forEach(function (r) { r.onchange = syncType; });
 

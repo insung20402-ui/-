@@ -91,17 +91,18 @@
     base = base || './';
     if (base.slice(-1) !== '/') base += '/';
     return remote().then(function (isR) {
-      var jobs = [
-        isR ? fetch('/api/tours', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
-          return d.tours.map(function (m) {
-            return Object.assign({}, m, { source: 'server', url: function (i) { return m.base + pad(i) + '.jpg'; },
-              remove: function () { return authFetch('/api/tours/' + encodeURIComponent(m.id), { method: 'DELETE' }); } });
-          });
-        }).catch(function () { return []; }) : Promise.resolve([]),
-        idbDo('readonly', function (s) { return s.getAll(); }).then(function (all) { return (all || []).map(localTour); }, function () { return []; }),
-        isR && !explicit ? Promise.resolve([]) : staticTours(base)
-      ];
-      return Promise.all(jobs).then(function (r) { return [].concat(r[0], r[1], r[2]); });
+      var server = isR ? fetch('/api/tours', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+        return d.tours.map(function (m) {
+          return Object.assign({}, m, { source: 'server', url: function (i) { return m.base + pad(i) + '.jpg'; },
+            remove: function () { return authFetch('/api/tours/' + encodeURIComponent(m.id), { method: 'DELETE' }); } });
+        });
+      }).catch(function () { return []; }) : Promise.resolve([]);
+      var local = idbDo('readonly', function (s) { return s.getAll(); }).then(function (all) { return (all || []).map(localTour); }, function () { return []; });
+      return Promise.all([server, local]).then(function (r) {
+        // a static folder is tried without a server, when asked for (?src=), or when the server has no tours yet
+        var wantStatic = !isR || explicit || !r[0].length;
+        return (wantStatic ? staticTours(base) : Promise.resolve([])).then(function (st) { return [].concat(r[0], r[1], st); });
+      });
     });
   }
 

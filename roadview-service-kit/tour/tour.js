@@ -1,5 +1,10 @@
-// Tour player: "walk" tours step forward/back through frames shot while walking;
-// "pan" tours scrub through frames shot while turning on the spot.
+// Tour player: "walk" tours move through frames shot while walking, "pan" tours scrub through frames shot while
+// turning on the spot.
+//
+// Walking is continuous: the position is a real number between frames. Between two photos the player estimates the
+// motion (tour/flow.js), bends both photos along it and cross-fades (tour/warp.js), so a step is a glide instead of a
+// jump. Without WebGL, or when the page is opened from file:// (browsers refuse to read pixels of local images), it
+// falls back to a zoom cross-fade.
 (function (root) {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
@@ -8,6 +13,7 @@
   var idx = -1, front = 'b', panX = 0, pf = 0, vel = 0, auto = true, raf = null, walking = null, down = null, moved = false, pa = -1, pb = -1;
   var token = 0, hintTimer = 0;
   var cache = {};
+  var A = $('a'), B = $('b');
 
   function imgOf(url) { return cache[url] || (cache[url] = Object.assign(new Image(), { src: url })); }
   function hint(text, ms) {
@@ -39,9 +45,88 @@
     $('count').textContent = label;
   }
 
-  /* ---- walk ---- */
-  var A = $('a'), B = $('b');
-  function paint(src, dir) {            // cross-fade two layers with a small zoom: forward = push in
+  /* ================= walk ================= */
+  var gl = null, glFailed = false, wpos = 0, wtarget = 0, holding = 0, walkRaf = 0, lastT = 0;
+  var flows = {}, grays = {}, flowQueue = [], flowTimer = 0, canvas = null;
+
+  function ensureGL() {
+    if (gl || glFailed) return !!gl;
+    try {
+      canvas = document.createElement('canvas'); canvas.id = 'gl';
+      rv.insertBefore(canvas, rv.firstChild);
+      gl = new root.TourWarper(canvas);
+    } catch (e) { glFailed = true; gl = null; if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas); }
+    return !!gl;
+  }
+  function disableGL() {            // reading pixels was refused (file://) or the context died: use the CSS fallback
+    glFailed = true;
+    if (gl) { try { gl.destroy(); } catch (e) { /* ignore */ } }
+    gl = null; if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
+    cancelAnimationFrame(walkRaf); walkRaf = 0;
+    if (tour && tour.type === 'walk') { var at = Math.round(wpos); idx = -1; front = 'b'; goCss(at); }
+  }
+
+  // ---- motion estimates, computed in the background, nearest pairs first ----
+  var WORK_W = 256;
+  function grayOf(tourId, i) {
+    var key = tourId + ':' + i;
+    if (grays[key]) return grays[key];
+    var im = imgOf(tour.url(i)), w = WORK_W, h = Math.max(8, Math.round(w * im.naturalHeight / im.naturalWidth));
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    var x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0, w, h);
+    return (grays[key] = root.TourFlow.gray(x.getImageData(0, 0, w, h).data, w, h));
+  }
+  function computePair(t, i) {
+    var key = t.id + ':' + i;
+    if (flows[key]) return;
+    var a = grayOf(t.id, i), b = grayOf(t.id, i + 1);
+    var pr = root.TourFlow.estimatePair(a, b);
+    flows[key] = { A: root.TourWarper.field(pr.ab), B: root.TourWarper.field(pr.ba) };
+  }
+  function queuePairs(t, around) {
+    flowQueue = [];
+    for (var i = 0; i < t.count - 1; i++) flowQueue.push(i);
+    flowQueue.sort(function (p, q) { return Math.abs(p - around) - Math.abs(q - around); });
+    clearTimeout(flowTimer); pumpFlows(t, token);
+  }
+  function pumpFlows(t, tk) {
+    if (tk !== token || !flowQueue.length) return;
+    try { computePair(t, flowQueue.shift()); wake(); } catch (e) { disableGL(); return; }
+    flowTimer = setTimeout(function () { pumpFlows(t, tk); }, 0);
+  }
+
+  // ---- drawing ----
+  function drawWalk() {
+    var n = tour.count, p = Math.min(n - 1, Math.max(0, wpos)), i = Math.min(n - 2, Math.floor(p)), f = n > 1 ? p - i : 0;
+    if (n < 2) i = 0;
+    var fl = flows[tour.id + ':' + i];
+    var w = rv.clientWidth || 1, h = rv.clientHeight || 1;
+    try {
+      gl.render(imgOf(tour.url(i)), n > 1 ? imgOf(tour.url(i + 1)) : null, fl && fl.A, fl && fl.B, f, [panX / w, 0]);
+    } catch (e) { disableGL(); return; }
+    progress(n > 1 ? p / (n - 1) : 0, (Math.round(p) + 1) + '/' + n);
+    $('fwd').style.opacity = Math.round(wtarget) >= n - 1 && !holding ? 0.35 : 1;
+    $('bck').style.opacity = Math.round(wtarget) <= 0 && !holding ? 0.35 : 1;
+  }
+  function wake() { if (gl && tour && tour.type === 'walk' && !walkRaf) { lastT = 0; walkRaf = requestAnimationFrame(walkTick); } }
+  function walkTick(now) {
+    walkRaf = 0;
+    if (!gl || !tour || tour.type !== 'walk') return;
+    var dt = lastT ? Math.min(0.05, (now - lastT) / 1000) : 0.016; lastT = now;
+    var diff = wtarget - wpos;
+    if (Math.abs(diff) > 0.0008) {
+      var step = diff * (1 - Math.exp(-dt * 5.5));                    // ease toward the target
+      var cap = (holding ? (tour.count > 20 ? 4.5 : 1.8) : 6) * dt;    // frames per second while walking / settling
+      wpos += Math.abs(step) > cap ? Math.sign(step) * cap : step;
+      if (Math.abs(wtarget - wpos) < 0.0008) wpos = wtarget;
+    }
+    drawWalk();
+    idx = Math.round(wtarget);
+    if (Math.abs(wtarget - wpos) > 0.0008 || down) walkRaf = requestAnimationFrame(walkTick);
+  }
+
+  // ---- CSS fallback (same look as before) ----
+  function paint(src, dir) {
     var next = front === 'a' ? 'b' : 'a', n = $(next), f = $(front);
     n.src = src;
     n.style.transition = 'none';
@@ -52,20 +137,37 @@
     f.style.opacity = 0; f.style.transform = 'translateX(' + panX + 'px) scale(' + (dir > 0 ? 1.18 : 0.88) + ')';
     front = next;
   }
-  function go(dir) {
-    if (!tour || tour.type !== 'walk') return false;
-    var g = Math.max(0, Math.min(tour.count - 1, idx + dir));
+  function goCss(g) {
+    g = Math.max(0, Math.min(tour.count - 1, g));
+    var dir = g >= idx ? 1 : -1;
     if (g === idx) return false;
-    idx = g; paint(tour.url(g), dir);
+    idx = g; wpos = wtarget = g; paint(tour.url(g), dir);
     progress(tour.count > 1 ? g / (tour.count - 1) : 0, (g + 1) + '/' + tour.count);
-    $('fwd').style.opacity = g === tour.count - 1 ? 0.35 : 1;
-    $('bck').style.opacity = g === 0 ? 0.35 : 1;
+    $('fwd').style.opacity = g === tour.count - 1 ? 0.35 : 1; $('bck').style.opacity = g === 0 ? 0.35 : 1;
     return true;
   }
-  function stopWalk() { clearInterval(walking); walking = null; }
-  function startWalk(dir) { stopWalk(); go(dir); walking = setInterval(function () { if (!go(dir)) stopWalk(); }, tour && tour.count > 20 ? 450 : 800); }
 
-  /* ---- pan ---- */
+  // ---- stepping ----
+  function go(dir) {
+    if (!tour || tour.type !== 'walk') return false;
+    if (!gl) return goCss(idx + dir);
+    var cur = Math.round(wtarget), t = Math.max(0, Math.min(tour.count - 1, cur + dir));
+    if (t === cur) return false;
+    wtarget = t; idx = t; wake();
+    return true;
+  }
+  function stopWalk() {
+    clearInterval(walking); walking = null;
+    if (holding && gl) { wtarget = holding > 0 ? Math.ceil(wpos - 1e-6) : Math.floor(wpos + 1e-6); holding = 0; wake(); }
+    holding = 0;
+  }
+  function startWalk(dir) {
+    stopWalk();
+    if (gl) { holding = dir; wtarget = dir > 0 ? tour.count - 1 : 0; wake(); return; }       // glide while held
+    go(dir); walking = setInterval(function () { if (!go(dir)) stopWalk(); }, tour && tour.count > 20 ? 450 : 800);
+  }
+
+  /* ================= pan ================= */
   function wrap(x) { return tour.loop ? ((x % tour.count) + tour.count) % tour.count : Math.max(0, Math.min(tour.count - 1, x)); }
   function showPano() {                 // blend the two neighbouring frames so motion between frames is smooth too
     var x = wrap(pf), i = Math.floor(x), fr = x - i, j = tour.loop ? (i + 1) % tour.count : Math.min(i + 1, tour.count - 1);
@@ -89,13 +191,13 @@
   }
 
   var HINTS = {
-    walk: '바닥을 클릭하면 앞으로, 화면 아래쪽을 클릭하면 뒤로 · 드래그로 둘러보기 · 스크롤/방향키 이동',
+    walk: '바닥을 클릭하면 앞으로, 화면 아래쪽을 클릭하면 뒤로 · 화살표를 누르고 있으면 계속 걷습니다 · 드래그로 둘러보기',
     pan: '좌우로 드래그해서 돌려 보세요 (카메라가 돌아가는 방향 그대로 움직입니다)'
   };
 
   function select(t) {
     var tk = ++token;
-    stopWalk(); cancelAnimationFrame(raf); down = null; tour = null;
+    stopWalk(); cancelAnimationFrame(raf); cancelAnimationFrame(walkRaf); walkRaf = 0; clearTimeout(flowTimer); down = null; tour = null;
     $('place').textContent = t.title;
     document.querySelectorAll('#tabs .btn').forEach(function (b) { b.classList.toggle('on', b.dataset.id === t.id); });
     $('arrows').style.display = t.type === 'walk' ? '' : 'none';
@@ -108,19 +210,33 @@
     }).then(function () {
       if (tk !== token) return;
       tour = t; panX = 0;
-      hint(HINTS[t.type], 5000);
+      hint(HINTS[t.type], 6000);
       [A, B].forEach(function (e) { e.style.opacity = 0; e.style.transition = ''; e.style.transform = 'none'; });
-      if (t.type === 'walk') { idx = -1; front = 'b'; go(1); }
-      else { pf = 0; vel = 0; auto = true; pa = pb = -1; front = 'a'; raf = requestAnimationFrame(loop); }
+      if (canvas) canvas.style.display = t.type === 'walk' ? '' : 'none';
+      if (t.type === 'walk') {
+        idx = -1; front = 'b'; wpos = wtarget = 0; holding = 0;
+        if (t.count > 1 && ensureGL()) {
+          canvas.style.display = '';
+          try { computePair(t, 0); } catch (e) { disableGL(); }            // first pair now so the first step is already smooth
+        }
+        if (gl) {
+          idx = 0; wake(); drawWalk(); queuePairs(t, 0);
+          // a second texture upload on the next frame exposes cross-origin refusals early
+          requestAnimationFrame(function () { if (gl && tour === t) drawWalk(); });
+        } else {
+          goCss(0);
+          if (t.count > 1) hint(HINTS.walk + (/^https?:$/.test(location.protocol) ? '' : ' · 서버나 http로 열면 프레임 사이가 부드럽게 이어집니다'), 8000);
+        }
+      } else { pf = 0; vel = 0; auto = true; pa = pb = -1; front = 'a'; raf = requestAnimationFrame(loop); }
       try { var u = new URL(location.href); u.searchParams.set('tour', t.id); history.replaceState(null, '', u); } catch (e) { /* file:// */ }
     });
   }
 
-  /* ---- pointer / keys ---- */
+  /* ================= pointer / keys ================= */
   function zone(e) { var r = rv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top, w: r.width, h: r.height }; }
   function setPan(x) {
     var lim = rv.clientWidth * 0.05; panX = Math.max(-lim, Math.min(lim, x));
-    $(front).style.transform = 'translateX(' + panX + 'px) scale(1)';
+    if (gl) wake(); else $(front).style.transform = 'translateX(' + panX + 'px) scale(1)';
   }
   rv.addEventListener('pointerdown', function (e) {
     if (!tour || e.target.closest('.btn,.arr,#mini')) return;
@@ -173,8 +289,9 @@
   });
   function toggleFs() { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
   $('fs').onclick = toggleFs;
+  root.addEventListener('resize', function () { if (gl) wake(); });
 
-  /* ---- boot ---- */
+  /* ================= boot ================= */
   var params = new URLSearchParams(location.search);
   root.RVTours.loadAll(params.get('src') || './', !!params.get('src')).then(function (list) {
     tours = list;
@@ -187,7 +304,7 @@
     return select(tours.filter(function (t) { return t.id === want; })[0] || tours[0]);
   }).then(function () {
     root.TourApp = { tours: function () { return tours; }, tour: function () { return tour; }, select: select, go: go,
-      state: function () { return { idx: idx, pf: pf, auto: auto }; }, ready: true };
+      state: function () { return { idx: idx, pos: wpos, target: wtarget, pf: pf, auto: auto, smooth: !!gl, flows: Object.keys(flows).length }; }, ready: true };
     root.dispatchEvent(new Event('tour-ready'));
   });
 })(window);
