@@ -10,3 +10,5 @@
 실제 사진으로 쓰는 앱: `live/index.html` (Chrome에서 열기). 카카오맵을 바탕 지도로 쓰려면 `live/config.js`에 JavaScript 키를 넣거나 `live/index.html?kakao=키`로 연다. 카카오 로드뷰 자체의 사진 데이터는 쓸 수 없으므로 사진은 직접 올려야 한다.
 
 미니PC 서버로 띄우기: `docs/deploy-n100.md` (Docker Compose 한 번으로 실행).
+
+영상으로 만드는 투어 로드뷰: `tour/make.html`에서 영상을 올리면 프레임을 뽑아 `tour/index.html`에서 볼 수 있다. 서버 없이도 되고(이 브라우저에 저장, 또는 ZIP), 서버를 쓰면 `/api/tours`에 저장된다. 원본 형식(`tours.js` + `frames/<id>/NNN.jpg`)은 `tour/index.html?src=폴더/`로 연다.

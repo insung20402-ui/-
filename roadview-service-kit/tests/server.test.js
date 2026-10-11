@@ -136,3 +136,28 @@ test('delete removes the node, its images and its renders', { skip }, async () =
   assert.equal((await call('GET', '/api/blobs/s-red')).status, 404);
   assert.equal((await call('GET', '/pano/n-flat/2-high.jpg')).status, 404);
 });
+
+test('video tours: frames then manifest; unknown revs and missing frames are refused; frames are immutable', { skip }, async () => {
+  const frame = (c) => solid(320, 180, c);
+  assert.equal((await call('PUT', '/api/tours/school/frames/0?rev=r1', await frame([255, 0, 0]))).status, 401);
+  for (let i = 0; i < 3; i++) assert.equal((await call('PUT', `/api/tours/school/frames/${i}?rev=r1`, await frame([i * 80, 100, 50]), auth)).status, 200);
+  const bad = await call('PUT', '/api/tours/school', JSON.stringify({ title: '복도', type: 'walk', count: 4, rev: 'r1' }), auth);
+  assert.equal(bad.status, 400); assert.match(JSON.parse(bad.body).error, /missing frame 3/);
+  const ok = await call('PUT', '/api/tours/school', JSON.stringify({ title: '복도', type: 'pan', count: 3, rev: 'r1', angle: 200, loop: true }), auth);
+  assert.equal(ok.status, 200);
+  const man = JSON.parse(ok.body);
+  assert.deepEqual([man.type, man.count, man.angle, man.loop, man.base], ['pan', 3, 200, true, '/tours/school/r1/']);
+  const list = JSON.parse((await call('GET', '/api/tours')).body).tours;
+  assert.equal(list.length, 1);
+  const fr = await call('GET', '/tours/school/r1/001.jpg');
+  assert.equal(fr.status, 200); assert.match(fr.headers['cache-control'], /immutable/);
+  // replacing the tour with a new revision removes the old frames
+  for (let i = 0; i < 2; i++) await call('PUT', `/api/tours/school/frames/${i}?rev=r2`, await frame([9, 9, 9]), auth);
+  assert.equal((await call('PUT', '/api/tours/school', JSON.stringify({ title: '복도', type: 'walk', count: 2, rev: 'r2' }), auth)).status, 200);
+  assert.equal((await call('GET', '/tours/school/r1/001.jpg')).status, 404);
+  assert.equal((await call('GET', '/tours/school/r2/001.jpg')).status, 200);
+  assert.equal(JSON.parse((await call('GET', '/api/tours')).body).tours[0].type, 'walk');
+  assert.equal((await call('GET', '/tours/school/..%2f/000.jpg')).status, 404);
+  assert.equal((await call('DELETE', '/api/tours/school', null, auth)).status, 200);
+  assert.equal(JSON.parse((await call('GET', '/api/tours')).body).tours.length, 0);
+});

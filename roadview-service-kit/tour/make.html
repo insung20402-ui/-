@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>투어 만들기</title>
+<style>
+  :root{--bg:#f6f7f9;--surface:#fff;--text:#171a1f;--muted:#5c6672;--line:#dde2e8;--acc:#fee500;--ink:#191919;--danger:#d93025}
+  @media (prefers-color-scheme:dark){:root{--bg:#0f1216;--surface:#171b21;--text:#e7eaee;--muted:#9aa4b1;--line:#2a313a;--danger:#ff7b72}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Malgun Gothic",sans-serif}
+  main{max-width:760px;margin:0 auto;padding:28px 16px 80px}
+  h1{font-size:22px;margin:0 0 4px}
+  .muted{color:var(--muted)}
+  section{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px 0}
+  h2{font-size:15px;margin:0 0 10px}
+  label{display:block;margin:8px 0 2px;font-size:13px;color:var(--muted)}
+  input[type=text],input[type=number]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  button,.btn{font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;text-decoration:none;display:inline-block}
+  button.primary{background:var(--acc);border-color:var(--acc);color:var(--ink);font-weight:700}
+  button:disabled{opacity:.5;cursor:default}
+  button.danger{color:var(--danger)}
+  .choice{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .choice label{margin:0;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--text);font-size:14px}
+  .choice input{margin-right:6px}
+  .choice label:has(input:checked){border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+  .choice small{display:block;color:var(--muted)}
+  video{width:100%;max-height:300px;background:#000;border-radius:8px}
+  .bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:10px 0}
+  .bar i{display:block;height:100%;width:0;background:#3d82f6}
+  .strip{display:flex;gap:4px;overflow:auto;padding:4px 0}
+  .strip img{height:64px;border-radius:4px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .warn{background:#fde9c7;color:#5a3a00;border-radius:8px;padding:8px 12px;font-size:13px;margin:8px 0}
+  .ok{background:#d5f0dc;color:#14632d;border-radius:8px;padding:8px 12px;font-size:13px;margin:8px 0}
+  .list .item{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+  .list .item span:first-child{flex:1}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <h1>투어 만들기</h1>
+  <p class="muted">영상 한 편에서 프레임을 뽑아 로드뷰를 만듭니다. <a href="index.html">보러 가기</a></p>
+
+  <section>
+    <h2>1. 영상</h2>
+    <input id="file" type="file" accept="video/*">
+    <div id="vbox" hidden>
+      <video id="vid" controls playsinline></video>
+      <div class="grid">
+        <div><label>시작(초) <a href="#" id="setStart">현재 위치로</a></label><input id="start" type="number" min="0" step="0.1" value="0"></div>
+        <div><label>끝(초) <a href="#" id="setEnd">현재 위치로</a></label><input id="end" type="number" min="0" step="0.1"></div>
+      </div>
+      <div class="muted" id="vinfo"></div>
+    </div>
+  </section>
+
+  <section id="optBox" hidden>
+    <h2>2. 어떤 로드뷰로?</h2>
+    <div class="choice">
+      <label><input type="radio" name="type" value="walk" checked>걸으며 촬영한 영상<small>복도처럼 앞으로 걸어가는 영상. 앞뒤로 이동합니다</small></label>
+      <label><input type="radio" name="type" value="pan">제자리에서 돌며 촬영한 영상<small>방 한가운데서 천천히 한 바퀴. 좌우로 돌려 봅니다</small></label>
+    </div>
+    <div class="grid">
+      <div><label>이름</label><input id="title" type="text" placeholder="예: 1층 복도"></div>
+      <div><label>프레임 수</label><input id="count" type="number" min="2" max="300" value="12"></div>
+      <div id="angleBox" hidden><label>돌아간 각도(°)</label><input id="angle" type="number" min="10" max="720" value="360"></div>
+    </div>
+    <label id="loopBox" hidden style="color:var(--text)"><input type="checkbox" id="loop"> 한 바퀴 돌아 처음과 이어지는 영상 (끝에서 처음으로 부드럽게 이어집니다)</label>
+    <p class="muted" id="tip"></p>
+    <button class="primary" id="make">프레임 뽑기</button>
+    <div class="bar" id="bar" hidden><i></i></div>
+    <div id="msg" class="muted"></div>
+  </section>
+
+  <section id="outBox" hidden>
+    <h2>3. 확인하고 저장</h2>
+    <div class="strip" id="strip"></div>
+    <div id="privacy"></div>
+    <label style="color:var(--text)" id="confirmBox" hidden><input type="checkbox" id="confirm"> 얼굴, 명찰, 화면, 문서 등 개인정보가 찍히지 않은 것을 확인했습니다</label>
+    <div class="row" style="margin-top:10px">
+      <button class="primary" id="save" disabled>저장</button>
+      <button id="zip" disabled>ZIP으로 내려받기</button>
+      <span id="saveMsg" class="muted"></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>저장된 투어</h2>
+    <div class="list" id="list"><span class="muted">불러오는 중…</span></div>
+  </section>
+</main>
+<script src="../shared/privacy-blur.js"></script>
+<script src="../shared/zip.js"></script>
+<script src="../shared/video-frames.js"></script>
+<script src="data.js"></script>
+<script src="make.js"></script>
+</body>
+</html>

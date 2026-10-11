@@ -8,6 +8,11 @@
 //   PUT    /api/blobs/:shotId    (token)    -> raw image body; re-encoded, EXIF stripped
 //   GET    /api/blobs/:shotId
 //   GET    /pano/:id/:rev-:lod.jpg          -> pre-rendered equirect (lod = high | low)
+//   GET    /api/tours                       -> video tours [{ id, title, type, count, ext, rev, ... }]
+//   PUT    /api/tours/:id/frames/:n?rev=R (token) -> one frame (raw image; re-encoded, EXIF stripped)
+//   PUT    /api/tours/:id        (token)    -> publish manifest for rev R once all frames are there
+//   DELETE /api/tours/:id        (token)
+//   GET    /tours/:id/:rev/:n.jpg           -> a frame (immutable)
 // Everything else is served from the kit directory.
 const http = require('node:http');
 const fs = require('node:fs');
@@ -23,8 +28,8 @@ const MAX_BLOB = 60 * 1024 * 1024, MAX_JSON = 1024 * 1024, MAX_PIXELS = 120e6;
 
 function createServer(opts) {
   const dataDir = path.resolve(opts.dataDir), staticDir = path.resolve(opts.staticDir);
-  const blobDir = path.join(dataDir, 'blobs'), panoDir = path.join(dataDir, 'pano');
-  fs.mkdirSync(blobDir, { recursive: true }); fs.mkdirSync(panoDir, { recursive: true });
+  const blobDir = path.join(dataDir, 'blobs'), panoDir = path.join(dataDir, 'pano'), tourDir = path.join(dataDir, 'tours');
+  fs.mkdirSync(blobDir, { recursive: true }); fs.mkdirSync(panoDir, { recursive: true }); fs.mkdirSync(tourDir, { recursive: true });
   const db = openDb(path.join(dataDir, 'roadview.db'));
   const sharp = require('sharp');
 
@@ -106,6 +111,7 @@ function createServer(opts) {
 
   async function api(req, res, url) {
     const p = url.pathname, m = req.method;
+    let mm;
     if (p === '/api/health') return send(res, 200, { ok: true });
     if (p === '/api/nodes' && m === 'GET') return send(res, 200, db.list(), { 'Cache-Control': 'no-cache' });
     if (p === '/api/nodes/near' && m === 'GET') {
@@ -115,7 +121,6 @@ function createServer(opts) {
       const hits = db.near(lat, lon, dLat, dLon).map((n) => ({ n, d: G.distance({ lat, lon }, n) })).filter((x) => x.d <= r).sort((a, b) => a.d - b.d);
       return send(res, 200, hits.map((x) => Object.assign({ distance: x.d }, x.n)));
     }
-    let mm;
     if ((mm = /^\/api\/nodes\/([^/]+)$/.exec(p))) {
       const id = mm[1];
       if (!ID.test(id)) return send(res, 400, { error: 'bad id' });
@@ -155,6 +160,52 @@ function createServer(opts) {
         } catch (e) { return send(res, 415, { error: 'unsupported image: ' + e.message }); }
       }
     }
+
+    // ---- video tours: frames + manifest on disk, no database needed ----
+    if (p === '/api/tours' && m === 'GET') {
+      const list = fs.readdirSync(tourDir).map((id) => {
+        try { return JSON.parse(fs.readFileSync(path.join(tourDir, id, 'manifest.json'), 'utf8')); } catch (e) { return null; }
+      }).filter(Boolean).sort((a, b) => (a.order || 0) - (b.order || 0) || String(a.created).localeCompare(String(b.created)));
+      return send(res, 200, { tours: list }, { 'Cache-Control': 'no-cache' });
+    }
+    if ((mm = /^\/api\/tours\/([^/]+)\/frames\/(\d{1,4})$/.exec(p)) && m === 'PUT') {
+      const id = mm[1], n = +mm[2], rev = url.searchParams.get('rev') || '';
+      if (!ID.test(id) || !ID.test(rev)) return send(res, 400, { error: 'bad id or rev' });
+      if (!authed(req)) return send(res, 401, { error: 'token required' });
+      let buf; try { buf = await readBody(req, MAX_BLOB); } catch (e) { return send(res, e.status || 400, { error: e.message }); }
+      try {
+        const out = await sharp(buf, { limitInputPixels: MAX_PIXELS }).rotate().resize({ width: 1920, height: 1920, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 85 }).toBuffer({ resolveWithObject: true });
+        const dir = path.join(tourDir, id, rev); fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path.join(dir, String(n).padStart(3, '0') + '.jpg'), out.data);
+        return send(res, 200, { n, width: out.info.width, height: out.info.height });
+      } catch (e) { return send(res, 415, { error: 'unsupported image: ' + e.message }); }
+    }
+    if ((mm = /^\/api\/tours\/([^/]+)$/.exec(p))) {
+      const id = mm[1];
+      if (!ID.test(id)) return send(res, 400, { error: 'bad id' });
+      if (m === 'GET') {
+        try { return send(res, 200, JSON.parse(fs.readFileSync(path.join(tourDir, id, 'manifest.json'), 'utf8'))); } catch (e) { return send(res, 404, { error: 'not found' }); }
+      }
+      if (!authed(req)) return send(res, 401, { error: 'token required' });
+      if (m === 'PUT') {
+        let b; try { b = JSON.parse((await readBody(req, MAX_JSON)).toString('utf8')); } catch (e) { return send(res, e.status || 400, { error: 'bad json' }); }
+        const rev = String(b.rev || ''), count = b.count | 0;
+        if (!ID.test(rev) || count < 1 || count > 2000) return send(res, 400, { error: 'bad rev or count' });
+        for (let i = 0; i < count; i++) if (!fs.existsSync(path.join(tourDir, id, rev, String(i).padStart(3, '0') + '.jpg'))) return send(res, 400, { error: 'missing frame ' + i });
+        const prev = (() => { try { return JSON.parse(fs.readFileSync(path.join(tourDir, id, 'manifest.json'), 'utf8')); } catch (e) { return null; } })();
+        const man = { id, title: String(b.title || id).slice(0, 80), type: b.type === 'pan' ? 'pan' : 'walk', count, ext: 'jpg', rev,
+          angle: Math.max(10, Math.min(720, +b.angle || 360)), loop: !!b.loop, order: prev ? prev.order : Date.now(),
+          created: prev ? prev.created : new Date().toISOString(), base: '/tours/' + id + '/' + rev + '/' };
+        fs.writeFileSync(path.join(tourDir, id, 'manifest.json'), JSON.stringify(man));
+        fs.readdirSync(path.join(tourDir, id)).forEach((d) => { if (d !== rev && d !== 'manifest.json') fs.rmSync(path.join(tourDir, id, d), { recursive: true, force: true }); });
+        return send(res, 200, man);
+      }
+      if (m === 'DELETE') { fs.rmSync(path.join(tourDir, id), { recursive: true, force: true }); return send(res, 200, { ok: true }); }
+    }
+    if ((mm = /^\/tours\/([^/]+)\/([^/]+)\/(\d{3})\.jpg$/.exec(p)) && m === 'GET') {
+      const file = path.join(tourDir, mm[1], mm[2], mm[3] + '.jpg');
+      return ID.test(mm[1]) && ID.test(mm[2]) && fs.existsSync(file) ? send(res, 200, fs.readFileSync(file), Object.assign({ 'Content-Type': 'image/jpeg' }, IMMUTABLE)) : send(res, 404, { error: 'not found' });
+    }
     if ((mm = /^\/pano\/([^/]+)\/(\d+)-(high|low)\.jpg$/.exec(p)) && m === 'GET') {
       const file = path.join(panoDir, mm[1], mm[2] + '-' + mm[3] + '.jpg');
       return ID.test(mm[1]) && fs.existsSync(file) ? send(res, 200, fs.readFileSync(file), Object.assign({ 'Content-Type': 'image/jpeg' }, IMMUTABLE)) : send(res, 404, { error: 'not rendered' });
@@ -177,7 +228,7 @@ function createServer(opts) {
   const server = http.createServer((req, res) => {
     let url; try { url = new URL(req.url, 'http://x'); } catch (e) { return send(res, 400, 'bad url'); }
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    const run = url.pathname.startsWith('/api/') || url.pathname.startsWith('/pano/') ? api(req, res, url) : (req.method === 'GET' || req.method === 'HEAD' ? serveStatic(req, res, url) : send(res, 405, 'method not allowed'));
+    const run = url.pathname.startsWith('/api/') || url.pathname.startsWith('/pano/') || url.pathname.startsWith('/tours/') ? api(req, res, url) : (req.method === 'GET' || req.method === 'HEAD' ? serveStatic(req, res, url) : send(res, 405, 'method not allowed'));
     if (run && run.catch) run.catch((e) => { console.error(e); if (!res.headersSent) send(res, 500, { error: 'server error' }); });
   });
   server.roadview = { db, token, idle: () => new Promise((r) => { const t = setInterval(() => { if (!running && !queue.length) { clearInterval(t); r(); } }, 50); }) };
