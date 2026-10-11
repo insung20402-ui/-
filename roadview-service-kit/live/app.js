@@ -47,6 +47,7 @@
     var inp = $('eqHead');
     if (inp) inp.onchange = function () {
       eq.heading = G.norm360(parseFloat(inp.value) || 0);
+      node.heading = eq.heading;
       S.updateNode(node); root.RVPano.forget(node.id); viewer.refresh();
     };
     $('bDel').onclick = function () { removeNode(node); };
@@ -144,14 +145,26 @@
 
   // Build capture points from staged items. `place` supplies positions for photos without GPS.
   function plan(items, place) {
-    var withGps = items.filter(function (i) { return i.gps; }).map(function (i) { return { it: i, kind: i.kind, gps: i.gps }; });
-    var c = G.cluster(withGps, 5), points = [];
+    var withGps = items.filter(function (i) { return i.gps; }).map(function (i) { return { it: i, kind: i.kind, gps: i.gps, heading: i.heading }; });
+    var c = G.cluster(withGps, 5), points = [], taken = [];
     c.groups.forEach(function (g) {
-      points.push({ lat: g.lat, lon: g.lon, items: g.photos.map(function (p) { return p.it; }), travel: null });
+      // two 360° shots at the very same coordinates would be unreachable from each other
+      var lat = g.lat, lon = g.lon, k = 0;
+      while (taken.some(function (t) { return G.distance(t, { lat: lat, lon: lon }) < 1; })) {
+        var o = G.offset(g, 90, 3 * ++k); lat = o.lat; lon = o.lon;
+      }
+      taken.push({ lat: lat, lon: lon });
+      points.push({ lat: lat, lon: lon, items: g.photos.map(function (p) { return p.it; }), travel: null });
     });
     var rest = items.filter(function (i) { return !i.gps; });
     if (rest.length && place) {
-      if (place.mode === 'spot') points.push({ lat: place.points[0].lat, lon: place.points[0].lon, items: rest, travel: null });
+      if (place.mode === 'spot') {
+        // one point per 360° shot (a node holds one sphere); ordinary photos share the first point
+        var eqs = rest.filter(function (i) { return i.kind === 'equirect'; }), flatsRest = rest.filter(function (i) { return i.kind !== 'equirect'; });
+        var groups = eqs.map(function (e, i) { return { pos: G.offset(place.points[0], 90, 3 * i), items: [e] }; });
+        if (flatsRest.length) { if (groups.length) groups[0].items = groups[0].items.concat(flatsRest); else groups.push({ pos: place.points[0], items: flatsRest }); }
+        groups.forEach(function (g) { points.push({ lat: g.pos.lat, lon: g.pos.lon, items: g.items, travel: null }); });
+      }
       else {
         var sorted = rest.slice().sort(function (a, b) { return a.name < b.name ? -1 : a.name > b.name ? 1 : 0; });
         G.interpolate(place.points[0], place.points[1], sorted.length).forEach(function (p, i) {
@@ -229,6 +242,7 @@
     }
     function show() { $('bannerText').textContent = text(); $('banner').style.display = 'flex'; map.setMarkers(pts.map(function (p, i) { return { lat: p.lat, lon: p.lon, label: need === 1 ? '' : String(i + 1) }; })); }
     pickFlow.click = function (lat, lon) {
+      if (pts.length && G.distance(pts[0], { lat: lat, lon: lon }) < 3) { toast('시작점과 3m 이상 떨어진 곳을 클릭하세요.'); return; }
       pts.push({ lat: lat, lon: lon });
       if (pts.length < need) { show(); return; }
       finish();

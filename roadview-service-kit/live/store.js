@@ -75,11 +75,18 @@
   }
 
   // decoded image for a shot (cached)
+  // Decoded bitmaps are big (a 2560x1920 photo is ~20 MB), so only the most recent are kept.
+  var IMAGE_LIMIT = 16;
   function getImage(shotId) {
-    if (images[shotId]) return images[shotId];
+    if (images[shotId]) {
+      var hit = images[shotId]; delete images[shotId]; images[shotId] = hit;   // refresh recency
+      return hit;
+    }
     var b = blobs[shotId];
     if (!b) return Promise.reject(new Error('missing image ' + shotId));
     images[shotId] = createImageBitmap(b);
+    var ids = Object.keys(images);
+    if (ids.length > IMAGE_LIMIT) delete images[ids[0]];
     return images[shotId];
   }
 

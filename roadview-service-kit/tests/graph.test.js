@@ -67,3 +67,12 @@ test('exif: GPS position, direction and focal length survive a round trip', () =
   assert.ok(Math.abs(e.gps.lat - 37.5665) < 1e-4 && Math.abs(e.gps.lon + 126.978) < 1e-4);
   assert.ok(Math.abs(e.gps.heading - 123.4) < 0.01);
 });
+
+test('cluster: a drive (same heading every few metres) stays separate nodes; a walk-around (different headings) merges', () => {
+  const drive = [0, 3, 6].map((m) => ({ kind: 'flat', gps: G.offset(A, 90, m), heading: 90 }));
+  assert.equal(G.cluster(drive, 5).groups.length, 3);
+  const around = [0, 90, 180, 270].map((h) => ({ kind: 'flat', gps: G.offset(A, 90, 1), heading: h }));
+  assert.equal(G.cluster(around, 5).groups.length, 1);
+  const unknown = [0, 1].map(() => ({ kind: 'flat', gps: A }));
+  assert.equal(G.cluster(unknown, 5).groups.length, 1);
+});

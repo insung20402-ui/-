@@ -64,7 +64,8 @@
   // Blend one photo into `dst` (RGBA, W x W/2). `src` is RGBA iw x ih.
   // shot: { heading, hfov, pitch?, roll? }. Edges are feathered so overlapping
   // shots and the synthetic backdrop meet without a hard seam.
-  function reprojectInto(dst, W, src, iw, ih, shot, cov) {
+  // rows (optional): [from, to) restricts the work to a band so callers can yield between bands.
+  function reprojectInto(dst, W, src, iw, ih, shot, cov, rows) {
     var H = W / 2, ppd = W / 360;
     var b = basis(shot.heading, shot.pitch || 0, shot.roll || 0);
     var fp = focalPx(iw, shot.hfov), k1 = shot.k1 || 0, k2 = shot.k2 || 0, rmax2 = maxR2(k1, k2);
@@ -85,6 +86,7 @@
     var ncols = full ? W : Math.min(W, Math.ceil(span * 2 * ppd) + 2);
     var y0 = Math.max(0, Math.floor((90 - Math.min(90, tilt + radius)) * ppd));
     var y1 = Math.min(H - 1, Math.ceil((90 - Math.max(-90, tilt - radius)) * ppd));
+    if (rows) { y0 = Math.max(y0, rows[0]); y1 = Math.min(y1, rows[1] - 1); }
 
     for (var j = y0; j <= y1; j++) {
       var pitch = (90 - (j + 0.5) / ppd) * D2R, cp = Math.cos(pitch), sp = Math.sin(pitch);
@@ -120,12 +122,8 @@
     }
   }
 
-  // Soft environment around the photos. Photos are composited at ~1 px/deg, then every
-  // uncovered pixel is filled by push-pull diffusion of the surrounding photo colours
-  // (so buildings bleed into soft colour instead of a flat sky/ground gradient), and the
-  // result is upsampled into `dst` (RGBA, W x W/2). items: [{ src, iw, ih, shot }].
-  function smartBackdrop(dst, W, items) {
-    var wl = 384, hl = 192, n = wl * hl;
+  function lowResFill(items, wl, hl) {
+    var n = wl * hl;
     var P = new Float32Array(n * 3), cov = new Float32Array(n);
     var buf = new Uint8ClampedArray(n * 4), cv = new Float32Array(n);
     items.forEach(function (it) {
@@ -180,9 +178,20 @@
         C[o2 * 3 + 2] = C[o2 * 3 + 2] * cw + r[2] * (1 - cw);
       }
     }
+    return col;
+  }
+
+  // Soft environment around the photos. Photos are composited at ~1 px/deg, then every
+  // uncovered pixel is filled by push-pull diffusion of the surrounding photo colours
+  // (so buildings bleed into soft colour instead of a flat sky/ground gradient), and the
+  // result is upsampled into `dst` (RGBA, W x W/2). items: [{ src, iw, ih, shot }].
+  function smartBackdrop(dst, W, items, state, rows) {
+    state = state || {};
+    var wl = 384, hl = 192;
+    if (!state.col) state.col = lowResFill(items, wl, hl);
+    var base = state.col[0], H = W / 2, r0 = rows ? rows[0] : 0, r1 = rows ? Math.min(H, rows[1]) : H;
     // bilinear upsample (wrapping in longitude) into dst
-    var base = col[0], H = W / 2;
-    for (var j = 0; j < H; j++) {
+    for (var j = r0; j < r1; j++) {
       var sy = (j + 0.5) / H * hl - 0.5, yA = Math.max(0, Math.min(hl - 1, Math.floor(sy))), yB = Math.min(hl - 1, yA + 1), ty2 = Math.max(0, Math.min(1, sy - yA));
       for (var i2 = 0; i2 < W; i2++) {
         var sx = (i2 + 0.5) / W * wl - 0.5, xA = Math.floor(sx), tx2 = sx - xA;

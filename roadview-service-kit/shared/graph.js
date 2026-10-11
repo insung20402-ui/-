@@ -70,15 +70,19 @@
 
   // Group photos that have GPS into capture points. Full 360° photos are always their
   // own point; ordinary photos taken within `clusterM` of each other are one point
-  // (a walk-around shoot of the same spot). Photos without GPS come back as `unplaced`.
+  // (a walk-around shoot of the same spot, told apart from a drive by heading). Photos without GPS come back as `unplaced`.
   function cluster(photos, clusterM) {
     clusterM = clusterM === undefined ? 5 : clusterM;
     var groups = [], unplaced = [];
     photos.forEach(function (p) {
       if (!p.gps) { unplaced.push(p); return; }
       if (p.kind !== 'flat') { groups.push({ lat: p.gps.lat, lon: p.gps.lon, photos: [p] }); return; }
+      // same spot AND a different viewing direction => one walk-around shoot. Photos that face
+      // the same way within a few metres are consecutive frames of a drive, not one spot.
       var g = groups.filter(function (x) {
-        return x.photos[0].kind === 'flat' && distance(x, p.gps) <= clusterM;
+        if (x.photos[0].kind !== 'flat' || distance(x, p.gps) > clusterM) return false;
+        if (p.heading === undefined || p.heading === null) return true;
+        return x.photos.every(function (q) { return q.heading === undefined || q.heading === null || angDiff(q.heading, p.heading) >= 25; });
       })[0];
       if (g) {
         g.photos.push(p);

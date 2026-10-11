@@ -16,6 +16,16 @@
     return { ctx: x, data: x.getImageData(0, 0, c.width, c.height).data, w: c.width, h: c.height, canvas: c };
   }
 
+  // yield to the event loop so a high-resolution build never freezes dragging/clicks
+  var chan = typeof MessageChannel !== 'undefined' ? new MessageChannel() : null, waiters = [];
+  if (chan) chan.port1.onmessage = function () { var w = waiters.shift(); if (w) w(); };
+  function tick() { return new Promise(function (r) { if (chan) { waiters.push(r); chan.port2.postMessage(0); } else setTimeout(r, 0); }); }
+  function inBands(H, step, fn) {
+    var chain = Promise.resolve();
+    for (var a = 0; a < H; a += step) (function (a) { chain = chain.then(function () { fn([a, a + step]); return tick(); }); })(a);
+    return chain;
+  }
+
   function build(node, W) {
     var H = W / 2, ppd = W / 360;
     var canvas = document.createElement('canvas');
@@ -45,10 +55,12 @@
         return { src: t.getContext('2d').getImageData(0, 0, t.width, t.height).data, iw: t.width, ih: t.height,
           shot: { heading: s.heading || 0, hfov: hfov, pitch: s.pitch || 0, roll: s.roll || 0, k1: s.k1 || 0, k2: s.k2 || 0, feather: 0.12 } };
       });
-      if (eqIdx < 0) RP.smartBackdrop(out.data, W, items);      // soft continuation of the photos, not scenery
-      items.forEach(function (it) { RP.reprojectInto(out.data, W, it.src, it.iw, it.ih, it.shot); });
-      ctx.putImageData(out, 0, 0);
-      return canvas;
+      var band = Math.max(16, Math.round(H / 24)), st = {};
+      var p = eqIdx < 0 ? inBands(H, band, function (rows) { RP.smartBackdrop(out.data, W, items, st, rows); }) : Promise.resolve();
+      items.forEach(function (it) {
+        p = p.then(function () { return inBands(H, band, function (rows) { RP.reprojectInto(out.data, W, it.src, it.iw, it.ih, it.shot, null, rows); }); });
+      });
+      return p.then(function () { ctx.putImageData(out, 0, 0); return canvas; });
     });
   }
 
