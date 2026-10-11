@@ -1,0 +1,10 @@
+{
+  "name": "roadview-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Storage + pre-render server for the roadview kit (runs on a small box such as an N100 mini PC)",
+  "main": "index.js",
+  "scripts": { "start": "node index.js" },
+  "engines": { "node": ">=22.13" },
+  "dependencies": { "sharp": "^0.33.5" }
+}

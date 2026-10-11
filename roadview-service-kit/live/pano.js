@@ -65,13 +65,31 @@
   }
 
   function key(node) {
-    return node.id + '|' + node.shots.map(function (s) { return [s.id, s.heading, s.hfov, s.pitch, s.roll, s.k1].join(','); }).join(';');
+    return node.id + '|' + (serverUrl(node, 'high') ? 'srv' + node.rev : '') + '|' + node.shots.map(function (s) { return [s.id, s.heading, s.hfov, s.pitch, s.roll, s.k1].join(','); }).join(';');
+  }
+  // server-rendered equirect (see server/render-worker.js), when it is current for this revision
+  function serverUrl(node, lod) {
+    var r = node.render;
+    return root.RVStore.isRemote() && r && r.status === 'done' && r.rev === node.rev
+      ? '/pano/' + encodeURIComponent(node.id) + '/' + node.rev + '-' + lod + '.jpg' : null;
+  }
+  function fromServer(url) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.onload = function () {
+        var c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext('2d').drawImage(img, 0, 0); resolve(c);
+      };
+      img.onerror = function () { reject(new Error('pano load failed')); };
+      img.src = url;
+    });
   }
   function get(node, lod) {
     lod = lod === 'high' ? 'high' : 'low';
     var k = key(node), c = cache[lod], hit = c.get(k);
     if (hit) { c.delete(k); c.set(k, hit); return hit; }
-    var p = build(node, LOD[lod]);
+    var su = serverUrl(node, lod === 'high' ? 'high' : 'low');
+    var p = su ? fromServer(su).catch(function () { return build(node, LOD[lod]); }) : build(node, LOD[lod]);
     c.set(k, p);
     p.catch(function () { c.delete(k); });
     if (c.size > LIMIT[lod]) c.delete(c.keys().next().value);

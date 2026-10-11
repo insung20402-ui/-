@@ -1,0 +1,15 @@
+# docker compose up -d --build
+# 처음 한 번:  mkdir -p data && cp .env.example .env   (그리고 .env의 ADMIN_TOKEN을 바꾼다)
+services:
+  roadview:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?.env 파일에 ADMIN_TOKEN을 적으세요}
+      DATA_DIR: /data
+    user: "${PUID:-1000}:${PGID:-1000}"
+    volumes:
+      - ./data:/data
+    mem_limit: 2g

@@ -304,6 +304,12 @@
     map.onNodeClick(function (id) { if (!pickFlow) go(id); });
     rebuild();
     if (nodes().length) { map.fit(); go(nodes()[0].id); }
+    S.onRender(function (n) {
+      // the server finished the high-quality pano: swap it in if the user is looking at that node
+      root.RVPano.forget(n.id);
+      if (current === n.id && viewer) viewer.refresh();
+    });
+    if (S.isRemote()) document.title += ' (서버)';
     if (!S.isPersistent()) toast('이 브라우저는 저장을 막고 있어 새로고침하면 사진이 사라집니다.', 5000);
     root.RVApp = { viewer: viewer, map: map, go: go, stage: stage, commit: commit, nodes: nodes, links: function () { return links; }, staged: function () { return staged; } };
     root.dispatchEvent(new Event('rvapp-ready'));
