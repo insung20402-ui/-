@@ -1,0 +1,309 @@
+<meta charset="utf-8">
+<title>교내 복도 로드뷰</title>
+<style>
+/* Layout: full-bleed photo stage, overlay chrome — top place bar, bottom-left minimap, bottom filmstrip. Single dark viewer look by design. */
+:root {
+  --bg: #0d1117;
+  --chrome: rgba(16, 20, 27, 0.82);
+  --line: rgba(255, 255, 255, 0.14);
+  --fg: #f2f4f7;
+  --muted: #9aa4b2;
+  --accent: #2f80ff;
+  --accent-soft: rgba(47, 128, 255, 0.28);
+  --route: #a8c64a;
+  --font-ui: "Pretendard", "Noto Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-ui); overflow: hidden; user-select: none; -webkit-user-select: none; }
+
+.stage { position: fixed; inset: 0; overflow: hidden; cursor: grab; touch-action: none; background: var(--bg); }
+.stage.dragging { cursor: grabbing; }
+.frame { position: absolute; inset: 0; will-change: transform, opacity; }
+.frame img { position: absolute; left: 50%; top: 50%; max-width: none; pointer-events: none; transform-origin: center; }
+
+/* floor arrows */
+.hot { position: absolute; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 6px; background: none; border: 0; padding: 0; cursor: pointer; color: var(--fg); font: inherit; z-index: 5; }
+.hot svg { width: 108px; height: 70px; filter: drop-shadow(0 4px 10px rgba(0,0,0,.45)); transition: transform .18s ease; transform: perspective(240px) rotateX(48deg); }
+.hot:hover svg, .hot:focus-visible svg { transform: perspective(240px) rotateX(48deg) scale(1.12); }
+.hot:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; border-radius: 8px; }
+.hot .tag { font-size: 12px; font-weight: 600; letter-spacing: .02em; background: var(--chrome); border: 1px solid var(--line); padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.hot .chev { fill: rgba(255,255,255,.92); stroke: rgba(0,0,0,.25); stroke-width: 1.5; }
+.hot:hover .chev { fill: #fff; }
+.hot.back svg { transform: perspective(240px) rotateX(48deg) rotate(180deg); width: 80px; height: 52px; opacity: .8; }
+.hot.back:hover svg { transform: perspective(240px) rotateX(48deg) rotate(180deg) scale(1.12); opacity: 1; }
+
+/* top bar */
+.top { position: fixed; top: 0; left: 0; right: 0; z-index: 10; padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px; display: flex; align-items: center; gap: 12px; background: linear-gradient(var(--chrome), rgba(16,20,27,0)); pointer-events: none; }
+.top > * { pointer-events: auto; }
+.badge { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-weight: 700; font-family: var(--font-num); font-size: 14px; }
+.place { min-width: 0; }
+.place h1 { margin: 0; font-size: 17px; font-weight: 700; text-wrap: balance; }
+.place p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+.top .spacer { flex: 1; }
+.iconbtn { flex: none; height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--chrome); color: var(--fg); font: inherit; font-size: 13px; cursor: pointer; }
+.iconbtn:hover { border-color: var(--accent); }
+.iconbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* minimap */
+.mini { position: fixed; left: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); z-index: 10; width: 200px; background: var(--chrome); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; backdrop-filter: blur(6px); }
+.mini header { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; font-size: 11px; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--line); }
+.mini header b { color: var(--fg); font-family: var(--font-num); font-weight: 500; letter-spacing: 0; }
+.mini svg { display: block; width: 100%; height: auto; }
+.mini .node { cursor: pointer; }
+
+/* filmstrip */
+.strip { position: fixed; right: 16px; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); z-index: 10; display: flex; gap: 6px; padding: 6px; background: var(--chrome); border: 1px solid var(--line); border-radius: 10px; max-width: calc(100% - 248px); overflow-x: auto; }
+.thumb { position: relative; flex: none; width: 84px; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; border: 2px solid transparent; padding: 0; background: var(--bg); cursor: pointer; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .65; transition: opacity .15s; }
+.thumb span { position: absolute; left: 4px; top: 3px; font-family: var(--font-num); font-size: 10px; text-shadow: 0 1px 2px #000; color: var(--fg); }
+.thumb:hover img { opacity: 1; }
+.thumb[aria-current="true"] { border-color: var(--accent); }
+.thumb[aria-current="true"] img { opacity: 1; }
+.thumb:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.hint { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 70px); transform: translateX(-50%); z-index: 9; font-size: 12px; color: var(--muted); background: var(--chrome); border: 1px solid var(--line); padding: 5px 12px; border-radius: 999px; transition: opacity .6s; white-space: nowrap; }
+.hint.gone { opacity: 0; }
+
+@media (max-width: 640px) {
+  .mini { width: 140px; }
+  .strip { left: 16px; right: 16px; max-width: none; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); }
+  .mini { bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); }
+  .thumb { width: 64px; }
+  .hot svg { width: 84px; height: 56px; }
+  .hint { display: none; }
+  .iconbtn.fs { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .frame { transition: none !important; } }
+</style>
+
+<div class="stage" id="stage" aria-label="로드뷰 화면"></div>
+
+<div class="top">
+  <div class="badge" id="badge">1</div>
+  <div class="place">
+    <h1 id="title">복도 출입구</h1>
+    <p id="sub">학교 복도 · 1 / 5</p>
+  </div>
+  <div class="spacer"></div>
+  <button class="iconbtn" id="reset" type="button">시점 초기화</button>
+  <button class="iconbtn fs" id="fs" type="button">전체화면</button>
+</div>
+
+<div class="hint" id="hint">드래그로 둘러보고, 바닥 화살표를 눌러 이동 · 키보드 ↑ ↓ ← →</div>
+
+<aside class="mini" aria-label="위치 지도">
+  <header><span>현재 위치</span><b id="heading">N 0°</b></header>
+  <svg id="map" viewBox="0 0 200 150" role="img" aria-label="복도 경로 지도"></svg>
+</aside>
+
+<nav class="strip" id="strip" aria-label="지점 목록"></nav>
+
+<script>
+// 각 지점: 사진, 이름, 지도 좌표, 바라보는 방향(도), 전진 화살표 위치(사진 기준 %)
+const SPOTS = [
+  { src: "frames/01.webp", name: "복도 출입구", note: "방화문을 지나 복도로 진입", map: [30, 128], heading: 0,  fwd: { x: 46, y: 80, label: "복도로 진입" } },
+  { src: "frames/02.webp", name: "중앙 복도", note: "창가 쪽 손잡이를 따라 직진", map: [30, 98],  heading: 0,  fwd: { x: 50, y: 72, label: "직진" } },
+  { src: "frames/03.webp", name: "복도 중간", note: "양쪽 창문 구간", map: [30, 68],  heading: 0,  fwd: { x: 49, y: 70, label: "직진" } },
+  { src: "frames/04.webp", name: "복도 끝 출입문 앞", note: "왼쪽 회색 문 너머 계단실", map: [30, 38],  heading: 0,  fwd: { x: 33, y: 68, label: "계단실로" } },
+  { src: "frames/05.webp", name: "계단실", note: "위층·아래층 연결 계단", map: [70, 22],  heading: 90, fwd: null },
+];
+const PLACE = "학교 복도";
+const ZOOM = 1.18;           // 드래그로 둘러볼 여유를 주는 확대율
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const stage = document.getElementById("stage");
+const $ = id => document.getElementById(id);
+let cur = 0, busy = false, pan = { x: 0, y: 0 };
+let frameEl = null;
+
+// preload
+SPOTS.forEach(s => { const i = new Image(); i.src = s.src; });
+
+function chevron() {
+  return `<svg viewBox="0 0 108 70" aria-hidden="true"><path class="chev" d="M54 4 L104 52 L82 66 L54 38 L26 66 L4 52 Z"/></svg>`;
+}
+
+function fit(img) {
+  const W = stage.clientWidth, H = stage.clientHeight;
+  const iw = img.naturalWidth || 1600, ih = img.naturalHeight || 900;
+  const s = Math.max(W / iw, H / ih) * ZOOM;
+  return { w: iw * s, h: ih * s, W, H };
+}
+
+function clampPan(f) {
+  const mx = (f.w - f.W) / 2, my = (f.h - f.H) / 2;
+  pan.x = Math.max(-mx, Math.min(mx, pan.x));
+  pan.y = Math.max(-my, Math.min(my, pan.y));
+}
+
+function layout(el) {
+  const img = el.querySelector("img");
+  const f = fit(img);
+  clampPan(f);
+  img.style.width = f.w + "px";
+  img.style.height = f.h + "px";
+  img.style.transform = `translate(calc(-50% + ${pan.x}px), calc(-50% + ${pan.y}px))`;
+  // 핫스팟을 사진 좌표에 맞춰 배치
+  const left = f.W / 2 - f.w / 2 + pan.x, top = f.H / 2 - f.h / 2 + pan.y;
+  el.querySelectorAll(".hot").forEach(h => {
+    const px = +h.dataset.x, py = +h.dataset.y;
+    const backY = f.H - (innerWidth <= 640 ? 120 : 60);
+    let x = left + f.w * px / 100, y = Math.min(top + f.h * py / 100, backY - (innerWidth <= 640 ? 200 : 120));
+    x = Math.max(70, Math.min(f.W - 70, x));
+    if (h.classList.contains("back")) { x = f.W / 2; y = backY; }
+    h.style.left = x + "px"; h.style.top = y + "px";
+  });
+}
+
+function buildFrame(i) {
+  const s = SPOTS[i];
+  const el = document.createElement("div");
+  el.className = "frame";
+  el.innerHTML = `<img alt="${s.name}" src="${s.src}" draggable="false">`;
+  if (s.fwd) {
+    const b = document.createElement("button");
+    b.className = "hot"; b.type = "button";
+    b.dataset.x = s.fwd.x; b.dataset.y = s.fwd.y;
+    b.innerHTML = chevron() + `<span class="tag">${s.fwd.label}</span>`;
+    b.setAttribute("aria-label", `${s.fwd.label}: ${SPOTS[i + 1].name}로 이동`);
+    b.addEventListener("click", e => { e.stopPropagation(); go(i + 1); });
+    el.appendChild(b);
+  }
+  if (i > 0) {
+    const b = document.createElement("button");
+    b.className = "hot back"; b.type = "button";
+    b.dataset.x = 50; b.dataset.y = 95;
+    b.innerHTML = chevron() + `<span class="tag">뒤로</span>`;
+    b.setAttribute("aria-label", `뒤로: ${SPOTS[i - 1].name}로 이동`);
+    b.addEventListener("click", e => { e.stopPropagation(); go(i - 1); });
+    el.appendChild(b);
+  }
+  const img = el.querySelector("img");
+  img.addEventListener("load", () => layout(el));
+  return el;
+}
+
+function go(next) {
+  if (busy || next < 0 || next >= SPOTS.length || next === cur) return;
+  const forward = next > cur;
+  const old = frameEl;
+  pan = { x: 0, y: 0 };
+  const el = buildFrame(next);
+  const dur = reduce ? 0 : 650;
+  el.style.opacity = "0";
+  el.style.transform = forward ? "scale(.92)" : "scale(1.25)";
+  stage.appendChild(el);
+  layout(el);
+  busy = true;
+  // 바라보는 지점 방향으로 걸어 들어가는 효과
+  if (old && forward) {
+    const fwd = SPOTS[cur].fwd;
+    old.style.transformOrigin = fwd ? `${fwd.x}% ${fwd.y - 15}%` : "50% 50%";
+  }
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const ease = `${dur}ms cubic-bezier(.4,.1,.2,1)`;
+    el.style.transition = `opacity ${ease}, transform ${ease}`;
+    el.style.opacity = "1"; el.style.transform = "scale(1)";
+    if (old) {
+      old.style.transition = `opacity ${ease}, transform ${ease}`;
+      old.style.opacity = "0";
+      old.style.transform = forward ? "scale(1.6)" : "scale(.85)";
+      old.querySelectorAll(".hot").forEach(h => h.style.visibility = "hidden");
+    }
+  }));
+  setTimeout(() => { old && old.remove(); el.style.transition = ""; busy = false; }, dur + 30);
+  frameEl = el; cur = next;
+  update();
+}
+
+function update() {
+  const s = SPOTS[cur];
+  $("badge").textContent = cur + 1;
+  $("title").textContent = s.name;
+  $("sub").textContent = `${PLACE} · ${s.note} · ${cur + 1} / ${SPOTS.length}`;
+  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  $("heading").textContent = `${dirs[Math.round(((s.heading % 360) + 360) % 360 / 45) % 8]} ${s.heading}°`;
+  document.querySelectorAll(".thumb").forEach((t, i) => t.setAttribute("aria-current", i === cur));
+  const at = document.querySelector('.thumb[aria-current="true"]');
+  at && at.scrollIntoView({ block: "nearest", inline: "nearest" });
+  drawMap();
+}
+
+function drawMap() {
+  const svg = $("map");
+  const pts = SPOTS.map(s => s.map);
+  const s = SPOTS[cur], [cx, cy] = s.map;
+  // 시야 부채꼴 (드래그 시 좌우로 회전)
+  const look = s.heading + pan.x / -12;
+  const r = 34, half = 30;
+  const a1 = (look - half - 90) * Math.PI / 180, a2 = (look + half - 90) * Math.PI / 180;
+  const fan = `M${cx} ${cy} L${cx + r * Math.cos(a1)} ${cy + r * Math.sin(a1)} A${r} ${r} 0 0 1 ${cx + r * Math.cos(a2)} ${cy + r * Math.sin(a2)} Z`;
+  svg.innerHTML = `
+    <rect x="14" y="10" width="34" height="132" fill="none" stroke="var(--line)" stroke-width="1"/>
+    <rect x="48" y="8" width="44" height="30" fill="none" stroke="var(--line)" stroke-width="1"/>
+    <text x="54" y="48" font-size="8" fill="var(--muted)" font-family="var(--font-ui)">계단실</text>
+    <text x="52" y="132" font-size="8" fill="var(--muted)" font-family="var(--font-ui)">출입구</text>
+    <polyline points="${pts.map(p => p.join(",")).join(" ")}" fill="none" stroke="var(--route)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
+    ${pts.map((p, i) => `<circle class="node" data-i="${i}" cx="${p[0]}" cy="${p[1]}" r="${i === cur ? 0 : 3.5}" fill="var(--fg)" stroke="var(--bg)" stroke-width="1.5"><title>${SPOTS[i].name}</title></circle>`).join("")}
+    <path d="${fan}" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1"/>
+    <circle cx="${cx}" cy="${cy}" r="6" fill="var(--accent)" stroke="var(--fg)" stroke-width="2"/>`;
+  svg.querySelectorAll(".node").forEach(n => n.addEventListener("click", () => go(+n.dataset.i)));
+}
+
+// 필름스트립
+SPOTS.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.className = "thumb"; b.type = "button";
+  b.setAttribute("aria-label", `${i + 1}. ${s.name}`);
+  b.innerHTML = `<img src="${s.src}" alt=""><span>${i + 1}</span>`;
+  b.addEventListener("click", () => go(i));
+  $("strip").appendChild(b);
+});
+
+// 드래그로 둘러보기
+let drag = null;
+stage.addEventListener("pointerdown", e => {
+  if (e.target.closest(".hot")) return;
+  drag = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
+  stage.setPointerCapture(e.pointerId);
+  stage.classList.add("dragging");
+  $("hint").classList.add("gone");
+});
+stage.addEventListener("pointermove", e => {
+  if (!drag || !frameEl) return;
+  pan.x = drag.px + (e.clientX - drag.x);
+  pan.y = drag.py + (e.clientY - drag.y);
+  layout(frameEl); drawMap();
+});
+const endDrag = () => { drag = null; stage.classList.remove("dragging"); };
+stage.addEventListener("pointerup", endDrag);
+stage.addEventListener("pointercancel", endDrag);
+
+addEventListener("keydown", e => {
+  if (e.key === "ArrowUp" || e.key === "PageDown") { e.preventDefault(); go(cur + 1); }
+  else if (e.key === "ArrowDown" || e.key === "PageUp") { e.preventDefault(); go(cur - 1); }
+  else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    e.preventDefault();
+    pan.x += e.key === "ArrowLeft" ? 60 : -60;
+    frameEl && layout(frameEl); drawMap();
+  }
+});
+
+$("reset").addEventListener("click", () => { pan = { x: 0, y: 0 }; layout(frameEl); drawMap(); });
+$("fs").addEventListener("click", () => {
+  try {
+    const p = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    p && p.catch && p.catch(() => {});
+  } catch (_) {}
+});
+addEventListener("resize", () => frameEl && layout(frameEl));
+setTimeout(() => $("hint").classList.add("gone"), 6000);
+
+// 시작
+frameEl = buildFrame(0);
+stage.appendChild(frameEl);
+layout(frameEl);
+update();
+</script>
