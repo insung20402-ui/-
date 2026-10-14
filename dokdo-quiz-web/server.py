@@ -10,7 +10,10 @@
       data/results.jsonl : 앱이 읽는 원본 기록
       data/results.csv   : 엑셀로 바로 열 수 있는 표 (학년, 반, 번호, 이름, 점수, 풀이 완료 시간 …)
   - 통계 화면은 data/results.jsonl 을 읽어 그래프를 그립니다.
+  - 한 휴대폰에서 한 번만 참여: 휴대폰마다 무작위 번호(deviceId)를 받아, 같은 번호로 두 번째 기록이 오면 거절합니다.
+    특정 학생을 다시 참여시키려면 data/results.jsonl 에서 그 학생의 줄을 지우세요. (메모장으로 열림)
 """
+import re
 import csv
 import json
 import socket
@@ -26,6 +29,7 @@ JSONL = DATA / "results.jsonl"
 CSV = DATA / "results.csv"
 KST = timezone(timedelta(hours=9))
 LOCK = threading.Lock()
+SAVE_LOCK = threading.Lock()
 CSV_HEADERS = ["풀이 완료 시간", "학년", "반", "번호", "이름", "점수", "정답 수", "걸린 시간(초)", "문항별 결과"]
 
 
@@ -44,7 +48,9 @@ def clean(rec):
         if isinstance(a, dict):
             answers.append({"id": str(a.get("id", ""))[:20], "correct": bool(a.get("correct"))})
     now = datetime.now(KST)
+    device = str(rec.get("deviceId") or "")
     return {
+        "deviceId": device if re.fullmatch(r"[a-f0-9]{32}", device) else "",
         "grade": grade, "klass": klass, "num": num, "name": name, "score": score,
         "finishedAt": now.isoformat(timespec="seconds"),
         "finishedAtText": now.strftime("%Y-%m-%d %H:%M:%S"),
@@ -67,6 +73,17 @@ def read_all():
                 except json.JSONDecodeError:
                     pass
     return rows
+
+
+def public(rec):
+    """브라우저에 보낼 때는 휴대폰 번호(deviceId)를 뺀다."""
+    return {k: v for k, v in rec.items() if k != "deviceId"}
+
+
+def find_device(device):
+    if not device:
+        return None
+    return next((r for r in read_all() if r.get("deviceId") == device), None)
 
 
 def append(rec):
@@ -101,7 +118,11 @@ class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         path = self.path.split("?")[0]
         if path == "/api/results":
-            return self._json(200, read_all())
+            return self._json(200, [public(r) for r in read_all()])
+        if path == "/api/check":
+            m = re.search(r"device=([a-f0-9]{32})", self.path)
+            found = find_device(m.group(1)) if m else None
+            return self._json(200, {"played": bool(found), "record": public(found) if found else None})
         if path.startswith("/data/") or path.endswith(".py"):
             return self._json(403, {"error": "forbidden"})  # 원본 기록·서버 코드는 브라우저로 못 받게
         return super().do_GET()
@@ -118,7 +139,10 @@ class Handler(SimpleHTTPRequestHandler):
             rec = None
         if not rec:
             return self._json(400, {"error": "invalid"})
-        append(rec)
+        with SAVE_LOCK:  # 두 탭에서 동시에 보내도 하나만 저장
+            if rec["deviceId"] and find_device(rec["deviceId"]):
+                return self._json(409, {"error": "already"})
+            append(rec)
         return self._json(200, {"ok": True})
 
     def log_message(self, fmt, *args):

@@ -28,6 +28,7 @@ const APP_CONFIG = {
   SHEETS_URL: "",
 
   SECONDS_PER_QUESTION: 20,
+  ONE_TRY_PER_DEVICE: true, // true: 한 휴대폰(브라우저)에서 한 번만 참여 가능
   GRADES: [1, 2, 3],        // 학년 선택지
   CLASSES_PER_GRADE: 10     // 학년별 반 수
 };

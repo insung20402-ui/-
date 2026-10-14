@@ -59,7 +59,20 @@
     if (saved) { $("playerGrade").value = saved.grade; $("playerClass").value = saved.klass; $("playerNum").value = saved.num; $("playerName").value = saved.name; }
   } catch {}
 
-  $("startForm").addEventListener("submit", (e) => {
+  // ───── 한 휴대폰 한 번만 ─────
+  const ONE_TRY = !!APP_CONFIG.ONE_TRY_PER_DEVICE;
+  $("oneTryNote").hidden = !ONE_TRY;
+  $("rRetry").hidden = ONE_TRY;
+  function showPlayed(rec) {
+    $("startForm").hidden = true;
+    $("playedBox").hidden = false;
+    $("playedInfo").textContent = rec && rec.name
+      ? `${rec.grade}학년 ${rec.klass}반 ${rec.num}번 ${rec.name} · ${rec.score}점 (${rec.finishedAtText || ""})`
+      : "";
+  }
+  if (ONE_TRY) Storage.checkPlayed().then((rec) => { if (rec && !state.list) showPlayed(rec); });
+
+  $("startForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const player = {
       grade: Number($("playerGrade").value), klass: Number($("playerClass").value),
@@ -70,6 +83,10 @@
     if (!player.name) return err("이름을 입력해 주세요.", $("playerName"));
     $("startErr").textContent = "";
     try { localStorage.setItem("dokdoQuizWebPlayer", JSON.stringify(player)); } catch {}
+    if (ONE_TRY) {
+      const played = await Storage.checkPlayed(); // 다른 탭에서 이미 풀었는지 한 번 더 확인
+      if (played) return showPlayed(played);
+    }
     start(player);
   });
   $("rRetry").addEventListener("click", () => start(state.player));
@@ -173,8 +190,11 @@
       : "<p>🎉 모두 맞혔어요! 완벽한 독도 지킴이!</p>";
     show("result");
     $("rSave").textContent = "기록 저장 중…";
-    const ok = await Storage.save(record);
-    $("rSave").textContent = ok ? `✅ 기록이 저장되었어요 (${Storage.label})` : "⚠️ 서버 저장에 실패해 이 기기에만 저장했어요.";
+    const result = await Storage.save(record);
+    $("rSave").textContent = result === "ok" ? `✅ 기록이 저장되었어요 (${Storage.label})`
+      : result === "already" ? "⚠️ 이 휴대폰은 이미 참여해서 이번 기록은 저장되지 않았어요."
+      : "⚠️ 서버 저장에 실패해 이 기기에만 저장했어요.";
+    if (ONE_TRY) showPlayed(result === "already" ? await Storage.checkPlayed() : record);
     renderStats();
   }
 

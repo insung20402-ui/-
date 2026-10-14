@@ -50,7 +50,14 @@
         <input id="playerName" class="field" maxlength="12" placeholder="예) 홍길동" autocomplete="off">
         <p id="startErr" class="err" role="alert"></p>
         <button class="btn-primary" type="submit">퀴즈 시작하기 🚀</button>
+        <p id="oneTryNote" class="muted text-xs text-center" hidden>※ 한 휴대폰에서 한 번만 참여할 수 있어요. 학년·반·번호·이름을 정확히 입력하세요!</p>
       </form>
+      <div id="playedBox" class="mt-6 glass p-5 text-left" hidden>
+        <p class="font-bold text-lg">✅ 이 휴대폰으로 이미 참여했어요</p>
+        <p id="playedInfo" class="mt-2"></p>
+        <p class="muted text-sm mt-2">퀴즈는 한 휴대폰에서 한 번만 풀 수 있어요. 통계 탭에서 친구들 결과를 볼 수 있어요.</p>
+        <button class="btn-ghost mt-4" data-view="stats">통계 보기 📊</button>
+      </div>
       <p class="muted text-xs mt-4">문제 은행 <b id="bankSize">0</b>문제 · 저장소: <span id="backendLabel">연결 중…</span></p>
     </div>
   </section>

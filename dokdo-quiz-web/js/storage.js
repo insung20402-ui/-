@@ -4,6 +4,8 @@
  *   Storage.save(record)          → Promise
  *   Storage.subscribe(onRows)     → 결과 목록이 바뀔 때마다 onRows(rows) 호출 (Firebase는 실시간)
  *   Storage.label                 → 현재 저장소 이름
+ *   Storage.checkPlayed()         → 이 휴대폰으로 이미 참여했으면 그 기록, 아니면 null
+ *   Storage.save() 결과           → "ok" | "already"(이 휴대폰은 이미 참여) | "failed"
  *
  * record 형식
  * {
@@ -25,6 +27,27 @@ const Storage = (() => {
 
   const api = { label: "이 브라우저 (테스트 모드)" };
   let impl = null;
+  const ONE_TRY = !!APP_CONFIG.ONE_TRY_PER_DEVICE;
+  const ALREADY = new Error("already");
+  const PLAYED_KEY = "dokdoQuizWebPlayed";
+
+  // 휴대폰(브라우저)마다 하나씩 만드는 무작위 번호. localStorage와 쿠키 두 곳에 보관
+  const deviceId = (() => {
+    const fromCookie = (document.cookie.match(/(?:^|; )dokdoDevice=([a-f0-9]{32})/) || [])[1];
+    let id = null;
+    try { id = localStorage.getItem("dokdoQuizDeviceId"); } catch {}
+    id = id || fromCookie;
+    if (!id) {
+      const b = new Uint8Array(16);
+      crypto.getRandomValues(b);
+      id = [...b].map((x) => x.toString(16).padStart(2, "0")).join("");
+    }
+    try { localStorage.setItem("dokdoQuizDeviceId", id); } catch {}
+    document.cookie = `dokdoDevice=${id}; max-age=${60 * 60 * 24 * 400}; path=/; SameSite=Lax`;
+    return id;
+  })();
+  const localPlayed = () => { try { return JSON.parse(localStorage.getItem(PLAYED_KEY) || "null"); } catch { return null; } };
+  const markPlayed = (rec) => { try { localStorage.setItem(PLAYED_KEY, JSON.stringify(rec)); } catch {} };
 
   // ── 이 브라우저에만 저장 ──
   const local = {
@@ -48,7 +71,14 @@ const Storage = (() => {
     const col = fs.collection(db, APP_CONFIG.FIREBASE_COLLECTION);
     return {
       label: "Firebase (실시간)",
-      async save(rec) { await fs.addDoc(col, { ...rec, createdAt: fs.serverTimestamp() }); },
+      // 한 번만 모드: 문서 번호를 휴대폰 번호로 저장 → 보안 규칙이 같은 번호로 두 번 저장(수정)하는 것을 막음
+      async check() { const d = await fs.getDoc(fs.doc(col, deviceId)); return d.exists() ? d.data() : null; },
+      async save(rec) {
+        const data = { ...rec, createdAt: fs.serverTimestamp() };
+        if (!ONE_TRY) return void await fs.addDoc(col, data);
+        if ((await fs.getDoc(fs.doc(col, deviceId))).exists()) throw ALREADY;
+        await fs.setDoc(fs.doc(col, deviceId), data);
+      },
       subscribe(fn) {
         const q = fs.query(col, fs.orderBy("finishedAt", "desc"), fs.limit(2000));
         fs.onSnapshot(q, (snap) => fn(snap.docs.map((d) => d.data())), (err) => {
@@ -88,10 +118,17 @@ const Storage = (() => {
     let pull = null;
     return {
       label: "미니 PC 서버",
+      async check() {
+        const res = await fetch("api/check?device=" + deviceId, { cache: "no-store" });
+        const j = await res.json();
+        return j.played ? j.record : null;
+      },
       async save(rec) {
         const res = await fetch("api/results", {
-          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec)
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(ONE_TRY ? { ...rec, deviceId } : rec)
         });
+        if (res.status === 409) throw ALREADY;
         if (!res.ok) throw new Error("server " + res.status);
         if (pull) pull(); // 저장 직후 통계 바로 갱신
       },
@@ -112,7 +149,12 @@ const Storage = (() => {
     const col = db.collection("results");
     return {
       label: "공유 기록 (실시간)",
-      async save(rec) { await col.add(rec); },
+      async check() { const d = await col.doc(deviceId).get(); return d.exists ? d.data() : null; },
+      async save(rec) {
+        if (!ONE_TRY) return void await col.add(rec);
+        if ((await col.doc(deviceId).get()).exists) throw ALREADY;
+        await col.doc(deviceId).set(rec);
+      },
       subscribe(fn) {
         col.orderBy("finishedAt", "desc").limit(1000).onSnapshot(
           (snap) => fn(snap.docs.map((d) => d.data())),
@@ -139,8 +181,23 @@ const Storage = (() => {
   api.ready = ready;
   api.save = async (rec) => {
     const s = await ready;
-    try { await s.save(rec); return true; }
-    catch (e) { console.error(e); if (s !== local) await local.save(rec); return false; }
+    try { await s.save(rec); if (ONE_TRY) markPlayed(rec); return "ok"; }
+    catch (e) {
+      if (e === ALREADY) return "already";
+      console.error(e);
+      if (s !== local) await local.save(rec);
+      if (ONE_TRY) markPlayed(rec);
+      return "failed";
+    }
+  };
+  // 서버·Firebase처럼 기록을 모으는 곳이 있으면 그쪽 판단을 따름 (선생님이 기록을 지우면 다시 참여 가능)
+  api.checkPlayed = async () => {
+    if (!ONE_TRY) return null;
+    const s = await ready;
+    if (s.check) {
+      try { return await s.check(); } catch (e) { console.error(e); }
+    }
+    return localPlayed();
   };
   api.subscribe = async (fn) => (await ready).subscribe(fn);
   return api;
