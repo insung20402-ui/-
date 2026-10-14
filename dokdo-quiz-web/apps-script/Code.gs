@@ -3,7 +3,7 @@
  *
  * 1. 새 구글 스프레드시트 → [확장 프로그램] → [Apps Script] → 이 코드 붙여넣기 → 저장
  * 2. [배포] → [새 배포] → 유형 '웹 앱' / 실행: 나 / 액세스: 모든 사용자 → 배포 → URL 복사
- * 3. js/config.js 에서 BACKEND: "sheets", SHEETS_URL: "복사한 URL"
+ * 3. src/js/config.js 에서 BACKEND: "sheets", SHEETS_URL: "복사한 URL"
  *
  * 'results' 시트에 한 판마다 한 줄: 풀이 완료 시간 | 학년 | 반 | 번호 | 이름 | 점수 | 정답 수 | 걸린 시간(초) | 문항별 결과
  */

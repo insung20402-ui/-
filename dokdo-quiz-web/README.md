@@ -20,7 +20,7 @@
 - `data/` 폴더를 지우면 기록이 초기화됩니다. 행사 전 시험 기록은 지우고 시작하세요.
 
 ### 📱 한 휴대폰에 한 번만 참여
-- `js/config.js`의 `ONE_TRY_PER_DEVICE: true`(기본값)이면 한 휴대폰에서 퀴즈를 한 번만 풀 수 있습니다.
+- `src/js/config.js`의 `ONE_TRY_PER_DEVICE: true`(기본값)이면 한 휴대폰에서 퀴즈를 한 번만 풀 수 있습니다.
   다시 열면 "이미 참여했어요"와 내 점수가 나옵니다. `false`로 바꾸면 여러 번 풀 수 있습니다.
 - 휴대폰마다 브라우저에 무작위 번호를 저장해 구분합니다. 그래서 **브라우저 기록을 지우거나, 시크릿 창이나
   다른 브라우저 앱을 쓰면 다시 풀 수 있습니다.** (학생 확인용이지 완벽한 차단은 아닙니다)
@@ -32,20 +32,21 @@
 ```
 dokdo-quiz-web/
 ├─ start-windows.bat       ★ 미니 PC(Windows)에서 더블클릭하면 서버 시작
-├─ server.py               미니 PC 서버 (웹사이트 + 결과 저장, 파이썬 기본 기능만 사용)
-├─ images/                 ★ 퀴즈 사진 넣는 곳 (파일 이름 목록: images/README.md)
+├─ index.html              완성된 퀴즈 화면 (한 파일에 디자인·코드가 모두 들어 있어 어디서 열어도 안 깨짐)
+├─ images/                 ★ 퀴즈 사진 넣는 곳 (파일 이름 목록: images/README.md) — index.html 옆에 있어야 함
 ├─ data/                   결과가 저장되는 곳 (서버를 처음 실행하면 생김)
-├─ index.html              화면 (시작 · 문제 · 결과 · 통계)
-├─ vendor/, css/tailwind.css  Chart.js · Tailwind (인터넷 없이도 동작하도록 포함)
-├─ css/style.css           동해 바다 그라데이션 + 반투명 유리(Glassmorphism) 테마
-├─ js/config.js            ★ 저장소 설정 (Firebase 키 / 스프레드시트 URL)
-├─ js/questions.js         ★ 문제 은행 (샘플 15문제, 500문제까지 같은 형식으로 추가)
-├─ js/storage.js           저장소 어댑터 (Firebase / 스프레드시트 / 브라우저)
-├─ js/charts.js            통계 집계 + Chart.js 그래프
-├─ js/app.js               퀴즈 진행 로직
+├─ server.py               미니 PC 서버 (웹사이트 + 결과 저장, 파이썬 기본 기능만 사용)
+├─ build.py                src/ 를 합쳐 index.html 을 만듦 (서버를 켤 때 자동 실행)
+├─ src/                    ★ 고칠 때는 여기를 고치세요
+│  ├─ js/config.js         저장소·학년/반 수·한 번만 참여 설정
+│  ├─ js/questions.js      문제 은행
+│  ├─ index.html, css/, js/app.js … 화면·디자인·동작
+│  └─ vendor/              Chart.js (인터넷 없이도 동작)
 ├─ firebase/firestore.rules  Firestore 보안 규칙
 └─ apps-script/Code.gs     구글 스프레드시트 저장 스크립트 (Firebase 대신 쓸 때)
 ```
+> `src/`를 고친 뒤에는 서버(start-windows.bat)를 다시 켜면 index.html에 자동 반영됩니다.
+> 서버 없이 쓸 때는 `python build.py`를 한 번 실행하세요.
 
 ## 출제 방식
 - **퀴즈 시작하기** → 문제 은행에서 무작위로 **하 2 · 중 6 · 상 2 = 10문제**
@@ -53,7 +54,7 @@ dokdo-quiz-web/
 - 보기 순서도 매번 섞입니다. 문제당 제한 시간 20초 (`config.js`에서 변경)
 
 ## 문제 추가 (500문제까지)
-`js/questions.js`의 `QUESTION_BANK`에 같은 형식으로 추가하세요.
+`src/js/questions.js`의 `QUESTION_BANK`에 같은 형식으로 추가하세요.
 ```js
 {
   id: "Q016",                 // 고유 번호 (통계 기준, 바꾸지 말 것)
@@ -92,7 +93,7 @@ dokdo-quiz-web/
 2. 왼쪽 **Firestore Database → 데이터베이스 만들기** (위치: `asia-northeast3 (서울)`, 프로덕션 모드)
 3. Firestore **규칙** 탭에 `firebase/firestore.rules` 내용을 붙여넣고 **게시**
 4. **프로젝트 설정(톱니바퀴) → 내 앱 → 웹(</>)** 으로 앱 등록 → 나오는 `firebaseConfig` 값을
-   `js/config.js`의 `FIREBASE`에 붙여넣기 (`BACKEND: "firebase"`)
+   `src/js/config.js`의 `FIREBASE`에 붙여넣기 (`BACKEND: "firebase"`)
 5. 끝! 통계 화면은 새 기록이 저장되면 **실시간으로** 바뀝니다.
 
 > Firebase의 `apiKey`는 비밀번호가 아니라 프로젝트 식별용이라 웹사이트에 들어가도 괜찮습니다.
@@ -101,7 +102,7 @@ dokdo-quiz-web/
 ## B. 구글 스프레드시트 연결 (대안)
 1. 새 구글 스프레드시트 → **확장 프로그램 → Apps Script** → `apps-script/Code.gs` 붙여넣기 → 저장
 2. **배포 → 새 배포 → 웹 앱** (실행: 나 / 액세스: 모든 사용자) → URL 복사
-3. `js/config.js`에서 `BACKEND: "sheets"`, `SHEETS_URL: "복사한 URL"`
+3. `src/js/config.js`에서 `BACKEND: "sheets"`, `SHEETS_URL: "복사한 URL"`
 → `results` 시트에 `풀이 완료 시간 | 학년 | 반 | 번호 | 이름 | 점수 | 정답 수 | 걸린 시간 | 문항별 결과`가 쌓입니다. (통계 화면은 30초마다 새로고침)
 
 ## 웹사이트로 올리기
@@ -111,5 +112,5 @@ dokdo-quiz-web/
 설정값을 비워 두면 결과가 그 브라우저에만 저장되는 **테스트 모드**로 동작합니다.
 
 ## 디자인을 고쳤다면
-`index.html`에 새 Tailwind 클래스를 쓰면 `css/tailwind.css`를 다시 만들어야 합니다.
-`npx tailwindcss@3.4.17 -o css/tailwind.css --minify --content "./**/*.{html,js}"`
+`src/index.html`에 새 Tailwind 클래스를 쓰면 `src/css/tailwind.css`를 다시 만들어야 합니다.
+`npx tailwindcss@3.4.17 -o src/css/tailwind.css --minify --content "./src/**/*.{html,js}"`

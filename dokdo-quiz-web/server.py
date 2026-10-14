@@ -163,6 +163,13 @@ def lan_ip():
 
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
+    # src/ 에서 고친 문제·설정을 index.html 에 반영
+    try:
+        sys.path.insert(0, str(ROOT))
+        import build
+        build.build()
+    except Exception as e:  # 합치기에 실패해도 기존 index.html 로 서버는 켬
+        print(f"[알림] index.html 다시 만들기 실패 (기존 파일 사용): {e}")
     server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
     print("=" * 56)
     print(" 독도 사진 퀴즈 서버가 켜졌습니다")

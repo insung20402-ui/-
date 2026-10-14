@@ -28,5 +28,5 @@
 - 공공누리 (kogl.or.kr) – '공공누리 1유형'은 출처만 밝히면 사용 가능
 - 위키미디어 공용 (commons.wikimedia.org) – 'Dokdo', 'Liancourt Rocks' 검색
 
-사진을 넣은 뒤 `js/questions.js`에서 그 문제의 `imageCredit`에 출처를 적어 주세요. (예: `"외교부 독도 홈페이지"`)
+사진을 넣은 뒤 `src/js/questions.js`에서 그 문제의 `imageCredit`에 출처를 적어 주세요. (예: `"외교부 독도 홈페이지"`)
 .png 파일이면 `imageUrl`의 확장자도 `.png`로 바꿔 주세요.
