@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>독도 사진 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<svg class="waves" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0 40 C150 10 300 70 450 40 S750 10 900 40 S1100 70 1200 40 V90 H0 Z" fill="#1166a8"/>
+  <path d="M0 60 C200 35 350 85 600 60 S1000 35 1200 60 V90 H0 Z" fill="#0a3d6b"/>
+</svg>
+
+<header class="topbar">
+  <div class="wrap flex items-center justify-between gap-3 py-3 flex-wrap">
+    <div class="display text-xl">🇰🇷 독도 사진 퀴즈</div>
+    <nav class="flex gap-2" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-view="quiz">퀴즈</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="stats">통계</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap py-6 pb-28">
+  <!-- 시작 화면 -->
+  <section id="v-start" class="rise">
+    <div class="glass p-6 sm:p-8 text-center">
+      <p class="muted text-sm tracking-widest">동경 131°52′ · 북위 37°14′</p>
+      <h1 class="display text-4xl sm:text-5xl mt-2 mb-3">사진을 보고 독도를 맞혀라!</h1>
+      <p class="muted">문제 은행에서 무작위 10문제 · 하 2 + 중 6 + 상 2 · <b class="text-white">100점 만점</b></p>
+      <div class="grid grid-cols-3 gap-2 mt-6 text-sm">
+        <div class="glass p-3"><b class="text-sky-200">하</b><br>5점 × 2</div>
+        <div class="glass p-3"><b class="text-amber-200">중</b><br>10점 × 6</div>
+        <div class="glass p-3"><b class="text-rose-200">상</b><br>15점 × 2</div>
+      </div>
+      <form id="startForm" class="mt-6 text-left grid gap-3" novalidate>
+        <label for="playerName" class="font-bold text-sm">이름</label>
+        <input id="playerName" class="field" maxlength="12" placeholder="예) 홍길동" autocomplete="off">
+        <p id="startErr" class="err" role="alert"></p>
+        <button class="btn-primary" type="submit">퀴즈 시작하기 🚀</button>
+      </form>
+      <p class="muted text-xs mt-4">문제 은행 <b id="bankSize">0</b>문제 · 저장소: <span id="backendLabel">연결 중…</span></p>
+    </div>
+  </section>
+
+  <!-- 문제 화면 -->
+  <section id="v-quiz" hidden>
+    <div class="glass p-5 sm:p-7">
+      <div class="flex items-center justify-between text-sm font-bold">
+        <span id="qCount">1 / 10</span>
+        <span>점수 <span id="qScore" class="text-amber-300">0</span></span>
+      </div>
+      <div class="progress mt-3"><i id="qProgress" style="width:0"></i></div>
+      <div class="progress timer mt-2"><i id="qTimer" style="width:100%"></i></div>
+      <div class="flex gap-2 mt-4">
+        <span id="qLevel" class="chip">중 · 10점</span>
+        <span id="qCat" class="chip">인물</span>
+      </div>
+      <figure class="mt-4 mb-0">
+        <img id="qImg" class="qimg" alt="">
+        <figcaption id="qCredit" class="credit"></figcaption>
+      </figure>
+      <h2 id="qText" class="text-lg sm:text-xl font-bold leading-relaxed mt-4 mb-4"></h2>
+      <div id="qChoices" class="grid gap-3"></div>
+      <div id="qFeedback" class="feedback mt-4" hidden></div>
+      <button id="qNext" class="btn-primary mt-4" hidden>다음 문제 ➜</button>
+    </div>
+  </section>
+
+  <!-- 결과 + 미니 대시보드 -->
+  <section id="v-result" hidden>
+    <div class="glass p-6 sm:p-8 text-center rise">
+      <p id="rWho" class="muted"></p>
+      <div id="rScore" class="big-score mt-2">0</div>
+      <p id="rTitle" class="display text-2xl mt-3"></p>
+      <p id="rDetail" class="muted text-sm mt-1"></p>
+      <p id="rSave" class="text-sm mt-3"></p>
+      <div class="grid sm:grid-cols-2 gap-3 mt-5">
+        <button id="rRetry" class="btn-primary">새 문제로 다시 풀기 🔀</button>
+        <button class="btn-ghost" data-view="stats">전체 통계 보기 📊</button>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-2 gap-4 mt-4">
+      <div class="glass p-5"><h3 class="font-bold mb-1">⭕ 친구들이 가장 많이 맞힌 문제</h3>
+        <p class="muted text-xs mb-3">막대에 마우스를 올리면 문제 전체가 보여요</p><div class="chart-box"><canvas id="rChartOk"></canvas></div></div>
+      <div class="glass p-5"><h3 class="font-bold mb-1">❌ 친구들이 가장 많이 틀린 문제</h3>
+        <p class="muted text-xs mb-3">막대에 마우스를 올리면 문제 전체가 보여요</p><div class="chart-box"><canvas id="rChartBad"></canvas></div></div>
+    </div>
+    <div class="glass p-5 mt-4">
+      <h3 class="font-bold mb-2">📝 내 오답 노트</h3>
+      <div id="rReview" class="grid gap-3 text-sm leading-relaxed"></div>
+    </div>
+  </section>
+
+  <!-- 통계 페이지 -->
+  <section id="v-stats" hidden>
+    <div class="glass p-5 sm:p-6">
+      <h2 class="display text-3xl">📊 독도 퀴즈 통계</h2>
+      <p class="muted text-sm mt-1">새 기록이 저장되면 자동으로 바뀝니다 · <span id="sSource"></span></p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+        <div class="glass p-4 kpi"><span>참여 횟수</span><strong id="kCount">0</strong></div>
+        <div class="glass p-4 kpi"><span>참여 인원</span><strong id="kPeople">0</strong></div>
+        <div class="glass p-4 kpi"><span>평균 점수</span><strong id="kAvg">0</strong></div>
+        <div class="glass p-4 kpi"><span>100점 만점</span><strong id="kPerfect">0</strong></div>
+      </div>
+    </div>
+    <p id="sEmpty" class="glass p-5 mt-4" hidden>아직 저장된 기록이 없어요. 첫 번째로 퀴즈를 풀면 여기에 그래프가 나타나요!</p>
+    <div id="sBody">
+      <div class="grid md:grid-cols-2 gap-4 mt-4">
+        <div class="glass p-5"><h3 class="font-bold mb-1">⭕ 가장 많이 맞힌 문제 TOP 3</h3>
+          <p class="muted text-xs mb-3">맞힌 사람 수 · 막대에 마우스를 올리면 문제 전체</p><div class="chart-box"><canvas id="sChartOk"></canvas></div></div>
+        <div class="glass p-5"><h3 class="font-bold mb-1">❌ 가장 많이 틀린 문제 TOP 3</h3>
+          <p class="muted text-xs mb-3">틀린 사람 수 · 막대에 마우스를 올리면 문제 전체</p><div class="chart-box"><canvas id="sChartBad"></canvas></div></div>
+      </div>
+      <div class="glass p-5 mt-4">
+        <h3 class="font-bold mb-1">문항별 정답률</h3>
+        <p class="muted text-xs mb-3">출제된 모든 문항 · 정답률 낮은 순</p>
+        <div class="chart-box" id="sRateBox"><canvas id="sChartRate"></canvas></div>
+      </div>
+      <div class="glass p-5 mt-4">
+        <h3 class="font-bold mb-3">🕗 최근 참여 기록</h3>
+        <div class="tablebox"><table>
+          <thead><tr><th>풀이 완료 시간</th><th>이름</th><th class="num">점수</th><th class="num">정답</th><th class="num">걸린 시간</th></tr></thead>
+          <tbody id="sRows"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/questions.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

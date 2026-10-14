@@ -1,0 +1,117 @@
+/* 깊은 동해 바다: 심해 남색 → 동해 파랑 그라데이션 위에 반투명 유리 카드. 단일 다크 테마로 고정 */
+:root {
+  --deep: #020c1b;
+  --sea-1: #04203d;
+  --sea-2: #0a3d6b;
+  --sea-3: #1166a8;
+  --foam: #e8f4ff;
+  --ink-2: #b8cde0;
+  --ink-3: #87a3bd;
+  --sun: #ffb347;      /* 독도 일출 주황 – 강조색 */
+  --ok: #3ddc97;
+  --bad: #ff6b6b;
+  --glass: rgba(255, 255, 255, 0.07);
+  --glass-strong: rgba(255, 255, 255, 0.12);
+  --glass-line: rgba(255, 255, 255, 0.16);
+  --series-ok: #3987e5;
+  --series-bad: #d95926;
+  --font-display: "Black Han Sans", "Noto Sans KR", system-ui, sans-serif;
+  --font-body: "Noto Sans KR", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--foam);
+  background: var(--deep);
+  background-image:
+    radial-gradient(1200px 500px at 80% -10%, rgba(255, 179, 71, 0.16), transparent 60%),
+    linear-gradient(180deg, var(--sea-3) 0%, var(--sea-2) 30%, var(--sea-1) 65%, var(--deep) 100%);
+  background-attachment: fixed;
+}
+.wrap {
+  max-width: 820px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.display { font-family: var(--font-display); font-weight: 400; letter-spacing: 0.5px; text-wrap: balance; }
+
+/* 유리 카드 */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  border-radius: 20px;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: 0 10px 40px rgba(0, 8, 20, 0.35);
+}
+
+/* 상단 바 */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+  background: rgba(2, 12, 27, 0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-line); }
+.tab { border: 1px solid var(--glass-line); color: var(--foam); background: transparent; border-radius: 999px;
+  padding: 6px 14px; font: inherit; font-size: 0.9rem; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--foam); color: var(--sea-1); font-weight: 700; }
+
+/* 입력·버튼 */
+.field { width: 100%; padding: 14px 16px; border-radius: 14px; font: inherit; font-size: 1rem;
+  color: var(--foam); background: rgba(2, 12, 27, 0.45); border: 1px solid var(--glass-line); }
+.field::placeholder { color: var(--ink-3); }
+.btn-primary { width: 100%; padding: 16px; border: 0; border-radius: 14px; cursor: pointer; font: inherit;
+  font-size: 1.1rem; font-weight: 900; color: #2b1600; background: linear-gradient(135deg, #ffd08a, var(--sun)); }
+.btn-ghost { width: 100%; padding: 14px; border-radius: 14px; cursor: pointer; font: inherit; font-weight: 700;
+  color: var(--foam); background: var(--glass-strong); border: 1px solid var(--glass-line); }
+.btn-primary:active, .btn-ghost:active { transform: scale(0.98); }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+
+/* 퀴즈 */
+.progress { height: 6px; background: rgba(255, 255, 255, 0.12); border-radius: 99px; overflow: hidden; }
+.progress > i { display: block; height: 100%; background: var(--foam); transition: width 0.3s; }
+.timer > i { background: var(--sun); transition: none; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 700; background: var(--glass-strong); border: 1px solid var(--glass-line); }
+.chip.lv-하 { color: #9fe3ff; }
+.chip.lv-중 { color: #ffe08a; }
+.chip.lv-상 { color: #ffb0a8; }
+.qimg { width: 100%; aspect-ratio: 16 / 10; max-width: 100%; object-fit: cover; border-radius: 16px;
+  border: 1px solid var(--glass-line); background: var(--sea-2); display: block; }
+.credit { font-size: 0.72rem; color: var(--ink-3); margin-top: 4px; text-align: right; }
+.choice { width: 100%; text-align: left; padding: 14px 16px; border-radius: 14px; cursor: pointer; font: inherit;
+  font-size: 1rem; line-height: 1.4; color: var(--foam); background: rgba(2, 12, 27, 0.35);
+  border: 1.5px solid var(--glass-line); transition: border-color 0.15s, background 0.15s; }
+.choice:hover:not(:disabled) { border-color: var(--foam); background: rgba(255, 255, 255, 0.08); }
+.choice:disabled { cursor: default; }
+.choice.is-correct { border-color: var(--ok); background: rgba(61, 220, 151, 0.16); }
+.choice.is-wrong { border-color: var(--bad); background: rgba(255, 107, 107, 0.16); }
+.feedback { border-radius: 14px; padding: 14px 16px; line-height: 1.6; }
+.feedback.ok { background: rgba(61, 220, 151, 0.12); border: 1px solid rgba(61, 220, 151, 0.4); }
+.feedback.no { background: rgba(255, 107, 107, 0.12); border: 1px solid rgba(255, 107, 107, 0.4); }
+
+/* 결과·통계 */
+.big-score { font-family: var(--font-display); font-size: clamp(3.2rem, 14vw, 5rem); line-height: 1; color: var(--sun);
+  font-variant-numeric: tabular-nums; }
+.kpi strong { display: block; font-size: 1.7rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.kpi span { font-size: 0.8rem; color: var(--ink-2); }
+.chart-box { position: relative; height: 240px; }
+.chart-box[data-empty]::after { content: attr(data-empty); position: absolute; inset: 0; display: grid; place-items: center;
+  color: var(--ink-2); font-size: 0.95rem; border: 1px dashed var(--glass-line); border-radius: 14px; }
+.tablebox { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+th, td { padding: 10px 8px; border-bottom: 1px solid var(--glass-line); text-align: left; white-space: nowrap; }
+th { color: var(--ink-2); font-size: 0.78rem; font-weight: 700; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.muted { color: var(--ink-2); }
+.err { color: var(--bad); min-height: 1.3em; font-size: 0.9rem; }
+
+/* 바다 물결 장식 */
+.waves { position: fixed; left: 0; right: 0; bottom: 0; height: 90px; pointer-events: none; z-index: 0; opacity: 0.35; }
+main, .topbar { position: relative; z-index: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise { animation: rise 0.35s ease both; }
+  @keyframes rise { from { opacity: 0.3; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}

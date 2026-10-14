@@ -1,0 +1,25 @@
+rules_version = '2';
+// 독도 퀴즈 Firestore 보안 규칙
+// - 누구나 결과를 '추가'하고 '읽을' 수 있음 (통계 화면용)
+// - 수정·삭제는 불가 (점수 조작 방지)
+// - 저장되는 값의 형식과 범위를 검사
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /quizResults/{docId} {
+      allow read: if true;
+      allow update, delete: if false;
+      allow create: if
+        request.resource.data.keys().hasOnly(['name', 'score', 'finishedAt', 'finishedAtText', 'durationSec', 'correctCount', 'answers', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 12
+        && request.resource.data.score is int
+        && request.resource.data.score >= 0 && request.resource.data.score <= 100
+        && request.resource.data.score % 5 == 0
+        && request.resource.data.finishedAt is string
+        && request.resource.data.durationSec is int
+        && request.resource.data.answers is list
+        && request.resource.data.answers.size() <= 10
+        && request.resource.data.createdAt == request.time;
+    }
+  }
+}
