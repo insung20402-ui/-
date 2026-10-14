@@ -11,27 +11,38 @@
     --sea: #0b4f8a; --sea-dark: #07335c; --sky: #e8f3fc; --accent: #ff7a1a;
     --ok: #1a9c5b; --bad: #d63a3a; --ink: #18232f; --muted: #5d6b7a;
     --card: #ffffff; --bg: #f3f8fc; --line: #d6e3ef;
+    --okbg: #e7f7ee; --badbg: #fdeaea; --hard: #fff0e4; --hardfg: #c25200; --mebg: #fff6ec; --codebg: #18232f;
   }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --sea: #6cb4f0; --sea-dark: #07335c; --sky: #16314a; --ink: #e6eef6; --muted: #9aaabb;
+    --card: #132232; --bg: #0b1622; --line: #24384d;
+    --okbg: #133a27; --badbg: #3d1a1a; --hard: #3a2512; --hardfg: #ffb27a; --mebg: #33260f; --codebg: #000; color-scheme: dark; } }
+  :root[data-theme="dark"] {
+    --sea: #6cb4f0; --sea-dark: #07335c; --sky: #16314a; --ink: #e6eef6; --muted: #9aaabb;
+    --card: #132232; --bg: #0b1622; --line: #24384d;
+    --okbg: #133a27; --badbg: #3d1a1a; --hard: #3a2512; --hardfg: #ffb27a; --mebg: #33260f; --codebg: #000; color-scheme: dark; }
   * { box-sizing: border-box; }
   body {
     margin: 0; font-family: "Noto Sans KR", system-ui, sans-serif; color: var(--ink);
     background: var(--bg); min-height: 100vh;
   }
   header {
-    background: linear-gradient(135deg, var(--sea-dark), var(--sea));
-    color: #fff; padding: 14px 16px; position: sticky; top: 0; z-index: 5;
+    background: linear-gradient(135deg, #07335c, #0b4f8a);
+    color: #fff; padding-block: 14px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
   }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
-  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0; }
+  .wrap { max-width: 760px; margin: 0 auto; padding-block: 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   header h1 { margin: 0; font-size: 1.15rem; font-weight: 900; letter-spacing: -0.5px; }
   nav button {
     background: transparent; border: 1px solid rgba(255,255,255,.4); color: #fff;
     padding: 6px 10px; border-radius: 999px; font: inherit; font-size: .85rem; cursor: pointer; margin-left: 4px;
   }
-  nav button.on { background: #fff; color: var(--sea); }
+  nav button.on { background: #fff; color: #0b4f8a; }
   main { padding: 20px 0 60px; }
   .screen { display: none; }
   .screen.on { display: block; animation: fade .25s ease; }
+  @media (prefers-reduced-motion: reduce) { .screen.on, .pop.go { animation: none; } }
+  .err { color: var(--bad); font-size: .88rem; min-height: 1.2em; margin: 8px 0 0; }
   @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
   .hero { text-align: center; padding: 28px 20px; }
@@ -42,7 +53,7 @@
   label { display: block; font-weight: 700; font-size: .9rem; margin: 12px 0 6px; }
   .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   select, input {
-    width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; background: #fff; color: var(--ink);
+    width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; background: var(--card); color: var(--ink);
   }
   .btn {
     display: block; width: 100%; padding: 15px; margin-top: 16px; border: 0; border-radius: 12px;
@@ -72,44 +83,44 @@
   .timer { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-bottom: 16px; }
   .timer i { display: block; height: 100%; background: var(--accent); width: 100%; }
   .badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: .75rem; font-weight: 700; background: var(--sky); color: var(--sea); }
-  .badge.l3 { background: #fff0e4; color: #c25200; }
+  .badge.l3 { background: var(--hard); color: var(--hardfg); }
   .question { font-size: 1.2rem; font-weight: 700; line-height: 1.55; margin: 10px 0 18px; }
   .choices { display: grid; gap: 10px; }
   .choices.ox { grid-template-columns: 1fr 1fr; }
   .choice {
-    padding: 14px; border: 2px solid var(--line); border-radius: 12px; background: #fff; text-align: left;
+    padding: 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); text-align: left;
     font: inherit; font-size: 1rem; cursor: pointer; color: var(--ink);
   }
   .choices.ox .choice { text-align: center; font-size: 2.6rem; font-weight: 900; padding: 18px; }
   .choice:hover:not(:disabled) { border-color: var(--sea); }
-  .choice.correct { border-color: var(--ok); background: #e7f7ee; }
-  .choice.wrong { border-color: var(--bad); background: #fdeaea; }
+  .choice.correct { border-color: var(--ok); background: var(--okbg); }
+  .choice.wrong { border-color: var(--bad); background: var(--badbg); }
   .choice:disabled { cursor: default; }
   .feedback { margin-top: 16px; padding: 14px; border-radius: 12px; display: none; line-height: 1.6; }
   .feedback.on { display: block; }
-  .feedback.ok { background: #e7f7ee; }
-  .feedback.no { background: #fdeaea; }
+  .feedback.ok { background: var(--okbg); }
+  .feedback.no { background: var(--badbg); }
   .combo { color: var(--accent); font-weight: 900; }
   .pop { position: fixed; left: 50%; top: 40%; transform: translate(-50%,-50%); font-size: 2rem; font-weight: 900;
-    color: var(--accent); pointer-events: none; opacity: 0; text-shadow: 0 2px 0 #fff; }
+    color: var(--accent); pointer-events: none; opacity: 0; text-shadow: 0 2px 0 var(--card); }
   .pop.go { animation: pop .9s ease; }
   @keyframes pop { 0% { opacity: 0; transform: translate(-50%,-30%) scale(.6);} 30% { opacity: 1; transform: translate(-50%,-50%) scale(1.15);} 100% { opacity: 0; transform: translate(-50%,-80%) scale(1);} }
   /* 결과 */
   .score { font-size: 3.4rem; font-weight: 900; color: var(--sea); margin: 4px 0; }
   .title { font-size: 1.3rem; font-weight: 900; }
   .code { font-family: ui-monospace, monospace; font-size: 1.6rem; font-weight: 900; letter-spacing: 3px;
-    background: var(--ink); color: #fff; border-radius: 12px; padding: 14px; margin: 10px 0; }
+    background: var(--codebg); color: #fff; border-radius: 12px; padding: 14px; margin: 10px 0; }
   .muted { color: var(--muted); font-size: .88rem; }
   .review div { padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: .9rem; line-height: 1.5; }
   /* 랭킹 */
   .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
-  .tabs button { flex: 1; padding: 10px; border: 1px solid var(--line); background: #fff; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; color: var(--ink); }
-  .tabs button.on { background: var(--sea); color: #fff; border-color: var(--sea); }
+  .tabs button { flex: 1; padding: 10px; border: 1px solid var(--line); background: var(--card); border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; color: var(--ink); }
+  .tabs button.on { background: var(--sea); color: var(--card); border-color: var(--sea); }
   table { width: 100%; border-collapse: collapse; font-size: .92rem; }
   th, td { padding: 10px 6px; border-bottom: 1px solid var(--line); text-align: left; }
   th { color: var(--muted); font-size: .8rem; }
   td.num, th.num { text-align: right; }
-  tr.me td { background: #fff6ec; font-weight: 700; }
+  tr.me td { background: var(--mebg); font-weight: 700; }
   .medal { font-size: 1.1rem; }
   .src { font-size: .8rem; color: var(--muted); margin-top: 10px; }
   @media (max-width: 480px) {
@@ -158,6 +169,7 @@
       </div>
       <label for="nick">이름 또는 닉네임 <span class="muted">(랭킹에 표시)</span></label>
       <input id="nick" maxlength="10" placeholder="예) 독도지킴이">
+      <p class="err" id="err" role="alert"></p>
       <button class="btn" id="startBtn">퀴즈 시작! 🚀</button>
       <button class="btn sub" data-go="learn">먼저 독도 공부하고 올래요 📚</button>
     </div>
@@ -289,7 +301,6 @@
   document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-go]");
     if (!t) return;
-    if (state.playing && t.dataset.go !== "quiz" && !confirm("퀴즈를 그만둘까요? 기록되지 않아요.")) return;
     state.playing = false;
     go(t.dataset.go);
   });
@@ -331,8 +342,9 @@
       grade: $("#grade").value, klass: $("#klass").value,
       num: String(parseInt($("#num").value, 10) || ""), nick: $("#nick").value.trim()
     };
-    if (!player.num || player.num < 1) { alert("번호를 입력해 주세요!"); $("#num").focus(); return; }
-    if (!player.nick) { alert("이름 또는 닉네임을 입력해 주세요!"); $("#nick").focus(); return; }
+    $("#err").textContent = "";
+    if (!player.num || player.num < 1) { $("#err").textContent = "번호를 입력해 주세요."; $("#num").focus(); return; }
+    if (!player.nick) { $("#err").textContent = "이름 또는 닉네임을 입력해 주세요."; $("#nick").focus(); return; }
     lsSet(LS_PLAYER, player);
     startGame(player);
   });
@@ -482,10 +494,20 @@
   }
 
   // ---------- 데이터베이스 저장 ----------
-  function saveRecord(rec) {
+  // claude.ai 아티팩트로 열면 공유 DB(claude.use("db"))를 사용, 아니면 구글 시트/이 기기 저장
+  const dbReady = (window.claude && window.claude.use) ? window.claude.use("db").catch(() => null) : Promise.resolve(null);
+
+  async function saveRecord(rec) {
     const all = lsGet(LS_KEY, []);
     all.push(rec);
     lsSet(LS_KEY, all);
+    const db = await dbReady;
+    if (db) {
+      $("#saveMsg").textContent = "기록 저장 중…";
+      try { await db.collection("results").add(rec); $("#saveMsg").textContent = "✅ 전체 기록에 저장되었어요!"; }
+      catch { $("#saveMsg").textContent = "⚠️ 공유 기록 저장 실패 — 이 기기에는 저장되었어요."; }
+      return;
+    }
     if (!CONFIG.SCRIPT_URL) {
       $("#saveMsg").textContent = "※ 이 기기에 저장되었어요. (선생님: config.js에 구글 시트 주소를 넣으면 전교 기록이 모여요)";
       return;
@@ -509,7 +531,17 @@
 
   async function loadRanking() {
     $("#rankBody").innerHTML = '<p class="muted">불러오는 중…</p>';
-    if (CONFIG.SCRIPT_URL) {
+    const db = await dbReady;
+    if (db) {
+      try {
+        const snap = await db.collection("results").get();
+        rankData = snap.docs.map((d) => d.data());
+        $("#rankSrc").textContent = "전체 참여 기록 기준";
+      } catch {
+        rankData = lsGet(LS_KEY, []);
+        $("#rankSrc").textContent = "⚠️ 공유 기록을 불러오지 못해 이 기기의 기록만 표시합니다.";
+      }
+    } else if (CONFIG.SCRIPT_URL) {
       try {
         const res = await fetch(CONFIG.SCRIPT_URL + "?action=list");
         rankData = await res.json();
