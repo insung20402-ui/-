@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>독도 수호 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sea: #0b4f8a; --sea-dark: #07335c; --sky: #e8f3fc; --accent: #ff7a1a;
+    --ok: #1a9c5b; --bad: #d63a3a; --ink: #18232f; --muted: #5d6b7a;
+    --card: #ffffff; --bg: #f3f8fc; --line: #d6e3ef;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: "Noto Sans KR", system-ui, sans-serif; color: var(--ink);
+    background: var(--bg); min-height: 100vh;
+  }
+  header {
+    background: linear-gradient(135deg, var(--sea-dark), var(--sea));
+    color: #fff; padding: 14px 16px; position: sticky; top: 0; z-index: 5;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0; }
+  header h1 { margin: 0; font-size: 1.15rem; font-weight: 900; letter-spacing: -0.5px; }
+  nav button {
+    background: transparent; border: 1px solid rgba(255,255,255,.4); color: #fff;
+    padding: 6px 10px; border-radius: 999px; font: inherit; font-size: .85rem; cursor: pointer; margin-left: 4px;
+  }
+  nav button.on { background: #fff; color: var(--sea); }
+  main { padding: 20px 0 60px; }
+  .screen { display: none; }
+  .screen.on { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+  .hero { text-align: center; padding: 28px 20px; }
+  .hero svg { width: 180px; max-width: 60%; }
+  .hero h2 { font-size: 1.7rem; margin: 10px 0 6px; font-weight: 900; }
+  .hero p { color: var(--muted); margin: 0; }
+  .hl { color: var(--accent); }
+  label { display: block; font-weight: 700; font-size: .9rem; margin: 12px 0 6px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  select, input {
+    width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 10px; font: inherit; background: #fff; color: var(--ink);
+  }
+  .btn {
+    display: block; width: 100%; padding: 15px; margin-top: 16px; border: 0; border-radius: 12px;
+    background: var(--accent); color: #fff; font: inherit; font-size: 1.1rem; font-weight: 900; cursor: pointer;
+  }
+  .btn.sub { background: var(--sky); color: var(--sea); }
+  .btn:active { transform: scale(.98); }
+  .rules { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .rules li { background: var(--sky); border-radius: 10px; padding: 10px 12px; font-size: .92rem; }
+  /* 독도 가치 */
+  .values { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+  .value { border-radius: 14px; padding: 16px; background: var(--card); border: 1px solid var(--line); }
+  .value .ico { font-size: 1.8rem; }
+  .value h3 { margin: 6px 0; font-size: 1.05rem; }
+  .value p { margin: 0; font-size: .9rem; color: var(--muted); line-height: 1.6; }
+  .timeline { border-left: 3px solid var(--sea); margin: 8px 0 0 6px; padding-left: 16px; }
+  .timeline div { margin-bottom: 12px; font-size: .92rem; line-height: 1.5; }
+  .timeline b { color: var(--sea); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+  .fact { background: var(--sky); border-radius: 12px; padding: 12px; text-align: center; }
+  .fact strong { display: block; font-size: 1.3rem; color: var(--sea); }
+  .fact span { font-size: .8rem; color: var(--muted); }
+  /* 퀴즈 */
+  .qtop { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: .95rem; }
+  .bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 16px; }
+  .bar i { display: block; height: 100%; background: var(--sea); transition: width .3s; }
+  .timer { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin-bottom: 16px; }
+  .timer i { display: block; height: 100%; background: var(--accent); width: 100%; }
+  .badge { display: inline-block; padding: 3px 8px; border-radius: 999px; font-size: .75rem; font-weight: 700; background: var(--sky); color: var(--sea); }
+  .badge.l3 { background: #fff0e4; color: #c25200; }
+  .question { font-size: 1.2rem; font-weight: 700; line-height: 1.55; margin: 10px 0 18px; }
+  .choices { display: grid; gap: 10px; }
+  .choices.ox { grid-template-columns: 1fr 1fr; }
+  .choice {
+    padding: 14px; border: 2px solid var(--line); border-radius: 12px; background: #fff; text-align: left;
+    font: inherit; font-size: 1rem; cursor: pointer; color: var(--ink);
+  }
+  .choices.ox .choice { text-align: center; font-size: 2.6rem; font-weight: 900; padding: 18px; }
+  .choice:hover:not(:disabled) { border-color: var(--sea); }
+  .choice.correct { border-color: var(--ok); background: #e7f7ee; }
+  .choice.wrong { border-color: var(--bad); background: #fdeaea; }
+  .choice:disabled { cursor: default; }
+  .feedback { margin-top: 16px; padding: 14px; border-radius: 12px; display: none; line-height: 1.6; }
+  .feedback.on { display: block; }
+  .feedback.ok { background: #e7f7ee; }
+  .feedback.no { background: #fdeaea; }
+  .combo { color: var(--accent); font-weight: 900; }
+  .pop { position: fixed; left: 50%; top: 40%; transform: translate(-50%,-50%); font-size: 2rem; font-weight: 900;
+    color: var(--accent); pointer-events: none; opacity: 0; text-shadow: 0 2px 0 #fff; }
+  .pop.go { animation: pop .9s ease; }
+  @keyframes pop { 0% { opacity: 0; transform: translate(-50%,-30%) scale(.6);} 30% { opacity: 1; transform: translate(-50%,-50%) scale(1.15);} 100% { opacity: 0; transform: translate(-50%,-80%) scale(1);} }
+  /* 결과 */
+  .score { font-size: 3.4rem; font-weight: 900; color: var(--sea); margin: 4px 0; }
+  .title { font-size: 1.3rem; font-weight: 900; }
+  .code { font-family: ui-monospace, monospace; font-size: 1.6rem; font-weight: 900; letter-spacing: 3px;
+    background: var(--ink); color: #fff; border-radius: 12px; padding: 14px; margin: 10px 0; }
+  .muted { color: var(--muted); font-size: .88rem; }
+  .review div { padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: .9rem; line-height: 1.5; }
+  /* 랭킹 */
+  .tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .tabs button { flex: 1; padding: 10px; border: 1px solid var(--line); background: #fff; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; color: var(--ink); }
+  .tabs button.on { background: var(--sea); color: #fff; border-color: var(--sea); }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th, td { padding: 10px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+  th { color: var(--muted); font-size: .8rem; }
+  td.num, th.num { text-align: right; }
+  tr.me td { background: #fff6ec; font-weight: 700; }
+  .medal { font-size: 1.1rem; }
+  .src { font-size: .8rem; color: var(--muted); margin-top: 10px; }
+  @media (max-width: 480px) {
+    header h1 { font-size: 1rem; }
+    nav button { padding: 5px 8px; font-size: .78rem; margin-left: 2px; }
+    .question { font-size: 1.08rem; }
+    .score { font-size: 2.8rem; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>🇰🇷 독도 수호 퀴즈</h1>
+    <nav>
+      <button data-go="home" class="on">홈</button>
+      <button data-go="learn">독도 알기</button>
+      <button data-go="rank">랭킹</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- 홈 -->
+  <section id="home" class="screen on">
+    <div class="card hero">
+      <svg viewBox="0 0 200 110" aria-label="독도 그림">
+        <rect x="0" y="78" width="200" height="32" fill="#cfe6f8"/>
+        <path d="M20 80 L55 22 L70 40 L92 80 Z" fill="#3b6e4a"/>
+        <path d="M100 80 L118 44 L130 30 L146 52 L170 80 Z" fill="#4e8a5c"/>
+        <rect x="128" y="18" width="2" height="16" fill="#333"/>
+        <path d="M130 18 h14 v9 h-14 z" fill="#fff" stroke="#333" stroke-width=".6"/>
+        <circle cx="137" cy="22.5" r="2.4" fill="#d63a3a"/>
+        <path d="M0 86 q10 -5 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" fill="none" stroke="#fff" stroke-width="2"/>
+      </svg>
+      <h2>나의 <span class="hl">독도력</span>은 몇 점?</h2>
+      <p>10문제 · 문제당 15초 · 우리 반 명예를 걸어라!</p>
+    </div>
+
+    <div class="card">
+      <label>학년 / 반 / 번호</label>
+      <div class="row">
+        <select id="grade"></select>
+        <select id="klass"></select>
+        <input id="num" type="number" min="1" max="40" placeholder="번호" inputmode="numeric">
+      </div>
+      <label for="nick">이름 또는 닉네임 <span class="muted">(랭킹에 표시)</span></label>
+      <input id="nick" maxlength="10" placeholder="예) 독도지킴이">
+      <button class="btn" id="startBtn">퀴즈 시작! 🚀</button>
+      <button class="btn sub" data-go="learn">먼저 독도 공부하고 올래요 📚</button>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">🎮 게임 규칙</h3>
+      <ul class="rules">
+        <li>⭐ 난이도별 점수: 쉬움 100 · 보통 150 · 어려움 200점</li>
+        <li>⏱️ 빨리 맞힐수록 <b>시간 보너스</b> (최대 +50점)</li>
+        <li>🔥 연속 정답 시 <b>콤보 보너스</b> (3콤보부터 +30점씩)</li>
+        <li>🏆 <b>반 대항전</b>: 우리 반 참여 인원 × 평균 점수로 순위 결정!</li>
+        <li>🎁 퀴즈를 마치면 나오는 <b>인증 코드</b>를 등굣길 '독도 수호 마음 나누기' 행사 부스에서 보여 주세요!</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 독도 알기 -->
+  <section id="learn" class="screen">
+    <div class="card">
+      <h2 style="margin-top:0">📍 한눈에 보는 독도</h2>
+      <div class="facts">
+        <div class="fact"><strong>91개</strong><span>동도·서도 + 부속도서 89개</span></div>
+        <div class="fact"><strong>87.4km</strong><span>울릉도에서의 거리</span></div>
+        <div class="fact"><strong>157.5km</strong><span>일본 오키섬에서의 거리</span></div>
+        <div class="fact"><strong>10월 25일</strong><span>독도의 날</span></div>
+      </div>
+      <p class="muted" style="margin-bottom:0">주소: 경상북도 울릉군 울릉읍 독도리 (동도: 독도이사부길 / 서도: 독도안용복길)</p>
+    </div>
+
+    <h2>💎 독도의 가치</h2>
+    <div class="values">
+      <div class="value"><div class="ico">📜</div><h3>역사적 가치</h3><p>512년 신라 이사부의 우산국 복속 이후 『세종실록』 지리지, 대한제국 칙령 제41호 등 수많은 기록이 독도가 우리 땅임을 증명합니다.</p></div>
+      <div class="value"><div class="ico">🗺️</div><h3>지리적·전략적 가치</h3><p>동해 한가운데 위치해 영해와 배타적 경제수역(EEZ)의 기준이 되며, 해상 교통과 국가 안보의 요충지입니다.</p></div>
+      <div class="value"><div class="ico">🐟</div><h3>경제적 가치</h3><p>한류와 난류가 만나는 조경수역으로 어족 자원이 풍부하고, 해저에는 '불타는 얼음' 가스 하이드레이트가 묻혀 있습니다.</p></div>
+      <div class="value"><div class="ico">🕊️</div><h3>생태적 가치</h3><p>섬 전체가 천연기념물 '독도 천연보호구역'입니다. 괭이갈매기·바다제비의 번식지이며 섬기린초·해국 등이 자랍니다.</p></div>
+      <div class="value"><div class="ico">🌋</div><h3>지질학적 가치</h3><p>약 460만~250만 년 전 해저 화산 활동으로 생긴 섬으로, 울릉도·제주도보다 먼저 태어난 '형님' 섬이에요.</p></div>
+      <div class="value"><div class="ico">⚖️</div><h3>국제법적 가치</h3><p>대한민국이 실효적으로 지배하는 고유 영토입니다. 독도경비대가 상주하며, 주민도 살고 있습니다.</p></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3 style="margin-top:0">⏳ 독도 역사 타임라인</h3>
+      <div class="timeline">
+        <div><b>512년</b> 신라 이사부, 우산국(울릉도·독도) 복속</div>
+        <div><b>1454년</b> 『세종실록』 지리지 – "우산과 무릉 두 섬은 맑은 날 서로 바라볼 수 있다"</div>
+        <div><b>1693·1696년</b> 안용복, 일본에 건너가 울릉도·독도가 조선 땅임을 주장</div>
+        <div><b>1877년</b> 일본 태정관 지령 – "울릉도 외 1도(독도)는 일본과 관계없다"</div>
+        <div><b>1900년 10월 25일</b> 대한제국 칙령 제41호 – 울도군이 '석도(독도)' 관할</div>
+        <div><b>1905년</b> 일본, 러일전쟁 중 '시마네현 고시 제40호'로 불법 편입 시도</div>
+        <div><b>1946년</b> 연합국 최고사령부 SCAPIN 제677호 – 독도를 일본 통치 범위에서 제외</div>
+        <div><b>1953~1956년</b> 홍순칠 대장과 독도의용수비대가 독도 수호</div>
+        <div><b>현재</b> 독도경비대 상주, 대한민국이 실효적으로 지배</div>
+      </div>
+      <p class="src">참고: 외교부 독도, 동북아역사재단 독도연구소, 경상북도 사이버독도</p>
+    </div>
+    <button class="btn" data-go="home">이제 퀴즈 풀러 가기! 🚀</button>
+  </section>
+
+  <!-- 퀴즈 -->
+  <section id="quiz" class="screen">
+    <div class="card">
+      <div class="qtop">
+        <span id="qnum">1 / 10</span>
+        <span id="combo" class="combo"></span>
+        <span>점수 <b id="qscore">0</b></span>
+      </div>
+      <div class="bar"><i id="progress" style="width:0"></i></div>
+      <div class="timer"><i id="timer"></i></div>
+      <span id="level" class="badge">보통</span>
+      <div class="question" id="question"></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn" id="nextBtn" style="display:none">다음 문제 ➜</button>
+    </div>
+  </section>
+
+  <!-- 결과 -->
+  <section id="result" class="screen">
+    <div class="card" style="text-align:center">
+      <div class="muted" id="who"></div>
+      <div class="score" id="finalScore">0</div>
+      <div class="title" id="finalTitle"></div>
+      <p class="muted" id="finalDetail"></p>
+      <div class="muted">🎁 행사 부스 인증 코드</div>
+      <div class="code" id="code"></div>
+      <p class="muted" id="saveMsg"></p>
+      <button class="btn" id="retryBtn">다시 도전 (최고 점수만 기록돼요)</button>
+      <button class="btn sub" data-go="rank">우리 반 순위 보기 🏆</button>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">📝 오답 노트</h3>
+      <div class="review" id="review"></div>
+    </div>
+  </section>
+
+  <!-- 랭킹 -->
+  <section id="rank" class="screen">
+    <div class="card">
+      <div class="tabs">
+        <button data-tab="class" class="on">🏫 반 대항전</button>
+        <button data-tab="person">🙋 개인 TOP 20</button>
+      </div>
+      <div id="rankBody"><p class="muted">불러오는 중…</p></div>
+      <p class="src" id="rankSrc"></p>
+    </div>
+    <button class="btn" data-go="home">나도 도전하기 🚀</button>
+  </section>
+</main>
+
+<div class="pop" id="pop"></div>
+
+<script src="config.js"></script>
+<script src="questions.js"></script>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const LS_KEY = "dokdoQuizResults";
+  const LS_PLAYER = "dokdoQuizPlayer";
+  const POINTS = { 1: 100, 2: 150, 3: 200 };
+  const LEVEL_NAME = { 1: "쉬움", 2: "보통", 3: "어려움" };
+
+  // ---------- 화면 전환 ----------
+  function go(id) {
+    document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("on", s.id === id));
+    document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.go === id));
+    if (id !== "quiz") stopTimer();
+    if (id === "rank") loadRanking();
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-go]");
+    if (!t) return;
+    if (state.playing && t.dataset.go !== "quiz" && !confirm("퀴즈를 그만둘까요? 기록되지 않아요.")) return;
+    state.playing = false;
+    go(t.dataset.go);
+  });
+
+  // ---------- 저장소 ----------
+  function lsGet(key, fallback) {
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+  }
+  function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
+
+  // ---------- 참가자 정보 ----------
+  CONFIG.GRADES.forEach((g) => $("#grade").add(new Option(g + "학년", g)));
+  for (let c = 1; c <= CONFIG.CLASSES_PER_GRADE; c++) $("#klass").add(new Option(c + "반", c));
+  const saved = lsGet(LS_PLAYER, null);
+  if (saved) { $("#grade").value = saved.grade; $("#klass").value = saved.klass; $("#num").value = saved.num; $("#nick").value = saved.nick; }
+
+  // ---------- 퀴즈 ----------
+  const state = { playing: false };
+  let timerId = null;
+
+  function shuffle(a) {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+
+  // 쉬운 문제 → 어려운 문제 순으로, 난이도가 섞이도록 출제
+  function pickQuestions(n) {
+    const picked = shuffle(QUESTIONS).slice(0, Math.min(n, QUESTIONS.length));
+    return picked.sort((a, b) => a.level - b.level).map((q) => {
+      if (q.type !== "mc") return q;
+      const order = shuffle(q.choices.map((_, i) => i));
+      return { ...q, choices: order.map((i) => q.choices[i]), answer: order.indexOf(q.answer) };
+    });
+  }
+
+  $("#startBtn").addEventListener("click", () => {
+    const player = {
+      grade: $("#grade").value, klass: $("#klass").value,
+      num: String(parseInt($("#num").value, 10) || ""), nick: $("#nick").value.trim()
+    };
+    if (!player.num || player.num < 1) { alert("번호를 입력해 주세요!"); $("#num").focus(); return; }
+    if (!player.nick) { alert("이름 또는 닉네임을 입력해 주세요!"); $("#nick").focus(); return; }
+    lsSet(LS_PLAYER, player);
+    startGame(player);
+  });
+  $("#retryBtn").addEventListener("click", () => startGame(state.player));
+
+  function startGame(player) {
+    Object.assign(state, {
+      player, list: pickQuestions(CONFIG.QUESTIONS_PER_GAME), idx: 0, score: 0,
+      correct: 0, combo: 0, maxCombo: 0, wrongs: [], playing: true, startedAt: Date.now()
+    });
+    go("quiz");
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = state.list[state.idx];
+    const total = state.list.length;
+    $("#qnum").textContent = `${state.idx + 1} / ${total}`;
+    $("#progress").style.width = (state.idx / total) * 100 + "%";
+    $("#qscore").textContent = state.score;
+    $("#combo").textContent = state.combo >= 2 ? `🔥 ${state.combo}콤보` : "";
+    $("#level").textContent = `${LEVEL_NAME[q.level]} · ${POINTS[q.level]}점`;
+    $("#level").className = "badge" + (q.level === 3 ? " l3" : "");
+    $("#question").textContent = (q.type === "ox" ? "[O/X] " : "") + q.q;
+    $("#feedback").className = "feedback";
+    $("#nextBtn").style.display = "none";
+
+    const box = $("#choices");
+    box.innerHTML = "";
+    box.className = "choices" + (q.type === "ox" ? " ox" : "");
+    const opts = q.type === "ox" ? ["O", "X"] : q.choices;
+    opts.forEach((text, i) => {
+      const b = document.createElement("button");
+      b.className = "choice";
+      b.textContent = q.type === "ox" ? text : `${i + 1}. ${text}`;
+      b.addEventListener("click", () => answer(i));
+      box.appendChild(b);
+    });
+    startTimer();
+  }
+
+  function startTimer() {
+    stopTimer();
+    const limit = CONFIG.SECONDS_PER_QUESTION * 1000;
+    state.qStart = Date.now();
+    const bar = $("#timer");
+    timerId = setInterval(() => {
+      const left = Math.max(0, limit - (Date.now() - state.qStart));
+      bar.style.width = (left / limit) * 100 + "%";
+      if (left <= 0) answer(-1);
+    }, 100);
+  }
+  function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+
+  function answer(choice) {
+    if (!timerId) return; // 이미 답함
+    stopTimer();
+    const q = state.list[state.idx];
+    const correctIdx = q.type === "ox" ? (q.answer ? 0 : 1) : q.answer;
+    const ok = choice === correctIdx;
+    const btns = $("#choices").querySelectorAll(".choice");
+    btns.forEach((b, i) => {
+      b.disabled = true;
+      if (i === correctIdx) b.classList.add("correct");
+      else if (i === choice) b.classList.add("wrong");
+    });
+
+    let gained = 0, msg;
+    if (ok) {
+      state.correct++; state.combo++; state.maxCombo = Math.max(state.maxCombo, state.combo);
+      const leftRatio = Math.max(0, 1 - (Date.now() - state.qStart) / (CONFIG.SECONDS_PER_QUESTION * 1000));
+      const timeBonus = Math.round(50 * leftRatio);
+      const comboBonus = state.combo >= 3 ? 30 * (state.combo - 2) : 0;
+      gained = POINTS[q.level] + timeBonus + comboBonus;
+      state.score += gained;
+      msg = `<b>⭕ 정답! +${gained}점</b> <span class="muted">(기본 ${POINTS[q.level]} · 시간 +${timeBonus}${comboBonus ? ` · 콤보 +${comboBonus}` : ""})</span>`;
+      popup(state.combo >= 3 ? `🔥 ${state.combo} COMBO!` : "정답! 👍");
+    } else {
+      state.combo = 0;
+      state.wrongs.push(q);
+      msg = choice === -1 ? "<b>⏰ 시간 초과!</b>" : "<b>❌ 아쉬워요!</b>";
+    }
+    const fb = $("#feedback");
+    fb.innerHTML = `${msg}<br>${q.exp}`;
+    fb.className = "feedback on " + (ok ? "ok" : "no");
+    $("#qscore").textContent = state.score;
+    $("#combo").textContent = state.combo >= 2 ? `🔥 ${state.combo}콤보` : "";
+    const last = state.idx === state.list.length - 1;
+    $("#nextBtn").textContent = last ? "결과 보기 🏁" : "다음 문제 ➜";
+    $("#nextBtn").style.display = "block";
+  }
+
+  $("#nextBtn").addEventListener("click", () => {
+    state.idx++;
+    if (state.idx < state.list.length) showQuestion();
+    else finish();
+  });
+
+  function popup(text) {
+    const p = $("#pop");
+    p.textContent = text;
+    p.classList.remove("go"); void p.offsetWidth; p.classList.add("go");
+  }
+
+  function titleFor(correct, total) {
+    const r = correct / total;
+    if (r === 1) return "👑 독도 수호 대장군";
+    if (r >= 0.8) return "🛡️ 독도 경비대장";
+    if (r >= 0.6) return "⚓ 독도 의용수비대원";
+    if (r >= 0.4) return "🐦 독도 괭이갈매기";
+    return "🌱 독도 새내기 (독도 알기 페이지를 읽고 재도전!)";
+  }
+
+  function makeCode(p, score) {
+    // 행사 부스 확인용 간단 코드: 학년반번호 + 점수 기반 체크 문자
+    const base = `${p.grade}${String(p.klass).padStart(2, "0")}${String(p.num).padStart(2, "0")}`;
+    let h = 0;
+    for (const ch of base + score + "dokdo") h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return `DD-${base}-${h.toString(36).toUpperCase().slice(-4)}`;
+  }
+
+  function finish() {
+    state.playing = false;
+    const p = state.player, total = state.list.length;
+    $("#progress").style.width = "100%";
+    $("#who").textContent = `${p.grade}학년 ${p.klass}반 ${p.num}번 ${p.nick}`;
+    $("#finalScore").textContent = state.score + "점";
+    $("#finalTitle").textContent = titleFor(state.correct, total);
+    $("#finalDetail").textContent = `${total}문제 중 ${state.correct}문제 정답 · 최대 ${state.maxCombo}콤보`;
+    $("#code").textContent = makeCode(p, state.score);
+    $("#review").innerHTML = state.wrongs.length
+      ? state.wrongs.map((q) => `<div><b>Q. ${escapeHtml(q.q)}</b><br>💡 ${escapeHtml(q.exp)}</div>`).join("")
+      : "<div>🎉 모두 맞혔어요! 완벽한 독도 지킴이!</div>";
+
+    const record = {
+      time: new Date().toISOString(), grade: +p.grade, klass: +p.klass, num: +p.num, nick: p.nick,
+      score: state.score, correct: state.correct, total, maxCombo: state.maxCombo,
+      seconds: Math.round((Date.now() - state.startedAt) / 1000),
+      wrongIds: state.wrongs.map((q) => QUESTIONS.findIndex((o) => o.q === q.q) + 1).join(",")
+    };
+    saveRecord(record);
+    go("result");
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  // ---------- 데이터베이스 저장 ----------
+  function saveRecord(rec) {
+    const all = lsGet(LS_KEY, []);
+    all.push(rec);
+    lsSet(LS_KEY, all);
+    if (!CONFIG.SCRIPT_URL) {
+      $("#saveMsg").textContent = "※ 이 기기에 저장되었어요. (선생님: config.js에 구글 시트 주소를 넣으면 전교 기록이 모여요)";
+      return;
+    }
+    $("#saveMsg").textContent = "기록 저장 중…";
+    fetch(CONFIG.SCRIPT_URL, {
+      method: "POST", mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(rec)
+    }).then(() => { $("#saveMsg").textContent = "✅ 기록이 저장되었어요!"; })
+      .catch(() => { $("#saveMsg").textContent = "⚠️ 서버 저장 실패 — 이 기기에는 저장되었어요."; });
+  }
+
+  // ---------- 랭킹 ----------
+  let rankTab = "class", rankData = [];
+  document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => {
+    rankTab = b.dataset.tab;
+    document.querySelectorAll("[data-tab]").forEach((x) => x.classList.toggle("on", x === b));
+    renderRanking();
+  }));
+
+  async function loadRanking() {
+    $("#rankBody").innerHTML = '<p class="muted">불러오는 중…</p>';
+    if (CONFIG.SCRIPT_URL) {
+      try {
+        const res = await fetch(CONFIG.SCRIPT_URL + "?action=list");
+        rankData = await res.json();
+        $("#rankSrc").textContent = "전교 참여 기록 (구글 시트) 기준";
+      } catch {
+        rankData = lsGet(LS_KEY, []);
+        $("#rankSrc").textContent = "⚠️ 서버 연결 실패 — 이 기기의 기록만 표시합니다.";
+      }
+    } else {
+      rankData = lsGet(LS_KEY, []);
+      $("#rankSrc").textContent = "이 기기에서 참여한 기록만 표시됩니다.";
+    }
+    renderRanking();
+  }
+
+  // 학생별 최고 점수만 남김 (학년-반-번호 기준)
+  function bestPerStudent(rows) {
+    const m = new Map();
+    rows.forEach((r) => {
+      const k = `${r.grade}-${r.klass}-${r.num}`;
+      if (!m.has(k) || +r.score > +m.get(k).score) m.set(k, r);
+    });
+    return [...m.values()];
+  }
+
+  function renderRanking() {
+    const best = bestPerStudent(rankData);
+    if (!best.length) { $("#rankBody").innerHTML = '<p class="muted">아직 기록이 없어요. 첫 번째 독도 지킴이가 되어 보세요!</p>'; return; }
+    const me = lsGet(LS_PLAYER, {});
+    const medal = (i) => ["🥇", "🥈", "🥉"][i] || i + 1;
+    if (rankTab === "person") {
+      const rows = best.sort((a, b) => b.score - a.score).slice(0, 20);
+      $("#rankBody").innerHTML = `<table><tr><th>순위</th><th>학반</th><th>닉네임</th><th class="num">점수</th></tr>${
+        rows.map((r, i) => `<tr class="${r.grade == me.grade && r.klass == me.klass && r.num == me.num ? "me" : ""}">
+          <td class="medal">${medal(i)}</td><td>${r.grade}-${r.klass}</td><td>${escapeHtml(r.nick)}</td><td class="num">${r.score}</td></tr>`).join("")
+      }</table>`;
+    } else {
+      const cls = new Map();
+      best.forEach((r) => {
+        const k = `${r.grade}-${r.klass}`;
+        const c = cls.get(k) || { k, n: 0, sum: 0 };
+        c.n++; c.sum += +r.score; cls.set(k, c);
+      });
+      // 반 점수 = 평균 점수 × 참여 인원 → 많이 참여할수록 유리 (참여 독려)
+      const rows = [...cls.values()].map((c) => ({ ...c, avg: Math.round(c.sum / c.n), total: c.sum }))
+        .sort((a, b) => b.total - a.total);
+      $("#rankBody").innerHTML = `<table><tr><th>순위</th><th>반</th><th class="num">참여</th><th class="num">평균</th><th class="num">반 점수</th></tr>${
+        rows.map((c, i) => `<tr class="${c.k === `${me.grade}-${me.klass}` ? "me" : ""}">
+          <td class="medal">${medal(i)}</td><td>${c.k.replace("-", "학년 ")}반</td><td class="num">${c.n}명</td><td class="num">${c.avg}</td><td class="num"><b>${c.total.toLocaleString()}</b></td></tr>`).join("")
+      }</table><p class="muted">반 점수 = 참여 학생 각자의 최고 점수 합계. 친구들을 많이 참여시킬수록 우리 반이 올라가요!</p>`;
+    }
+  }
+})();
+</script>
+</body>
+</html>
