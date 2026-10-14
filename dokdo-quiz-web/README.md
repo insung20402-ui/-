@@ -1,12 +1,33 @@
 # 🇰🇷 독도 사진 퀴즈 (웹사이트)
 
 사진을 보고 맞히는 독도 퀴즈 웹사이트입니다. HTML · CSS(Tailwind) · JavaScript · Chart.js로 만들었고,
-결과는 **Firebase Firestore**(추천) 또는 **구글 스프레드시트**에 저장됩니다.
+결과는 **미니 PC 서버**(추천), **Firebase Firestore**, **구글 스프레드시트** 중 하나에 저장됩니다.
+
+## 🖥️ 미니 PC로 띄우기 (추천 · 계정 필요 없음)
+1. 미니 PC에 **파이썬** 설치: https://www.python.org/downloads/
+   (설치 첫 화면에서 **"Add python.exe to PATH"** 꼭 체크)
+2. 이 `dokdo-quiz-web` 폴더를 미니 PC에 통째로 복사
+3. 사진을 `images/` 폴더에 정해진 이름으로 넣기 → 목록은 `images/README.md`
+4. **`start-windows.bat` 더블클릭** (맥·리눅스는 `start-mac-linux.sh`)
+5. 검은 창에 나오는 **학생 접속 주소**(예: `http://192.168.0.15:8000`)를 QR 코드로 만들어 교실·복도에 붙이기
+
+- 학생 휴대폰이 미니 PC와 **같은 와이파이(학교 네트워크)** 에 있어야 접속됩니다.
+- 처음 실행할 때 Windows 방화벽 창이 뜨면 **허용**을 누르세요.
+- 결과는 미니 PC의 `data/results.csv`(엑셀로 열기)에 쌓이고, 웹 화면의 **통계** 탭에서 그래프로 볼 수 있습니다.
+  학생이 퀴즈를 마치면 5초 안에 통계에 반영됩니다.
+- 미니 PC를 끄면 퀴즈도 꺼집니다. 행사 기간에는 미니 PC가 절전 모드로 들어가지 않게 설정해 주세요.
+- Tailwind와 Chart.js를 폴더 안에 넣어 두어 **인터넷이 끊겨도** 동작합니다. (글꼴만 기본 글꼴로 바뀜)
+- `data/` 폴더를 지우면 기록이 초기화됩니다. 행사 전 시험 기록은 지우고 시작하세요.
 
 ## 폴더 구조
 ```
 dokdo-quiz-web/
+├─ start-windows.bat       ★ 미니 PC(Windows)에서 더블클릭하면 서버 시작
+├─ server.py               미니 PC 서버 (웹사이트 + 결과 저장, 파이썬 기본 기능만 사용)
+├─ images/                 ★ 퀴즈 사진 넣는 곳 (파일 이름 목록: images/README.md)
+├─ data/                   결과가 저장되는 곳 (서버를 처음 실행하면 생김)
 ├─ index.html              화면 (시작 · 문제 · 결과 · 통계)
+├─ vendor/, css/tailwind.css  Chart.js · Tailwind (인터넷 없이도 동작하도록 포함)
 ├─ css/style.css           동해 바다 그라데이션 + 반투명 유리(Glassmorphism) 테마
 ├─ js/config.js            ★ 저장소 설정 (Firebase 키 / 스프레드시트 URL)
 ├─ js/questions.js         ★ 문제 은행 (샘플 15문제, 500문제까지 같은 형식으로 추가)
@@ -57,7 +78,7 @@ dokdo-quiz-web/
 ```
 `answers`(문항별 맞춤/틀림)로 통계 화면의 '가장 많이 맞힌 문제 / 가장 많이 틀린 문제' 그래프를 그립니다.
 
-## A. Firebase 연결 (추천, 무료 Spark 요금제)
+## A. Firebase 연결 (미니 PC 대신 인터넷 서비스로 운영할 때)
 1. https://console.firebase.google.com → **프로젝트 추가**
 2. 왼쪽 **Firestore Database → 데이터베이스 만들기** (위치: `asia-northeast3 (서울)`, 프로덕션 모드)
 3. Firestore **규칙** 탭에 `firebase/firestore.rules` 내용을 붙여넣고 **게시**
@@ -79,3 +100,7 @@ dokdo-quiz-web/
 - 또는 **Firebase Hosting**: `npm i -g firebase-tools` → `firebase init hosting` (public 폴더를 `dokdo-quiz-web`로) → `firebase deploy`
 
 설정값을 비워 두면 결과가 그 브라우저에만 저장되는 **테스트 모드**로 동작합니다.
+
+## 디자인을 고쳤다면
+`index.html`에 새 Tailwind 클래스를 쓰면 `css/tailwind.css`를 다시 만들어야 합니다.
+`npx tailwindcss@3.4.17 -o css/tailwind.css --minify --content "./**/*.{html,js}"`

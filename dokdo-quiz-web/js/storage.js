@@ -19,8 +19,9 @@
  */
 const Storage = (() => {
   const LOCAL_KEY = "dokdoQuizWebResults";
-  const firebaseReady = () => APP_CONFIG.BACKEND === "firebase" && APP_CONFIG.FIREBASE.apiKey && APP_CONFIG.FIREBASE.projectId;
-  const sheetsReady = () => APP_CONFIG.BACKEND === "sheets" && APP_CONFIG.SHEETS_URL;
+  const want = (name) => APP_CONFIG.BACKEND === "auto" || APP_CONFIG.BACKEND === name;
+  const firebaseReady = () => want("firebase") && APP_CONFIG.FIREBASE.apiKey && APP_CONFIG.FIREBASE.projectId;
+  const sheetsReady = () => want("sheets") && APP_CONFIG.SHEETS_URL;
 
   const api = { label: "이 브라우저 (테스트 모드)" };
   let impl = null;
@@ -77,6 +78,32 @@ const Storage = (() => {
     };
   }
 
+  // ── 미니 PC 서버 (server.py) ──
+  async function makeServer() {
+    if (!want("server") || !/^https?:$/.test(location.protocol)) return null;
+    try {
+      const res = await fetch("api/results", { cache: "no-store" });
+      if (!res.ok || !(res.headers.get("content-type") || "").includes("json")) return null;
+    } catch { return null; }
+    let pull = null;
+    return {
+      label: "미니 PC 서버",
+      async save(rec) {
+        const res = await fetch("api/results", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec)
+        });
+        if (!res.ok) throw new Error("server " + res.status);
+        if (pull) pull(); // 저장 직후 통계 바로 갱신
+      },
+      subscribe(fn) {
+        pull = () => fetch("api/results", { cache: "no-store" }).then((r) => r.json()).then((rows) => fn(rows))
+          .catch(() => fn(null, "미니 PC 서버에 연결하지 못했어요."));
+        pull();
+        setInterval(pull, 5000); // 5초마다 새 기록 확인
+      }
+    };
+  }
+
   // ── claude.ai 아티팩트에서 열었을 때: 아티팩트 공유 DB ──
   async function makeClaudeDb() {
     if (!(window.claude && window.claude.use)) return null;
@@ -98,6 +125,7 @@ const Storage = (() => {
     try {
       impl = (await makeClaudeDb())
         || (firebaseReady() ? await makeFirebase() : null)
+        || (await makeServer())
         || (sheetsReady() ? makeSheets() : null)
         || local;
     } catch (e) {
