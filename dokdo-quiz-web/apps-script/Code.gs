@@ -5,10 +5,10 @@
  * 2. [배포] → [새 배포] → 유형 '웹 앱' / 실행: 나 / 액세스: 모든 사용자 → 배포 → URL 복사
  * 3. js/config.js 에서 BACKEND: "sheets", SHEETS_URL: "복사한 URL"
  *
- * 'results' 시트에 한 판마다 한 줄: 풀이 완료 시간 | 이름 | 점수 | 정답 수 | 걸린 시간(초) | 문항별 결과
+ * 'results' 시트에 한 판마다 한 줄: 풀이 완료 시간 | 학년 | 반 | 번호 | 이름 | 점수 | 정답 수 | 걸린 시간(초) | 문항별 결과
  */
 const SHEET = "results";
-const HEADERS = ["풀이 완료 시간", "이름", "점수", "정답 수", "걸린 시간(초)", "문항별 결과(JSON)", "finishedAt(ISO)"];
+const HEADERS = ["풀이 완료 시간", "학년", "반", "번호", "이름", "점수", "정답 수", "걸린 시간(초)", "문항별 결과(JSON)", "finishedAt(ISO)"];
 
 function sheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -34,12 +34,13 @@ function doPost(e) {
     const r = JSON.parse(e.postData.contents);
     const score = Number(r.score);
     const name = String(r.name || "").trim().slice(0, 12);
-    if (!name || !(score >= 0 && score <= 100)) return out_({ ok: false });
+    const grade = Number(r.grade), klass = Number(r.klass), num = Number(r.num);
+    if (!name || !grade || !klass || !num || !(score >= 0 && score <= 100)) return out_({ ok: false });
     const answers = (Array.isArray(r.answers) ? r.answers : []).slice(0, 10)
       .map(function (a) { return { id: String(a.id).slice(0, 20), correct: !!a.correct }; });
     sheet_().appendRow([
       Utilities.formatDate(new Date(), "Asia/Seoul", "yyyy-MM-dd HH:mm:ss"),
-      name, score, Number(r.correctCount) || 0, Number(r.durationSec) || 0,
+      grade, klass, num, name, score, Number(r.correctCount) || 0, Number(r.durationSec) || 0,
       JSON.stringify(answers), String(r.finishedAt || new Date().toISOString())
     ]);
     return out_({ ok: true });
@@ -51,11 +52,12 @@ function doPost(e) {
 function doGet() {
   const rows = sheet_().getDataRange().getValues().slice(1).map(function (v) {
     let answers = [];
-    try { answers = JSON.parse(v[5]); } catch (err) {}
+    try { answers = JSON.parse(v[8]); } catch (err) {}
     return {
       finishedAtText: v[0] instanceof Date ? Utilities.formatDate(v[0], "Asia/Seoul", "yyyy-MM-dd HH:mm:ss") : String(v[0]),
-      name: String(v[1]), score: Number(v[2]), correctCount: Number(v[3]), durationSec: Number(v[4]),
-      answers: answers, finishedAt: String(v[6])
+      grade: Number(v[1]), klass: Number(v[2]), num: Number(v[3]), name: String(v[4]),
+      score: Number(v[5]), correctCount: Number(v[6]), durationSec: Number(v[7]),
+      answers: answers, finishedAt: String(v[9])
     };
   });
   return out_(rows);

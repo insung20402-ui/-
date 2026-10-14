@@ -39,6 +39,12 @@
         <div class="glass p-3"><b class="text-rose-200">상</b><br>15점 × 2</div>
       </div>
       <form id="startForm" class="mt-6 text-left grid gap-3" novalidate>
+        <label for="playerGrade" class="font-bold text-sm">학년 / 반 / 번호</label>
+        <div class="grid grid-cols-3 gap-2">
+          <select id="playerGrade" class="field" aria-label="학년"></select>
+          <select id="playerClass" class="field" aria-label="반"></select>
+          <input id="playerNum" class="field" type="number" min="1" max="50" inputmode="numeric" placeholder="번호" aria-label="번호">
+        </div>
         <label for="playerName" class="font-bold text-sm">이름</label>
         <input id="playerName" class="field" maxlength="12" placeholder="예) 홍길동" autocomplete="off">
         <p id="startErr" class="err" role="alert"></p>
@@ -125,7 +131,7 @@
       <div class="glass p-5 mt-4">
         <h3 class="font-bold mb-3">🕗 최근 참여 기록</h3>
         <div class="tablebox"><table>
-          <thead><tr><th>풀이 완료 시간</th><th>이름</th><th class="num">점수</th><th class="num">정답</th><th class="num">걸린 시간</th></tr></thead>
+          <thead><tr><th>풀이 완료 시간</th><th>학년-반-번호</th><th>이름</th><th class="num">점수</th><th class="num">정답</th><th class="num">걸린 시간</th></tr></thead>
           <tbody id="sRows"></tbody>
         </table></div>
       </div>

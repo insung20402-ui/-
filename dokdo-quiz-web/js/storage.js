@@ -7,6 +7,7 @@
  *
  * record 형식
  * {
+ *   grade: 1, klass: 3, num: 12,              // 학년, 반, 번호
  *   name: "홍길동",
  *   score: 85,
  *   finishedAt: "2026-10-20T08:15:32.000Z",   // 풀이 완료 시각

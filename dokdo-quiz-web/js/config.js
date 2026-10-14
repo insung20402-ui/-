@@ -24,5 +24,7 @@ const APP_CONFIG = {
   // 구글 스프레드시트 Apps Script 웹 앱 URL (BACKEND: "sheets" 일 때)
   SHEETS_URL: "",
 
-  SECONDS_PER_QUESTION: 20
+  SECONDS_PER_QUESTION: 20,
+  GRADES: [1, 2, 3],        // 학년 선택지
+  CLASSES_PER_GRADE: 10     // 학년별 반 수
 };

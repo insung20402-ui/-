@@ -56,19 +56,30 @@
   const state = { finished: false };
   let timer = null;
 
+  APP_CONFIG.GRADES.forEach((g) => $("playerGrade").add(new Option(g + "학년", g)));
+  for (let c = 1; c <= APP_CONFIG.CLASSES_PER_GRADE; c++) $("playerClass").add(new Option(c + "반", c));
+  try {
+    const saved = JSON.parse(localStorage.getItem("dokdoQuizWebPlayer") || "null");
+    if (saved) { $("playerGrade").value = saved.grade; $("playerClass").value = saved.klass; $("playerNum").value = saved.num; $("playerName").value = saved.name; }
+  } catch {}
+
   $("startForm").addEventListener("submit", (e) => {
     e.preventDefault();
-    const name = $("playerName").value.trim();
-    if (!name) { $("startErr").textContent = "이름을 입력해 주세요."; $("playerName").focus(); return; }
+    const player = {
+      grade: Number($("playerGrade").value), klass: Number($("playerClass").value),
+      num: parseInt($("playerNum").value, 10), name: $("playerName").value.trim()
+    };
+    const err = (msg, el) => { $("startErr").textContent = msg; el.focus(); };
+    if (!(player.num >= 1 && player.num <= 50)) return err("번호를 입력해 주세요. (1~50)", $("playerNum"));
+    if (!player.name) return err("이름을 입력해 주세요.", $("playerName"));
     $("startErr").textContent = "";
-    try { localStorage.setItem("dokdoQuizWebName", name); } catch {}
-    start(name);
+    try { localStorage.setItem("dokdoQuizWebPlayer", JSON.stringify(player)); } catch {}
+    start(player);
   });
-  try { $("playerName").value = localStorage.getItem("dokdoQuizWebName") || ""; } catch {}
-  $("rRetry").addEventListener("click", () => start(state.name));
+  $("rRetry").addEventListener("click", () => start(state.player));
 
-  function start(name) {
-    Object.assign(state, { name, list: buildQuiz(), idx: 0, score: 0, answers: [], startedAt: Date.now(), finished: false });
+  function start(player) {
+    Object.assign(state, { player, name: player.name, list: buildQuiz(), idx: 0, score: 0, answers: [], startedAt: Date.now(), finished: false });
     show("quiz");
     renderQuestion();
   }
@@ -143,8 +154,12 @@
     state.finished = true;
     const now = new Date();
     const correctCount = state.answers.filter((a) => a.correct).length;
+    const p = state.player;
     const record = {
-      name: state.name,
+      grade: p.grade,
+      klass: p.klass,
+      num: p.num,
+      name: p.name,
       score: state.score,
       finishedAt: now.toISOString(),
       finishedAtText: kst(now),
@@ -152,7 +167,7 @@
       correctCount,
       answers: state.answers
     };
-    $("rWho").textContent = `${state.name} · ${record.finishedAtText} 완료`;
+    $("rWho").textContent = `${p.grade}학년 ${p.klass}반 ${p.num}번 ${p.name} · ${record.finishedAtText} 완료`;
     $("rScore").textContent = state.score + "점";
     $("rTitle").textContent = titleFor(state.score);
     $("rDetail").textContent = `10문제 중 ${correctCount}문제 정답 · ${Math.floor(record.durationSec / 60)}분 ${record.durationSec % 60}초`;
@@ -185,7 +200,7 @@
     $("sEmpty").hidden = rows.length > 0;
     $("sBody").hidden = rows.length === 0;
     $("kCount").textContent = rows.length.toLocaleString();
-    $("kPeople").textContent = new Set(rows.map((r) => r.name)).size.toLocaleString();
+    $("kPeople").textContent = new Set(rows.map((r) => r.grade ? `${r.grade}-${r.klass}-${r.num}` : r.name)).size.toLocaleString();
     $("kAvg").textContent = rows.length ? Math.round(rows.reduce((s, r) => s + (+r.score || 0), 0) / rows.length) + "점" : "-";
     $("kPerfect").textContent = rows.filter((r) => +r.score === 100).length + "회";
     if (!rows.length) return;
@@ -193,7 +208,7 @@
     Stats.barChart("sChartBad", bad3, "bad");
     Stats.rateChart("sChartRate", list);
     const recent = rows.slice().sort((a, b) => String(b.finishedAt).localeCompare(String(a.finishedAt))).slice(0, 50);
-    $("sRows").innerHTML = recent.map((r) => `<tr><td>${esc(r.finishedAtText || r.finishedAt)}</td><td>${esc(r.name)}</td>
+    $("sRows").innerHTML = recent.map((r) => `<tr><td>${esc(r.finishedAtText || r.finishedAt)}</td><td>${r.grade ? `${esc(r.grade)}-${esc(r.klass)}-${esc(r.num)}` : ""}</td><td>${esc(r.name)}</td>
       <td class="num">${esc(r.score)}</td><td class="num">${esc(r.correctCount ?? "")}/10</td>
       <td class="num">${r.durationSec ? Math.floor(r.durationSec / 60) + "분 " + (r.durationSec % 60) + "초" : ""}</td></tr>`).join("");
   }

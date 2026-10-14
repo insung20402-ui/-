@@ -9,7 +9,10 @@ service cloud.firestore {
       allow read: if true;
       allow update, delete: if false;
       allow create: if
-        request.resource.data.keys().hasOnly(['name', 'score', 'finishedAt', 'finishedAtText', 'durationSec', 'correctCount', 'answers', 'createdAt'])
+        request.resource.data.keys().hasOnly(['grade', 'klass', 'num', 'name', 'score', 'finishedAt', 'finishedAtText', 'durationSec', 'correctCount', 'answers', 'createdAt'])
+        && request.resource.data.grade is int && request.resource.data.grade >= 1 && request.resource.data.grade <= 6
+        && request.resource.data.klass is int && request.resource.data.klass >= 1 && request.resource.data.klass <= 30
+        && request.resource.data.num is int && request.resource.data.num >= 1 && request.resource.data.num <= 50
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 12
         && request.resource.data.score is int

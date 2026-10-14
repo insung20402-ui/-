@@ -45,6 +45,7 @@ dokdo-quiz-web/
 퀴즈를 마칠 때마다 한 건씩 저장됩니다.
 ```json
 {
+  "grade": 1, "klass": 3, "num": 12,
   "name": "홍길동",
   "score": 85,
   "finishedAt": "2026-10-20T08:15:32.000Z",
@@ -71,7 +72,7 @@ dokdo-quiz-web/
 1. 새 구글 스프레드시트 → **확장 프로그램 → Apps Script** → `apps-script/Code.gs` 붙여넣기 → 저장
 2. **배포 → 새 배포 → 웹 앱** (실행: 나 / 액세스: 모든 사용자) → URL 복사
 3. `js/config.js`에서 `BACKEND: "sheets"`, `SHEETS_URL: "복사한 URL"`
-→ `results` 시트에 `풀이 완료 시간 | 이름 | 점수 | 정답 수 | 걸린 시간 | 문항별 결과`가 쌓입니다. (통계 화면은 30초마다 새로고침)
+→ `results` 시트에 `풀이 완료 시간 | 학년 | 반 | 번호 | 이름 | 점수 | 정답 수 | 걸린 시간 | 문항별 결과`가 쌓입니다. (통계 화면은 30초마다 새로고침)
 
 ## 웹사이트로 올리기
 - **GitHub Pages**: 저장소 Settings → Pages → 브랜치 선택 → `https://<아이디>.github.io/<저장소>/dokdo-quiz-web/`
