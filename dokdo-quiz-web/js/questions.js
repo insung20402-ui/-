@@ -9,7 +9,7 @@
  *  question    문제 문장
  *  imageUrl    사진 주소. images/ 폴더의 파일(예: images/q005-isabu.jpg) 또는 https://… 주소.
  *              파일이 없거나 비워 두면 파란 자리 표시자가 나옵니다.
- *  imageAlt    사진 설명 (자리 표시자 문구 + 화면 낭독기용)
+ *  imageAlt    어떤 사진이 필요한지 적는 메모 (정답이 드러나므로 화면에는 표시하지 않음)
  *  imageCredit 사진 출처 (공공누리·CC 사진은 꼭 적기)
  *  choices     보기 4개
  *  answer      정답 보기의 번호 (0부터)

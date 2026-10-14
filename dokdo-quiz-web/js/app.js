@@ -24,18 +24,14 @@
   });
 
   // ───── 이미지 자리 표시자 (파란색 톤) ─────
-  function placeholder(text) {
-    const lines = String(text).match(/.{1,18}/g) || [""];
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  // 정답이 드러나지 않도록 사진 설명은 넣지 않고 '사진 준비 중'만 표시
+  const PLACEHOLDER = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
       <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1166a8"/><stop offset="1" stop-color="#04203d"/></linearGradient></defs>
       <rect width="800" height="500" fill="url(#g)"/>
       <path d="M0 400 C150 370 300 430 450 400 S700 370 800 400 V500 H0Z" fill="#0a3d6b" opacity=".7"/>
       <path d="M210 400 L300 230 L340 280 L400 400Z M430 400 L480 300 L520 250 L560 320 L620 400Z" fill="#e8f4ff" opacity=".18"/>
-      <text x="400" y="150" text-anchor="middle" font-size="64">📷</text>
-      ${lines.map((l, i) => `<text x="400" y="${230 + i * 44}" text-anchor="middle" fill="#e8f4ff" font-family="Noto Sans KR, sans-serif" font-size="34" font-weight="700">${esc(l)}</text>`).join("")}
-      <text x="400" y="${250 + lines.length * 44}" text-anchor="middle" fill="#b8cde0" font-family="Noto Sans KR, sans-serif" font-size="22">사진 준비 중</text></svg>`;
-    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-  }
+      <text x="400" y="200" text-anchor="middle" font-size="72">📷</text>
+      <text x="400" y="270" text-anchor="middle" fill="#b8cde0" font-family="Noto Sans KR, sans-serif" font-size="28" font-weight="700">사진 준비 중</text></svg>`);
 
   // ───── 출제: 하 2 + 중 6 + 상 2 ─────
   function buildQuiz() {
@@ -93,9 +89,9 @@
     $("qLevel").className = `chip lv-${q.level}`;
     $("qCat").textContent = q.category;
     const img = $("qImg");
-    img.onerror = () => { img.onerror = null; img.src = placeholder(q.imageAlt); };
-    img.src = q.imageUrl || placeholder(q.imageAlt);
-    img.alt = q.imageAlt;
+    img.onerror = () => { img.onerror = null; img.src = PLACEHOLDER; };
+    img.src = q.imageUrl || PLACEHOLDER;
+    img.alt = "퀴즈 사진"; // 사진 설명(imageAlt)에 정답이 들어 있어 화면에는 노출하지 않음
     $("qCredit").textContent = q.imageUrl && q.imageCredit ? `사진: ${q.imageCredit}` : "";
     $("qText").textContent = q.question;
     $("qFeedback").hidden = true;
