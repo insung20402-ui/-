@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <title>감성 가계부</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <style>
+    :root {
+      --bg-top: #0d3b25;
+      --bg-mid: #145a38;
+      --bg-bot: #1a7a4e;
+      --card-bg: rgba(255,255,255,0.94);
+      --primary: #16a34a;
+      --primary-light: #22c55e;
+      --primary-hover: #15803d;
+      --primary-glow: rgba(22,163,74,0.25);
+      --accent-gold: #eab308;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --radius: 22px;
+      --radius-sm: 14px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', sans-serif;
+      background: linear-gradient(170deg, var(--bg-top) 0%, var(--bg-mid) 50%, var(--bg-bot) 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    /* ─ 돈 떨어지는 배경 ─ */
+    .money-rain { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
+    .money {
+      position: absolute;
+      top: -80px;
+      user-select: none;
+      animation: moneyFall linear infinite;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+    }
+    @keyframes moneyFall {
+      0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity:0.9; }
+      20%  { transform: translateY(20vh) rotate(72deg) translateX(30px); }
+      40%  { transform: translateY(40vh) rotate(144deg) translateX(-25px); opacity:0.75; }
+      60%  { transform: translateY(60vh) rotate(288deg) translateX(35px); }
+      80%  { transform: translateY(80vh) rotate(504deg) translateX(-15px); opacity:0.5; }
+      100% { transform: translateY(110vh) rotate(720deg) translateX(20px); opacity:0; }
+    }
+
+    /* 반짝이 효과 */
+    .sparkle {
+      position: absolute;
+      width: 4px; height: 4px;
+      background: var(--accent-gold);
+      border-radius: 50%;
+      animation: sparkleAnim 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes sparkleAnim {
+      0%, 100% { opacity:0; transform:scale(0); }
+      50% { opacity:1; transform:scale(1); }
+    }
+
+    .app-wrap {
+      position: relative; z-index: 10;
+      width: 100%; max-width: 520px;
+      margin-top: 8px;
+      padding-bottom: 24px;
+    }
+
+    /* 헤더 */
+    .app-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 14px;
+      padding: 12px 0;
+    }
+    .app-header .logo { font-size: 2.2rem; margin-bottom: 4px; }
+    .app-header h1 {
+      font-size: 1.5rem; font-weight: 900;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      background: linear-gradient(90deg, #86efac, #fde68a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .app-header p { font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+    /* 로그인 배지 */
+    .user-badge {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #bbf7d0;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+      display: none;
+      letter-spacing: 0.3px;
+    }
+
+    /* 카드 */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* 탭 */
+    .tab-bar {
+      display: flex;
+      background: #f0fdf4;
+      padding: 5px;
+      border-radius: 16px;
+      gap: 4px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 4px;
+      border: none;
+      background: transparent;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.25s;
+      white-space: nowrap;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .tab-panel { display:none; flex-direction:column; gap:14px; }
+    .tab-panel.active { display:flex; }
+
+    /* 폼 */
+    h2 { font-size:1.15rem; color:var(--text-main); }
+    .sub { font-size:0.82rem; color:var(--text-muted); margin-top:2px; }
+    .field { display:flex; flex-direction:column; gap:5px; }
+    .field label { font-size:0.8rem; font-weight:700; color:var(--text-main); }
+    .row { display:flex; gap:8px; }
+    input, select {
+      width:100%; padding:12px 14px;
+      border: 2px solid #e2e8f0; border-radius: var(--radius-sm);
+      outline:none; font-size:0.9rem; background:#f8fafc;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+      background: #fff;
+    }
+    .btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white; border: none;
+      padding: 14px; border-radius: 16px;
+      font-weight: 800; font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 6px 24px var(--primary-glow);
+      transition: all 0.2s;
+      margin-top: 6px;
+    }
+    .btn:hover { transform:translateY(-2px); box-shadow: 0 8px 30px rgba(22,163,74,0.35); }
+    .btn:active { transform:scale(0.97); }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+    /* 통계 */
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .stat-box {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid #f1f5f9;
+      transition: transform 0.2s;
+    }
+    .stat-box:hover { transform:translateY(-2px); }
+    .stat-box .icon { font-size:1.3rem; margin-bottom:4px; }
+    .stat-box .label { font-size:0.72rem; color:var(--text-muted); font-weight:700; }
+    .stat-box .value { font-size:1.15rem; font-weight:800; margin-top:4px; }
+    .stat-box.green { background:#f0fdf4; border-color:#dcfce7; }
+    .stat-box.green .value { color:var(--primary); }
+    .stat-box.blue { background:#eff6ff; border-color:#dbeafe; }
+    .stat-box.blue .value { color:var(--accent-blue); }
+    .stat-box.red { background:#fef2f2; border-color:#fecaca; }
+    .stat-box.red .value { color:var(--accent-red); }
+    .stat-box.gold { background:#fffbeb; border-color:#fef3c7; }
+    .stat-box.gold .value { color:#b45309; }
+
+    .advice {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border: 1px solid #a7f3d0;
+      border-radius: 16px;
+      padding: 16px;
+      color: #065f46;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      font-weight: 500;
+      white-space: pre-line;
+    }
+
+    .chart-wrap { position:relative; width:100%; height:240px; }
+    .empty-msg { text-align:center; color:var(--text-muted); font-size:0.85rem; padding:40px 0; line-height:1.6; }
+    .loading { text-align:center; color:var(--text-muted); padding:20px; font-size:0.85rem; }
+
+    /* 토스트 */
+    .toast {
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
+      background: #166534; color:white;
+      padding: 12px 24px; border-radius:30px;
+      font-size:0.85rem; font-weight:700;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      z-index:9999; opacity:0;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      pointer-events:none;
+    }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<div class="money-rain" id="moneyRain"></div>
+<div id="toast" class="toast"></div>
+
+<div class="app-wrap">
+  <div class="app-header">
+    <div class="logo">💰</div>
+    <h1>감성 소비 심리 가계부</h1>
+    <p>나의 지출 패턴과 감정을 스마트하게 분석</p>
+  </div>
+
+  <div class="user-badge" id="userBadge"></div>
+
+  <div class="card">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="tab1">👤 등록</button>
+      <button class="tab-btn" data-tab="tab2">💸 지출</button>
+      <button class="tab-btn" data-tab="tab3">📊 그래프</button>
+      <button class="tab-btn" data-tab="tab4">🧠 분석</button>
+    </div>
+
+    <!-- Tab 1 -->
+    <div id="tab1" class="tab-panel active">
+      <div>
+        <h2>프로필 등록 / 로그인</h2>
+        <p class="sub">본인 전용 가계부를 위해 먼저 등록해 주세요.</p>
+      </div>
+      <form id="formUser" onsubmit="return doRegister(event)">
+        <div class="row">
+          <div class="field" style="flex:1"><label>학년</label><input type="number" id="uGrade" min="1" max="6" value="2" required></div>
+          <div class="field" style="flex:1"><label>반</label><input type="number" id="uClass" min="1" max="20" value="1" required></div>
+          <div class="field" style="flex:1"><label>번호</label><input type="number" id="uNum" min="1" max="50" value="1" required></div>
+        </div>
+        <div class="field" style="margin-top:10px"><label>이름</label><input type="text" id="uName" required placeholder="이름을 입력하세요"></div>
+        <button type="submit" class="btn" id="btnReg">로그인 / 등록하기</button>
+      </form>
+    </div>
+
+    <!-- Tab 2 -->
+    <div id="tab2" class="tab-panel">
+      <div>
+        <h2>지출 기록하기</h2>
+        <p class="sub">금액과 감정 상태를 함께 남겨주세요.</p>
+      </div>
+      <form id="formExp" onsubmit="return doExpense(event)">
+        <div class="field"><label>지출 일시</label><input type="datetime-local" id="eDate" required></div>
+        <div class="row">
+          <div class="field" style="flex:1">
+            <label>카테고리</label>
+            <select id="eCat">
+              <option>식비/카페</option><option>쇼핑/패션</option>
+              <option>취미/유흥</option><option>교통/통신</option><option>기타</option>
+            </select>
+          </div>
+          <div class="field" style="flex:1"><label>금액(원)</label><input type="number" id="eAmt" placeholder="15000" required min="1"></div>
+        </div>
+        <div class="field">
+          <label>소비 만족도</label>
+          <select id="eSat">
+            <option value="1">1점 - 후회됨</option>
+            <option value="2">2점 - 별로</option>
+            <option value="3" selected>3점 - 보통</option>
+            <option value="4">4점 - 만족</option>
+            <option value="5">5점 - 최고!</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>지출 당시 감정</label>
+          <select id="eEmo">
+            <option>평온/일상</option><option>스트레스</option>
+            <option>홧김</option><option>기쁨/축하</option><option>우울함</option>
+          </select>
+        </div>
+        <button type="submit" class="btn" id="btnExp">지출 저장하기</button>
+      </form>
+    </div>
+
+    <!-- Tab 3 -->
+    <div id="tab3" class="tab-panel">
+      <div>
+        <h2>내 지출 그래프</h2>
+        <p class="sub">카테고리별 비율 & 감정 분포</p>
+      </div>
+      <div id="chartArea">
+        <div class="loading" id="chartLoading">데이터를 불러오는 중...</div>
+        <div class="chart-wrap" style="display:none" id="cw1"><canvas id="chartCat"></canvas></div>
+        <p style="text-align:center;font-size:0.8rem;color:var(--text-muted);margin:8px 0 0;" id="cl1"></p>
+        <div class="chart-wrap" style="display:none;margin-top:16px;" id="cw2"><canvas id="chartEmo"></canvas></div>
+        <p style="text-align:center;font-size:0.8rem;color:var(--text-muted);margin:8px 0 0;" id="cl2"></p>
+        <p class="empty-msg" style="display:none" id="chartEmpty">기록된 지출이 없습니다.<br>먼저 [💸 지출] 탭에서 기록해 주세요!</p>
+      </div>
+    </div>
+
+    <!-- Tab 4 -->
+    <div id="tab4" class="tab-panel">
+      <div>
+        <h2>소비 심리 분석 리포트</h2>
+        <p class="sub">AI 스타일 분석 & 맞춤 개선 가이드</p>
+      </div>
+      <div id="reportArea">
+        <div class="loading" id="rptLoad">분석 결과를 계산 중...</div>
+        <div id="rptContent" style="display:none">
+          <div class="stats-grid">
+            <div class="stat-box green"><div class="icon">💵</div><span class="label">누적 지출액</span><div class="value" id="rTotal">0원</div></div>
+            <div class="stat-box blue"><div class="icon">🔮</div><span class="label">다음달 예상</span><div class="value" id="rPred">0원</div></div>
+            <div class="stat-box red"><div class="icon">🔥</div><span class="label">감정적 낭비액</span><div class="value" id="rWaste">0원</div></div>
+            <div class="stat-box gold"><div class="icon">⭐</div><span class="label">평균 만족도</span><div class="value" id="rSat">0</div></div>
+          </div>
+          <div class="advice" id="rAdvice"></div>
+        </div>
+        <p class="empty-msg" style="display:none" id="rptEmpty">분석할 지출 데이터가 없습니다.<br>먼저 지출을 기록해 주세요!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── 돈 비 배경 ───
+(function() {
+  var box = document.getElementById('moneyRain');
+  var icons = ['💵','💴','💶','💷','🪙','💰','💸','🤑'];
+  for (var i = 0; i < 22; i++) {
+    var el = document.createElement('div');
+    el.className = 'money';
+    el.textContent = icons[Math.floor(Math.random() * icons.length)];
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.fontSize = (Math.random() * 1.4 + 0.8) + 'rem';
+    el.style.animationDuration = (Math.random() * 12 + 8) + 's';
+    el.style.animationDelay = (Math.random() * 10) + 's';
+    box.appendChild(el);
+  }
+})();
+
+// ─── 토스트 ───
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+// ─── 사용자 ───
+function getUser() { try { return JSON.parse(localStorage.getItem('up')) || null; } catch(e){ return null; } }
+function setUser(o) { try { localStorage.setItem('up', JSON.stringify(o)); } catch(e){} }
+function showBadge() {
+  var u = getUser(), b = document.getElementById('userBadge');
+  if (u && u.name) { b.textContent = '✅ ' + u.grade + '학년 ' + u.classNum + '반 ' + u.studentNum + '번 ' + u.name; b.style.display='block'; }
+  else { b.style.display='none'; }
+}
+showBadge();
+
+// ─── 탭 ───
+var tbs = document.querySelectorAll('.tab-btn');
+for (var i=0;i<tbs.length;i++) {
+  tbs[i].addEventListener('click', function() {
+    var id = this.getAttribute('data-tab');
+    if (id !== 'tab1' && !getUser()) { toast('먼저 프로필을 등록/로그인하세요!'); return; }
+    for (var j=0;j<tbs.length;j++) tbs[j].classList.remove('active');
+    this.classList.add('active');
+    var ps = document.querySelectorAll('.tab-panel');
+    for (var j=0;j<ps.length;j++) ps[j].classList.remove('active');
+    document.getElementById(id).classList.add('active');
+    if (id==='tab3') fetchCharts();
+    if (id==='tab4') fetchReport();
+  });
+}
+
+// ─── 등록 ───
+function doRegister(ev) {
+  ev.preventDefault();
+  var btn = document.getElementById('btnReg');
+  btn.disabled = true; btn.textContent = '처리 중...';
+  var p = {
+    grade: document.getElementById('uGrade').value,
+    classNum: document.getElementById('uClass').value,
+    studentNum: document.getElementById('uNum').value,
+    name: document.getElementById('uName').value.trim()
+  };
+  google.script.run
+    .withSuccessHandler(function(r) {
+      btn.disabled=false; btn.textContent='로그인 / 등록하기';
+      if (r.success) { setUser(p); showBadge(); toast(r.message); }
+      else { toast(r.message); }
+    })
+    .withFailureHandler(function(e) {
+      btn.disabled=false; btn.textContent='로그인 / 등록하기';
+      toast('오류: ' + e.message);
+    })
+    .registerUser(p);
+  return false;
+}
+
+// ─── 지출 ───
+function initDT() {
+  var n = new Date(); n.setMinutes(n.getMinutes() - n.getTimezoneOffset());
+  document.getElementById('eDate').value = n.toISOString().slice(0,16);
+}
+initDT();
+
+function doExpense(ev) {
+  ev.preventDefault();
+  var u = getUser();
+  if (!u) { toast('먼저 프로필을 등록하세요!'); return false; }
+  var btn = document.getElementById('btnExp');
+  btn.disabled=true; btn.textContent='저장 중...';
+  var p = {
+    datetime: document.getElementById('eDate').value,
+    grade:u.grade, classNum:u.classNum, studentNum:u.studentNum, name:u.name,
+    category: document.getElementById('eCat').value,
+    amount: document.getElementById('eAmt').value,
+    satisfaction: document.getElementById('eSat').value,
+    emotion: document.getElementById('eEmo').value
+  };
+  google.script.run
+    .withSuccessHandler(function(r) {
+      btn.disabled=false; btn.textContent='지출 저장하기';
+      if (r.success) { toast(u.name + '님의 지출이 저장되었습니다!'); document.getElementById('formExp').reset(); initDT(); }
+    })
+    .withFailureHandler(function(e) {
+      btn.disabled=false; btn.textContent='지출 저장하기';
+      toast('저장 오류: ' + e.message);
+    })
+    .addExpense(p);
+  return false;
+}
+
+// ─── 차트 ───
+var c1=null, c2=null;
+function fetchCharts() {
+  var u = getUser();
+  document.getElementById('chartLoading').style.display='block';
+  document.getElementById('cw1').style.display='none';
+  document.getElementById('cw2').style.display='none';
+  document.getElementById('chartEmpty').style.display='none';
+  document.getElementById('cl1').textContent='';
+  document.getElementById('cl2').textContent='';
+
+  google.script.run
+    .withSuccessHandler(function(d) {
+      document.getElementById('chartLoading').style.display='none';
+      if (!d||!d.hasData) { document.getElementById('chartEmpty').style.display='block'; return; }
+
+      document.getElementById('cw1').style.display='block';
+      document.getElementById('cl1').textContent='카테고리별 지출 비율';
+      var x1 = document.getElementById('chartCat').getContext('2d');
+      if (c1) c1.destroy();
+      c1 = new Chart(x1, {
+        type:'doughnut',
+        data:{ labels:d.catLabels, datasets:[{ data:d.catValues, backgroundColor:['#16a34a','#ef4444','#eab308','#3b82f6','#8b5cf6','#ec4899'], borderWidth:2, borderColor:'#fff' }] },
+        options:{ responsive:true, maintainAspectRatio:false, cutout:'55%', plugins:{ legend:{ position:'bottom', labels:{font:{size:11},padding:12} } } }
+      });
+
+      if (d.emotionLabels && d.emotionLabels.length > 0) {
+        document.getElementById('cw2').style.display='block';
+        document.getElementById('cl2').textContent='감정 상태별 지출 횟수';
+        var x2 = document.getElementById('chartEmo').getContext('2d');
+        if (c2) c2.destroy();
+        c2 = new Chart(x2, {
+          type:'bar',
+          data:{ labels:d.emotionLabels, datasets:[{ label:'횟수', data:d.emotionValues, backgroundColor:['#86efac','#fb923c','#f87171','#67e8f9','#c4b5fd'], borderRadius:10, borderSkipped:false }] },
+          options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{beginAtZero:true,ticks:{stepSize:1}}, x:{grid:{display:false}} }, plugins:{legend:{display:false}} }
+        });
+      }
+    })
+    .withFailureHandler(function(e) {
+      document.getElementById('chartLoading').style.display='none';
+      document.getElementById('chartEmpty').style.display='block';
+    })
+    .getExpenseAnalytics(u);
+}
+
+// ─── 리포트 ───
+function fetchReport() {
+  var u = getUser();
+  document.getElementById('rptLoad').style.display='block';
+  document.getElementById('rptContent').style.display='none';
+  document.getElementById('rptEmpty').style.display='none';
+
+  google.script.run
+    .withSuccessHandler(function(d) {
+      document.getElementById('rptLoad').style.display='none';
+      if (!d||!d.hasData) { document.getElementById('rptEmpty').style.display='block'; return; }
+      document.getElementById('rptContent').style.display='block';
+      document.getElementById('rTotal').textContent = d.totalAmount.toLocaleString()+'원';
+      document.getElementById('rPred').textContent = d.predictedNextMonth.toLocaleString()+'원';
+      document.getElementById('rWaste').textContent = d.wasteAmount.toLocaleString()+'원';
+      document.getElementById('rSat').textContent = d.avgSatisfaction + '점';
+      document.getElementById('rAdvice').textContent = d.advice;
+    })
+    .withFailureHandler(function(e) {
+      document.getElementById('rptLoad').style.display='none';
+      document.getElementById('rptEmpty').style.display='block';
+    })
+    .getExpenseAnalytics(u);
+}
+</script>
+</body>
+</html>
