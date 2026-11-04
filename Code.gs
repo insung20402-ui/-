@@ -51,7 +51,32 @@ function registerUser(data) {
   return { success: true, message: '프로필이 등록되었습니다! 이제 다른 탭을 이용하세요.' };
 }
 
+function isRegistered(user) {
+  if (!user || !user.name) return false;
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName('사용자DB');
+  if (!sheet) return false;
+  var rows = sheet.getDataRange().getValues();
+  var grade = String(user.grade).trim();
+  var classNum = String(user.classNum).trim();
+  var studentNum = String(user.studentNum).trim();
+  var name = String(user.name).trim();
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][1]).trim() == grade &&
+        String(rows[i][2]).trim() == classNum &&
+        String(rows[i][3]).trim() == studentNum &&
+        String(rows[i][4]).trim() == name) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function addExpense(data) {
+  if (!isRegistered(data)) {
+    return { success: false, needsRegister: true, message: '등록되지 않은 사용자입니다. 먼저 프로필을 등록해 주세요.' };
+  }
+
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('지출DB');
   if (!sheet) {
@@ -72,7 +97,7 @@ function addExpense(data) {
     Number(data.grade),
     Number(data.classNum),
     Number(data.studentNum),
-    String(data.name),
+    String(data.name).trim(),
     String(data.category),
     Number(data.amount),
     Number(data.satisfaction),
@@ -83,6 +108,10 @@ function addExpense(data) {
 }
 
 function getExpenseAnalytics(user) {
+  if (!isRegistered(user)) {
+    return { hasData: false, needsRegister: true };
+  }
+
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName('지출DB');
 
@@ -91,22 +120,19 @@ function getExpenseAnalytics(user) {
   var rows = sheet.getDataRange().getValues();
   if (rows.length <= 1) return { hasData: false };
 
-  var userGrade = user ? String(user.grade).trim() : '';
-  var userClass = user ? String(user.classNum).trim() : '';
-  var userNum = user ? String(user.studentNum).trim() : '';
-  var userName = user ? String(user.name).trim() : '';
-  var hasUser = userName.length > 0;
+  var userGrade = String(user.grade).trim();
+  var userClass = String(user.classNum).trim();
+  var userNum = String(user.studentNum).trim();
+  var userName = String(user.name).trim();
 
   var expenses = [];
   for (var i = 1; i < rows.length; i++) {
-    if (hasUser) {
-      var rGrade = String(rows[i][1]).trim();
-      var rClass = String(rows[i][2]).trim();
-      var rNum = String(rows[i][3]).trim();
-      var rName = String(rows[i][4]).trim();
-      if (rGrade != userGrade || rClass != userClass || rNum != userNum || rName != userName) {
-        continue;
-      }
+    var rGrade = String(rows[i][1]).trim();
+    var rClass = String(rows[i][2]).trim();
+    var rNum = String(rows[i][3]).trim();
+    var rName = String(rows[i][4]).trim();
+    if (rGrade != userGrade || rClass != userClass || rNum != userNum || rName != userName) {
+      continue;
     }
 
     var amt = Number(rows[i][6]);
