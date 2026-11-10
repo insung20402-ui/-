@@ -217,6 +217,21 @@
     .stat-box.gold { background:#fffbeb; border-color:#fef3c7; }
     .stat-box.gold .value { color:#b45309; }
 
+    .msg-box {
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      line-height: 1.65;
+      font-weight: 500;
+    }
+    .msg-box .msg-title { font-weight: 800; margin-bottom: 4px; font-size: 0.8rem; }
+    .msg-box .msg-title span { font-weight: 500; opacity: 0.7; margin-left: 4px; }
+    .msg-box.blue { background:#eff6ff; border:1px solid #dbeafe; color:#1e40af; }
+    .msg-box.red { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; }
+    #rptContent .advice, #rptContent .btn { margin-top: 10px; }
+    #rptContent .btn { width: 100%; }
+
     .advice {
       background: linear-gradient(135deg, #ecfdf5, #d1fae5);
       border: 1px solid #a7f3d0;
@@ -356,7 +371,10 @@
             <div class="stat-box red"><div class="icon">🔥</div><span class="label">감정적 낭비액</span><div class="value" id="rWaste">0원</div></div>
             <div class="stat-box gold"><div class="icon">⭐</div><span class="label">평균 만족도</span><div class="value" id="rSat">0</div></div>
           </div>
+          <div class="msg-box blue"><div class="msg-title">🔮 다음 달 예상 <span id="rBasis"></span></div><div id="rPredMsg"></div></div>
+          <div class="msg-box red"><div class="msg-title">🔥 감정적 낭비 분석</div><div id="rWasteMsg"></div></div>
           <div class="advice" id="rAdvice"></div>
+          <button type="button" class="btn" id="btnRefresh">🔄 다른 분석 보기</button>
         </div>
         <p class="empty-msg" style="display:none" id="rptEmpty">분석할 지출 데이터가 없습니다.<br>먼저 지출을 기록해 주세요!</p>
       </div>
@@ -537,6 +555,8 @@ function fetchCharts() {
     .getExpenseAnalytics(u);
 }
 
+document.getElementById('btnRefresh').addEventListener('click', function() { fetchReport(); });
+
 // ─── 리포트 ───
 function fetchReport() {
   var u = getUser();
@@ -555,6 +575,9 @@ function fetchReport() {
       document.getElementById('rWaste').textContent = d.wasteAmount.toLocaleString()+'원';
       document.getElementById('rSat').textContent = d.avgSatisfaction + '점';
       document.getElementById('rAdvice').textContent = d.advice;
+      document.getElementById('rPredMsg').textContent = d.predictMsg;
+      document.getElementById('rWasteMsg').textContent = d.wasteMsg;
+      document.getElementById('rBasis').textContent = '(' + d.predictBasis + ')';
     })
     .withFailureHandler(function(e) {
       document.getElementById('rptLoad').style.display='none';
