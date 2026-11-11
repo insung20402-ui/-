@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>중2 영어 문법 Unit 7·8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fb;
+  --paper:#ffffff;
+  --ink:#1f2433;
+  --muted:#5d6478;
+  --line:#e2e6ef;
+  --key:#f37aa0;
+  --key-soft:#fde4ed;
+  --piece:#ffefcf;
+  --c1:#14966a; --c1s:#e1f5ec;
+  --c2:#2f6fdc; --c2s:#e6eefc;
+  --c3:#e0701a; --c3s:#fdeedf;
+  --c4:#8247d1; --c4s:#efe7fb;
+  --bad:#d64545; --good:#14966a;
+  --display:"Jua","Noto Sans KR",system-ui,sans-serif;
+  --body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.65;word-break:keep-all}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;line-height:1.3}
+img,svg{max-width:100%;height:auto}
+p{margin:0}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 64px;display:grid;gap:26px}
+.hero{background:var(--paper);border-radius:22px;padding:26px 24px;display:grid;gap:16px;border:2px solid var(--line)}
+.hero .unit{font-family:var(--display);color:var(--key);font-size:20px}
+.hero h1{font-size:clamp(32px,6vw,48px)}
+.hero .sub{color:var(--muted)}
+.howto{display:flex;flex-wrap:wrap;gap:8px}
+.howto span{background:#f2f4f9;border-radius:999px;padding:4px 14px;font-weight:700;font-size:15px;color:var(--muted)}
+.howto b{color:var(--ink)}
+.unitlabel{font-family:var(--display);font-size:18px;color:var(--muted);margin-top:4px}
+.overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.ov{display:grid;gap:4px;padding:16px;border-radius:16px;text-decoration:none;color:var(--ink);border:2px solid transparent;transition:transform .15s}
+.ov:hover,.ov:focus-visible{transform:translateY(-3px);outline:none;border-color:currentColor}
+.ov .n{font-family:var(--display);font-size:15px}
+.ov .t{font-family:var(--display);font-size:22px}
+.ov .f{font-weight:700;font-size:15px}
+.ov .m{font-size:14px;color:var(--muted)}
+.ov1{background:var(--c1s)} .ov1 .n,.ov1 .f{color:var(--c1)}
+.ov2{background:var(--c2s)} .ov2 .n,.ov2 .f{color:var(--c2)}
+.ov3{background:var(--c3s)} .ov3 .n,.ov3 .f{color:var(--c3)}
+.ov4{background:var(--c4s)} .ov4 .n,.ov4 .f{color:var(--c4)}
+.voicebar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--key-soft);border-radius:14px;padding:10px 14px;font-weight:500}
+.voicebar .lbl{font-family:var(--display);font-size:18px;color:#c92e63}
+.seg{display:inline-flex;border-radius:999px;background:#fff;padding:3px}
+.seg button{font:inherit;font-size:14.5px;font-weight:700;border:none;background:transparent;border-radius:999px;padding:4px 14px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--key);color:#fff}
+.voicebar .note{font-size:14px;color:var(--muted)}
+.unitcard{background:var(--paper);border-radius:22px;border:2px solid var(--line);overflow:hidden}
+.unitcard>header{display:flex;align-items:center;gap:14px;padding:16px 22px;color:#fff;flex-wrap:wrap}
+.unitcard>header .badge{flex:none;width:46px;height:46px;border-radius:50%;background:#fff;display:grid;place-items:center;font-family:var(--display);font-size:24px}
+.unitcard>header h2{font-size:clamp(24px,4vw,31px)}
+.unitcard>header .from{margin-left:auto;font-size:14px;opacity:.9;font-weight:700;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 12px}
+.unitcard .body{padding:22px 22px 26px;display:grid;gap:24px}
+.s1>header{background:var(--c1)} .s1 .badge{color:var(--c1)}
+.s2>header{background:var(--c2)} .s2 .badge{color:var(--c2)}
+.s3>header{background:var(--c3)} .s3 .badge{color:var(--c3)}
+.s4>header{background:var(--c4)} .s4 .badge{color:var(--c4)}
+.oneline{display:flex;gap:12px;align-items:flex-start;background:#fffbea;border-radius:14px;padding:12px 16px;border:2px solid #f6e3a2;font-size:18px;font-weight:500}
+.oneline .tag1{flex:none;font-family:var(--display);background:#f5c542;color:#5b4300;border-radius:8px;padding:0 10px;font-size:16px;line-height:30px}
+.formula{font-family:var(--display);font-size:clamp(21px,4.2vw,31px);text-align:center;padding:14px 12px;border-radius:16px;border:3px dashed currentColor}
+.s1 .formula{color:var(--c1);background:var(--c1s)}
+.s2 .formula{color:var(--c2);background:var(--c2s)}
+.s3 .formula{color:var(--c3);background:var(--c3s)}
+.s4 .formula{color:var(--c4);background:var(--c4s)}
+.formula small{display:block;font-family:var(--body);font-size:16px;color:var(--ink);font-weight:500;margin-top:4px}
+.split{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;align-items:center}
+@media (max-width:720px){.split{grid-template-columns:1fr}}
+.figure{background:#fbfcff;border:2px solid var(--line);border-radius:16px;padding:12px}
+.lead{font-size:18px}
+.lead b{background:linear-gradient(transparent 58%,var(--key-soft) 58%)}
+em.hl{font-style:normal;font-weight:700;color:#c92e63}
+h3{font-size:22px;display:flex;align-items:center;gap:8px}
+h3::before{content:"";width:8px;height:22px;border-radius:4px;background:currentColor;flex:none}
+.s1 h3{color:var(--c1)} .s2 h3{color:var(--c2)} .s3 h3{color:var(--c3)} .s4 h3{color:var(--c4)}
+.blk{display:grid;gap:12px}
+.steps{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.steps .st{background:#fff;border:2px solid var(--line);border-radius:12px;padding:6px 12px;display:grid;line-height:1.35}
+.steps .st small{font-size:12.5px;color:var(--muted);font-weight:700}
+.steps .st b{font-size:17px}
+.steps .ar{font-family:var(--display);color:var(--muted);font-size:20px}
+.steps .st.k{border-color:var(--key);background:var(--key-soft)}
+.puzzle{display:flex;flex-wrap:wrap;row-gap:10px;align-items:stretch}
+.pz{position:relative;display:flex;flex-direction:column;justify-content:center;background:var(--piece);padding:6px 20px 8px 22px;border-radius:8px;min-height:60px;font-weight:500;font-size:17px}
+.pz .r{font-size:11.5px;color:var(--muted);font-weight:700}
+.pz.k{background:var(--key);color:#fff}
+.pz.k .r{color:#ffe7ef}
+.pz:not(:last-child)::after{content:"";position:absolute;right:-10px;top:50%;width:20px;height:20px;border-radius:50%;background:inherit;transform:translateY(-50%);z-index:2}
+.puzzle .pz+.pz{margin-left:2px}
+.kor{margin-top:4px;color:var(--muted);font-size:15.5px}
+.saywrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tbl{overflow-x:auto}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;min-width:540px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1.5px solid var(--line);vertical-align:top}
+th{font-size:14.5px;color:var(--muted);font-weight:700;background:#f7f8fc}
+th:first-child{border-top-left-radius:10px} th:last-child{border-top-right-radius:10px}
+td .tag{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:700;font-size:14.5px;color:#fff;white-space:nowrap}
+.s1 .tag{background:var(--c1)}
+.s2 .tag{background:var(--c2)}
+td .ko{display:block;color:var(--muted);font-size:14.5px}
+.sig{display:flex;flex-wrap:wrap;gap:5px}
+.sig span{background:var(--key-soft);color:#b8335f;border-radius:6px;padding:1px 8px;font-weight:700;font-size:14.5px}
+.warn{border-radius:16px;background:#fff6f6;border:2px solid #f6caca;padding:14px 18px;display:grid;gap:8px}
+.warn .ttl{font-family:var(--display);font-size:20px;color:var(--bad)}
+.ox{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:baseline}
+.ox .x,.ox .o{font-family:var(--display);font-size:18px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.ox .x{background:var(--bad)} .ox .o{background:var(--good)}
+.ox s{text-decoration-color:var(--bad);text-decoration-thickness:2px;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.two{grid-template-columns:1fr}}
+.cmp{border-radius:16px;padding:14px;display:grid;gap:8px}
+.cmp .h{font-family:var(--display);font-size:20px}
+.s1 .cmp{background:var(--c1s)} .s1 .cmp .h{color:var(--c1)}
+.s2 .cmp{background:var(--c2s)} .s2 .cmp .h{color:var(--c2)}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.three{grid-template-columns:1fr}}
+.vc{border-radius:16px;padding:14px;display:grid;gap:6px;justify-items:center;text-align:center}
+.s3 .vc{background:var(--c3s)}
+.s4 .vc{background:var(--c4s)}
+.vc .w{font-family:var(--display);font-size:26px}
+.s3 .vc .w{color:var(--c3)}
+.s4 .vc .w{color:var(--c4)}
+.vc .feel{font-weight:700}
+.vc .ex{font-size:15px;color:var(--muted)}
+.vc .ex b{color:var(--ink)}
+.four{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:640px){.four{grid-template-columns:repeat(2,1fr)}}
+.sense{border-radius:14px;padding:12px;display:grid;justify-items:center;gap:4px;text-align:center}
+.s2 .sense{background:var(--c2s)}
+.sense .nm{font-family:var(--display);font-size:18px}
+.s2 .sense .nm{color:var(--c2)}
+.sense .vb{font-weight:700;font-size:15px}
+.quiz{border-radius:18px;border:3px solid #f3e4b8;background:#fffdf5;padding:16px 16px 18px;display:grid;gap:14px}
+.quiz .qhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.quiz .qhead .ttl{font-family:var(--display);font-size:24px;color:#b0780b}
+.quiz .score{margin-left:auto;font-weight:900;font-size:16px;background:#fff;border:2px solid #f3e4b8;border-radius:999px;padding:3px 14px}
+.qitem{background:#fff;border-radius:14px;border:2px solid var(--line);padding:12px 14px;display:grid;gap:10px}
+.qitem.right{border-color:#9edbbf}
+.qitem.wrong{border-color:#f2b3b3}
+.qtext{font-weight:700;font-size:17.5px;display:flex;gap:8px}
+.qtext .qn{flex:none;font-family:var(--display);width:28px;height:28px;border-radius:50%;background:#f5c542;color:#5b4300;display:grid;place-items:center;font-size:16px;font-weight:400}
+.qhint{color:var(--muted);font-size:15px;margin-top:-4px;padding-left:36px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;padding-left:36px}
+@media (max-width:520px){.opts,.qhint,.why{padding-left:0}}
+.opt{font:inherit;font-size:16px;font-weight:500;border:2px solid #d9dfeb;background:#fff;border-radius:12px;padding:7px 16px;cursor:pointer;color:var(--ink);text-align:left}
+.opt:hover:not(:disabled){border-color:#f5c542;background:#fffbea}
+.opt:focus-visible{outline:3px solid #6d9cf0;outline-offset:2px}
+.opt:disabled{cursor:default}
+.opt.correct{background:#e1f5ec;border-color:var(--good);color:#0b6b4a;font-weight:700}
+.opt.picked-wrong{background:#fdecec;border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.why{padding-left:36px;font-size:15.5px;display:none;gap:8px;align-items:center;flex-wrap:wrap}
+.qitem.done .why{display:flex}
+.why .mark{font-family:var(--display);font-size:18px}
+.right .why .mark{color:var(--good)} .wrong .why .mark{color:var(--bad)}
+.qbtns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:15px;font-weight:700;border-radius:999px;padding:6px 16px;cursor:pointer;border:2px solid currentColor;background:#fff;color:var(--muted)}
+.btn:focus-visible{outline:3px solid #6d9cf0;outline-offset:2px}
+.btn.main{color:#fff;border-color:transparent;background:#b0780b}
+.build{border-radius:16px;border:2px solid var(--line);padding:14px 16px;display:grid;gap:10px;background:#fbfcff}
+.build .ttl{font-family:var(--display);font-size:20px}
+.build .q{color:var(--muted)}
+.slot{min-height:54px;border-radius:12px;border:2px dashed #c3c9d8;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#fff}
+.slot:empty::before{content:"아래 조각을 순서대로 누르세요";color:#a2a8b8;font-size:15px;padding-left:6px}
+.bank{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:16px;font-weight:500;border:none;border-radius:9px;padding:8px 14px;cursor:pointer;background:var(--piece);color:var(--ink);box-shadow:0 2px 0 #e3cf9f}
+.chip:focus-visible{outline:3px solid #6d9cf0;outline-offset:2px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.s1 .btn.go{background:var(--c1)} .s2 .btn.go{background:var(--c2)} .s3 .btn.go{background:var(--c3)} .s4 .btn.go{background:var(--c4)}
+.btn.go{color:#fff;border-color:transparent}
+.result{font-weight:700}
+.result.ok{color:var(--good)} .result.no{color:var(--bad)}
+.spk{flex:none;display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;background:#fff;color:#c92e63;box-shadow:0 0 0 2px var(--key-soft) inset;vertical-align:middle;transition:transform .12s}
+.spk:hover{transform:scale(1.08);background:var(--key-soft)}
+.spk:focus-visible{outline:3px solid #6d9cf0;outline-offset:2px}
+.spk.sm{width:30px;height:30px;margin-left:6px}
+.spk.on{background:var(--key);color:#fff}
+.spk svg{width:20px;height:20px;display:block}
+.spk.sm svg{width:16px;height:16px}
+.report{background:var(--paper);border-radius:22px;border:2px solid var(--line);padding:22px;display:grid;gap:16px}
+.report h2{font-size:30px;color:#c92e63}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:120px 1fr 64px;gap:10px;align-items:center;font-weight:700}
+.bar .track{height:18px;border-radius:999px;background:#eef1f7;overflow:hidden}
+.bar .fill{height:100%;width:0;border-radius:999px;transition:width .4s}
+.bar .num{text-align:right;font-variant-numeric:tabular-nums}
+.total{font-family:var(--display);font-size:24px}
+.msg{font-weight:500;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<section class="hero">
+  <div class="unit">중학교 2학년 · Grammar Study</div>
+  <h1>영어 문법 4가지, 쉽게 끝내기</h1>
+  <p class="sub">문법마다 순서는 같아요. 아래 순서대로 따라오면 돼요.</p>
+  <div class="howto"><span><b>1</b> 한 줄 요약</span><span><b>2</b> 공식</span><span><b>3</b> 그림으로 이해</span><span><b>4</b> 문장 퍼즐</span><span><b>5</b> 주의할 점</span><span><b>6</b> 문제 풀기</span></div>
+  <div class="voicebar"><span class="lbl">문장 듣기</span><span>스피커 버튼을 누르면 영어 문장을 읽어 줘요.</span><span class="seg" role="group" aria-label="읽기 속도"><button type="button" id="rate-slow" aria-pressed="false">천천히</button><button type="button" id="rate-normal" aria-pressed="true">보통</button></span><span class="note" id="voicenote"></span></div>
+  <div class="unitlabel">Unit 7</div>
+  <nav class="overview" aria-label="Unit 7 문법">
+    <a class="ov ov1" href="#sothat"><span class="n">Unit 7 · A</span><span class="t">so ~ that 구문</span><span class="f">so + 형용사/부사 + that …</span><span class="m">너무 ~해서 …하다</span></a>
+    <a class="ov ov2" href="#participle"><span class="n">Unit 7 · B</span><span class="t">명사를 꾸미는 분사</span><span class="f">V-ing / p.p. + 명사</span><span class="m">~하는 / ~된 (명사)</span></a>
+  </nav>
+  <div class="unitlabel">Unit 8</div>
+  <nav class="overview" aria-label="Unit 8 문법">
+    <a class="ov ov3" href="#indirect"><span class="n">Unit 8 · A</span><span class="t">간접의문문</span><span class="f">의문사 + 주어 + 동사</span><span class="m">~인지 알다 / 모르다</span></a>
+    <a class="ov ov4" href="#whto"><span class="n">Unit 8 · B</span><span class="t">의문사 + to부정사</span><span class="f">의문사 + to + 동사원형</span><span class="m">~할지, ~하는 방법</span></a>
+  </nav>
+</section>
+
+<!-- ============ Unit 7 A: so ~ that ============ -->
+<section class="unitcard s1" id="sothat">
+  <header><span class="badge">A</span><h2>so ~ that 구문</h2><span class="from">Unit 7</span></header>
+  <div class="body">
+    <div class="oneline"><span class="tag1">한 줄 요약</span><span>"너무 ~해서 …하다"라는 뜻이에요. <b>원인(so)</b>과 <b>결과(that)</b>를 연결해 줘요.</span></div>
+    <div class="formula">주어 + 동사 + so + 형용사/부사 + that + 주어 + 동사<small>해석: 너무 ~해서 …하다</small></div>
+
+    <div class="split">
+      <div class="figure">
+        <svg viewBox="0 0 520 200" role="img" aria-label="so와 that이 원인과 결과를 연결하는 다리 그림">
+          <defs><marker id="ah1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#14966a"/></marker></defs>
+          <rect x="20" y="40" width="200" height="70" rx="16" fill="#e1f5ec" stroke="#14966a" stroke-width="3"/>
+          <text x="120" y="65" text-anchor="middle" font-family="Jua, sans-serif" font-size="16" fill="#14966a">원인 (이유)</text>
+          <text x="120" y="95" text-anchor="middle" font-family="Jua, sans-serif" font-size="22" fill="#1f2433">so fast</text>
+          <rect x="300" y="40" width="200" height="70" rx="16" fill="#fde4ed" stroke="#f37aa0" stroke-width="3"/>
+          <text x="400" y="65" text-anchor="middle" font-family="Jua, sans-serif" font-size="16" fill="#c92e63">결과</text>
+          <text x="400" y="95" text-anchor="middle" font-family="Jua, sans-serif" font-size="22" fill="#1f2433">I can't follow</text>
+          <path d="M225 75 L295 75" stroke="#14966a" stroke-width="5" marker-end="url(#ah1)"/>
+          <rect x="232" y="58" width="50" height="30" rx="15" fill="#14966a"/>
+          <text x="257" y="79" text-anchor="middle" font-family="Jua, sans-serif" font-size="18" fill="#fff">that</text>
+          <text x="260" y="160" text-anchor="middle" font-family="Jua, sans-serif" font-size="20" fill="#14966a">너무 빨라서 → 따라갈 수 없다</text>
+        </svg>
+      </div>
+      <div class="blk">
+        <p class="lead"><b>so</b> 뒤에는 형용사나 부사가, <b>that</b> 뒤에는 결과 문장이 와요.</p>
+        <p class="lead">He ran <em class="hl">so fast</em> <em class="hl">that</em> I couldn't follow him.<br><span class="kor">그는 너무 빨리 달려서 나는 그를 따라갈 수 없었다.</span></p>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>이렇게 해석해요</h3>
+      <div class="steps">
+        <span class="st k"><small>1단계: so + 형용사</small><b>so tired → 너무 피곤해서</b></span><span class="ar">→</span>
+        <span class="st k"><small>2단계: that + 결과</small><b>that I fell asleep → 잠들어 버렸다</b></span><span class="ar">=</span>
+        <span class="st"><small>합치면</small><b>너무 피곤해서 잠들어 버렸다</b></span>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>문장 퍼즐</h3>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">주어+동사</span>The movie was</span><span class="pz k"><span class="r">so + 형용사</span>so scary</span><span class="pz k"><span class="r">that + 결과</span>that I closed my eyes.</span></div>
+        <p class="kor">그 영화는 너무 무서워서 나는 눈을 감았다.</p>
+      </div>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">주어+동사</span>She spoke</span><span class="pz k"><span class="r">so + 부사</span>so quickly</span><span class="pz k"><span class="r">that + 결과</span>that we couldn't understand her.</span></div>
+        <p class="kor">그녀는 너무 빨리 말해서 우리는 그녀를 이해할 수 없었다.</p>
+      </div>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">주어+동사</span>The bag was</span><span class="pz k"><span class="r">so + 형용사</span>so heavy</span><span class="pz k"><span class="r">that + 결과</span>that he couldn't carry it.</span></div>
+        <p class="kor">그 가방은 너무 무거워서 그는 들 수 없었다.</p>
+      </div>
+    </div>
+
+    <div class="warn">
+      <div class="ttl">주의! so 뒤에는 형용사/부사만!</div>
+      <p><b>so</b> 뒤에 명사를 쓰면 안 돼요. 명사 앞에는 <b>such</b>를 써요.</p>
+      <div class="ox">
+        <span class="o">O</span><span>It was <b>so</b> cold that we stayed home. (cold = 형용사)</span>
+        <span class="o">O</span><span>It was <b>such</b> a cold day that we stayed home. (a cold day = 명사)</span>
+        <span class="x">X</span><span><s>It was so a cold day that we stayed home.</s></span>
+      </div>
+    </div>
+
+    <div class="build" data-answer="The movie was|so scary|that|I closed my eyes.">
+      <div class="ttl" style="color:var(--c1)">문장 조립하기</div>
+      <p class="q">"그 영화는 너무 무서워서 나는 눈을 감았다."</p>
+      <div class="slot"></div><div class="bank"></div>
+      <div class="btns"><button class="btn go chk" type="button">확인</button><button class="btn rst" type="button">다시 섞기</button><button class="btn lsn" type="button">정답 문장 듣기</button><span class="result" aria-live="polite"></span></div>
+    </div>
+
+    <div class="quiz" data-quiz="sothat"></div>
+  </div>
+</section>
+
+<!-- ============ Unit 7 B: 분사 ============ -->
+<section class="unitcard s2" id="participle">
+  <header><span class="badge">B</span><h2>명사를 꾸미는 분사</h2><span class="from">Unit 7</span></header>
+  <div class="body">
+    <div class="oneline"><span class="tag1">한 줄 요약</span><span>동사에서 나온 <b>V-ing(현재분사)</b>와 <b>p.p.(과거분사)</b>가 형용사처럼 명사를 꾸며요.</span></div>
+    <div class="formula">V-ing + 명사 = ~하는 (능동)<br>p.p. + 명사 = ~된 (수동)<small>명사 앞에서 꾸미거나, 길면 명사 뒤에서 꾸며요</small></div>
+
+    <div class="split">
+      <div class="figure">
+        <svg viewBox="0 0 520 200" role="img" aria-label="현재분사는 능동, 과거분사는 수동을 나타내는 그림">
+          <rect x="20" y="20" width="230" height="160" rx="16" fill="#e6eefc" stroke="#2f6fdc" stroke-width="3"/>
+          <text x="135" y="55" text-anchor="middle" font-family="Jua, sans-serif" font-size="20" fill="#2f6fdc">V-ing (현재분사)</text>
+          <text x="135" y="90" text-anchor="middle" font-family="Jua, sans-serif" font-size="24" fill="#1f2433">sleeping baby</text>
+          <text x="135" y="120" text-anchor="middle" font-family="Jua, sans-serif" font-size="17" fill="#5d6478">자고 있는 아기</text>
+          <text x="135" y="155" text-anchor="middle" font-family="Jua, sans-serif" font-size="16" fill="#2f6fdc">아기가 스스로 자고 있어요 (능동)</text>
+          <rect x="270" y="20" width="230" height="160" rx="16" fill="#fde4ed" stroke="#f37aa0" stroke-width="3"/>
+          <text x="385" y="55" text-anchor="middle" font-family="Jua, sans-serif" font-size="20" fill="#c92e63">p.p. (과거분사)</text>
+          <text x="385" y="90" text-anchor="middle" font-family="Jua, sans-serif" font-size="24" fill="#1f2433">broken window</text>
+          <text x="385" y="120" text-anchor="middle" font-family="Jua, sans-serif" font-size="17" fill="#5d6478">깨진 창문</text>
+          <text x="385" y="155" text-anchor="middle" font-family="Jua, sans-serif" font-size="16" fill="#c92e63">창문이 깨져 버린 거예요 (수동)</text>
+        </svg>
+      </div>
+      <div class="blk">
+        <p class="lead"><b>V-ing</b>: 명사가 직접 그 행동을 해요 (능동)</p>
+        <p class="lead"><b>p.p.</b>: 명사가 그 행동을 당해요 (수동)</p>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>현재분사 vs 과거분사 비교</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>종류</th><th>모양</th><th>뜻</th><th>예</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag">현재분사</span></td><td>V-ing</td><td>~하는, ~하고 있는 (능동)</td><td class="say" data-say="a sleeping baby">a <b>sleeping</b> baby<span class="ko">자고 있는 아기</span></td></tr>
+          <tr><td><span class="tag">현재분사</span></td><td>V-ing</td><td>~하는 (능동)</td><td class="say" data-say="boiling water">  <b>boiling</b> water<span class="ko">끓고 있는 물</span></td></tr>
+          <tr><td><span class="tag">과거분사</span></td><td>p.p.</td><td>~된, ~당한 (수동)</td><td class="say" data-say="a broken window">a <b>broken</b> window<span class="ko">깨진 창문</span></td></tr>
+          <tr><td><span class="tag">과거분사</span></td><td>p.p.</td><td>~된 (수동)</td><td class="say" data-say="a used car">a <b>used</b> car<span class="ko">중고(사용된) 자동차</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="blk">
+      <h3>감정 동사: 사람 vs 사물</h3>
+      <div class="two">
+        <div class="cmp">
+          <div class="h">V-ing = 감정을 일으키는 (사물)</div>
+          <p class="say" data-say="The movie was exciting.">The movie was <b>exciting</b>.<br><span class="kor">그 영화는 흥미진진했다.</span></p>
+          <p class="say" data-say="The news was surprising.">The news was <b>surprising</b>.<br><span class="kor">그 뉴스는 놀라웠다.</span></p>
+        </div>
+        <div class="cmp">
+          <div class="h">p.p. = 감정을 느끼는 (사람)</div>
+          <p class="say" data-say="I was excited.">I was <b>excited</b>.<br><span class="kor">나는 흥분했다.</span></p>
+          <p class="say" data-say="We were surprised.">We were <b>surprised</b>.<br><span class="kor">우리는 놀랐다.</span></p>
+        </div>
+      </div>
+      <p class="kor">기억법: 사물이 감정을 만들면 -ing, 사람이 감정을 느끼면 p.p.!</p>
+    </div>
+
+    <div class="blk">
+      <h3>문장 퍼즐</h3>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">앞부분</span>Look at the</span><span class="pz k"><span class="r">현재분사</span>sleeping</span><span class="pz"><span class="r">명사</span>baby.</span></div>
+        <p class="kor">자고 있는 아기를 봐.</p>
+      </div>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">앞부분</span>He found a</span><span class="pz k"><span class="r">과거분사</span>broken</span><span class="pz"><span class="r">명사</span>chair in the room.</span></div>
+        <p class="kor">그는 방에서 부서진 의자를 발견했다.</p>
+      </div>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">앞부분</span>The girl</span><span class="pz k"><span class="r">현재분사 (뒤에서 꾸밈)</span>sitting on the bench</span><span class="pz"><span class="r">동사</span>is my sister.</span></div>
+        <p class="kor">벤치에 앉아 있는 그 소녀는 내 여동생이다.</p>
+      </div>
+    </div>
+
+    <div class="warn">
+      <div class="ttl">주의! -ing와 p.p. 헷갈리지 마세요</div>
+      <div class="ox">
+        <span class="o">O</span><span>The game was <b>exciting</b>. (게임이 흥분을 일으킴)</span>
+        <span class="o">O</span><span>The players were <b>excited</b>. (선수들이 흥분을 느낌)</span>
+        <span class="x">X</span><span><s>The game was excited.</s> → 게임이 흥분을 느낄 수 없어요!</span>
+        <span class="x">X</span><span><s>I was exciting.</s> → 내가 다른 사람을 흥분시킨다는 뜻이 됨!</span>
+      </div>
+    </div>
+
+    <div class="build" data-answer="Look at|the sleeping|baby.">
+      <div class="ttl" style="color:var(--c2)">문장 조립하기</div>
+      <p class="q">"자고 있는 아기를 봐."</p>
+      <div class="slot"></div><div class="bank"></div>
+      <div class="btns"><button class="btn go chk" type="button">확인</button><button class="btn rst" type="button">다시 섞기</button><button class="btn lsn" type="button">정답 문장 듣기</button><span class="result" aria-live="polite"></span></div>
+    </div>
+
+    <div class="quiz" data-quiz="participle"></div>
+  </div>
+</section>
+
+<!-- ============ Unit 8 A: 간접의문문 ============ -->
+<section class="unitcard s3" id="indirect">
+  <header><span class="badge">A</span><h2>간접의문문</h2><span class="from">Unit 8</span></header>
+  <div class="body">
+    <div class="oneline"><span class="tag1">한 줄 요약</span><span>의문문이 다른 문장 속에 들어가면 <b>어순이 "주어 + 동사"로 바뀌어요</b>.</span></div>
+    <div class="formula">주절 + 의문사 + 주어 + 동사<small>해석: ~인지 알다 / 모르다 / 궁금하다</small></div>
+
+    <div class="split">
+      <div class="figure">
+        <svg viewBox="0 0 520 220" role="img" aria-label="직접의문문이 간접의문문으로 바뀌는 그림">
+          <rect x="20" y="10" width="480" height="90" rx="16" fill="#fdeedf" stroke="#e0701a" stroke-width="3"/>
+          <text x="260" y="40" text-anchor="middle" font-family="Jua, sans-serif" font-size="17" fill="#e0701a">직접 의문문 (혼자서 질문)</text>
+          <text x="260" y="72" text-anchor="middle" font-family="Jua, sans-serif" font-size="24" fill="#1f2433">Where does he live?</text>
+          <path d="M260 105 L260 125" stroke="#e0701a" stroke-width="4" marker-end="url(#ah3)"/>
+          <defs><marker id="ah3" viewBox="0 0 10 10" refX="5" refY="10" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L5 10L10 0z" fill="#e0701a"/></marker></defs>
+          <rect x="20" y="130" width="480" height="90" rx="16" fill="#e1f5ec" stroke="#14966a" stroke-width="3"/>
+          <text x="260" y="160" text-anchor="middle" font-family="Jua, sans-serif" font-size="17" fill="#14966a">간접 의문문 (문장 속 의문문)</text>
+          <text x="260" y="195" text-anchor="middle" font-family="Jua, sans-serif" font-size="24" fill="#1f2433">Do you know where he <tspan fill="#c92e63" font-size="26">lives</tspan>?</text>
+        </svg>
+      </div>
+      <div class="blk">
+        <p class="lead">직접: Where <b>does he live</b>? (의문문 어순)</p>
+        <p class="lead">간접: Do you know where <b>he lives</b>? (평서문 어순)</p>
+        <p class="lead"><em class="hl">does가 사라지고</em>, 동사에 <em class="hl">-s가 돌아와요!</em></p>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>주절에 자주 쓰이는 표현</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>표현</th><th>뜻</th><th>예문</th></tr></thead>
+        <tbody>
+          <tr><td><b>Do you know</b></td><td>~인지 아니?</td><td class="say" data-say="Do you know where she lives?">Do you know <b>where she lives</b>?<span class="ko">그녀가 어디 사는지 아니?</span></td></tr>
+          <tr><td><b>I don't know</b></td><td>~인지 모르겠어</td><td class="say" data-say="I don't know what this means.">I don't know <b>what this means</b>.<span class="ko">이것이 무슨 뜻인지 모르겠어.</span></td></tr>
+          <tr><td><b>I wonder</b></td><td>~인지 궁금해</td><td class="say" data-say="I wonder why he was late.">I wonder <b>why he was late</b>.<span class="ko">왜 그가 늦었는지 궁금해.</span></td></tr>
+          <tr><td><b>Can you tell me</b></td><td>~인지 말해 줄래?</td><td class="say" data-say="Can you tell me when the show starts?">Can you tell me <b>when the show starts</b>?<span class="ko">쇼가 언제 시작하는지 말해 줄래?</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="blk">
+      <h3>문장 퍼즐</h3>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">주절</span>Do you know</span><span class="pz k"><span class="r">의문사</span>where</span><span class="pz k"><span class="r">주어 + 동사</span>she lives?</span></div>
+        <p class="kor">그녀가 어디에 사는지 아니?</p>
+      </div>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">주절</span>I wonder</span><span class="pz k"><span class="r">의문사</span>why</span><span class="pz k"><span class="r">주어 + 동사</span>he was late.</span></div>
+        <p class="kor">왜 그가 늦었는지 궁금하다.</p>
+      </div>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">주절</span>Can you tell me</span><span class="pz k"><span class="r">의문사</span>how</span><span class="pz k"><span class="r">주어 + 동사</span>I can get to the station?</span></div>
+        <p class="kor">역까지 어떻게 갈 수 있는지 말해 줄래?</p>
+      </div>
+    </div>
+
+    <div class="warn">
+      <div class="ttl">주의! 어순이 바뀌어요</div>
+      <p>간접의문문에서는 <b>do/does/did가 사라지고</b>, 동사가 주어 뒤로 가요.</p>
+      <div class="ox">
+        <span class="x">X</span><span><s>Do you know where does he live?</s></span>
+        <span class="o">O</span><span>Do you know where <b>he lives</b>?</span>
+        <span class="x">X</span><span><s>I wonder what did she buy.</s></span>
+        <span class="o">O</span><span>I wonder what <b>she bought</b>.</span>
+      </div>
+    </div>
+
+    <div class="build" data-answer="Do you know|where|she|lives?">
+      <div class="ttl" style="color:var(--c3)">문장 조립하기</div>
+      <p class="q">"그녀가 어디에 사는지 아니?"</p>
+      <div class="slot"></div><div class="bank"></div>
+      <div class="btns"><button class="btn go chk" type="button">확인</button><button class="btn rst" type="button">다시 섞기</button><button class="btn lsn" type="button">정답 문장 듣기</button><span class="result" aria-live="polite"></span></div>
+    </div>
+
+    <div class="quiz" data-quiz="indirect"></div>
+  </div>
+</section>
+
+<!-- ============ Unit 8 B: 의문사 + to부정사 ============ -->
+<section class="unitcard s4" id="whto">
+  <header><span class="badge">B</span><h2>의문사 + to부정사</h2><span class="from">Unit 8</span></header>
+  <div class="body">
+    <div class="oneline"><span class="tag1">한 줄 요약</span><span>"의문사 + to + 동사원형"으로 <b>"~할지", "~하는 방법"</b>이라는 뜻을 만들어요.</span></div>
+    <div class="formula">의문사 + to + 동사원형<small>해석: ~할지, ~하는 방법</small></div>
+
+    <div class="blk">
+      <h3>의문사별 뜻 정리</h3>
+      <div class="four">
+        <div class="sense" style="background:var(--c4s)"><span class="nm" style="color:var(--c4)">what to</span><span class="vb">무엇을 ~할지</span></div>
+        <div class="sense" style="background:var(--c4s)"><span class="nm" style="color:var(--c4)">how to</span><span class="vb">어떻게 ~할지<br>(~하는 방법)</span></div>
+        <div class="sense" style="background:var(--c4s)"><span class="nm" style="color:var(--c4)">where to</span><span class="vb">어디서 ~할지</span></div>
+        <div class="sense" style="background:var(--c4s)"><span class="nm" style="color:var(--c4)">when to</span><span class="vb">언제 ~할지</span></div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="figure">
+        <svg viewBox="0 0 520 180" role="img" aria-label="의문사+to부정사가 간접의문문을 짧게 줄이는 그림">
+          <rect x="20" y="10" width="480" height="70" rx="14" fill="#fdeedf" stroke="#e0701a" stroke-width="2.5"/>
+          <text x="260" y="35" text-anchor="middle" font-family="Jua, sans-serif" font-size="15" fill="#e0701a">간접의문문 (길다)</text>
+          <text x="260" y="62" text-anchor="middle" font-family="Jua, sans-serif" font-size="20" fill="#1f2433">I don't know what I should do.</text>
+          <text x="260" y="103" text-anchor="middle" font-family="Jua, sans-serif" font-size="22" fill="#8247d1">= 줄이면</text>
+          <rect x="20" y="115" width="480" height="60" rx="14" fill="#efe7fb" stroke="#8247d1" stroke-width="3"/>
+          <text x="260" y="153" text-anchor="middle" font-family="Jua, sans-serif" font-size="24" fill="#1f2433">I don't know <tspan fill="#8247d1" font-size="26">what to do</tspan>.</text>
+        </svg>
+      </div>
+      <div class="blk">
+        <p class="lead">간접의문문에서 <b>주어 + should/can</b>을 빼고 <b>to</b>만 남기면 돼요.</p>
+        <p class="lead">I know <b>how I should cook</b> pasta.<br>= I know <em class="hl">how to cook</em> pasta.<br><span class="kor">나는 파스타 요리하는 방법을 안다.</span></p>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>예문으로 익히기</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>의문사 + to V</th><th>예문</th></tr></thead>
+        <tbody>
+          <tr><td><b>what to do</b><br><span class="ko">무엇을 할지</span></td><td class="say" data-say="I don't know what to do.">I don't know <b>what to do</b>.<span class="ko">나는 무엇을 할지 모르겠다.</span></td></tr>
+          <tr><td><b>how to get</b><br><span class="ko">어떻게 갈지</span></td><td class="say" data-say="Can you tell me how to get there?">Can you tell me <b>how to get</b> there?<span class="ko">거기에 어떻게 가는지 말해 줄래?</span></td></tr>
+          <tr><td><b>where to go</b><br><span class="ko">어디로 갈지</span></td><td class="say" data-say="She decided where to go.">She decided <b>where to go</b>.<span class="ko">그녀는 어디로 갈지 정했다.</span></td></tr>
+          <tr><td><b>when to start</b><br><span class="ko">언제 시작할지</span></td><td class="say" data-say="Tell me when to start.">Tell me <b>when to start</b>.<span class="ko">언제 시작할지 말해 줘.</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="blk">
+      <h3>문장 퍼즐</h3>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">주어+동사</span>I don't know</span><span class="pz k"><span class="r">의문사 + to V</span>what to do.</span></div>
+        <p class="kor">나는 무엇을 할지 모르겠다.</p>
+      </div>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">주어+동사</span>She learned</span><span class="pz k"><span class="r">의문사 + to V</span>how to cook</span><span class="pz"><span class="r">나머지</span>spaghetti.</span></div>
+        <p class="kor">그녀는 스파게티 요리하는 법을 배웠다.</p>
+      </div>
+      <div>
+        <div class="puzzle"><span class="pz"><span class="r">주어+동사</span>We decided</span><span class="pz k"><span class="r">의문사 + to V</span>where to go</span><span class="pz"><span class="r">나머지</span>for vacation.</span></div>
+        <p class="kor">우리는 방학에 어디로 갈지 정했다.</p>
+      </div>
+    </div>
+
+    <div class="warn">
+      <div class="ttl">주의! why + to부정사는 안 돼요</div>
+      <p>what, how, where, when, which는 되지만 <b>why는 to부정사와 함께 쓸 수 없어요</b>.</p>
+      <div class="ox">
+        <span class="o">O</span><span>I know <b>what to do</b>.</span>
+        <span class="o">O</span><span>Tell me <b>how to solve</b> this problem.</span>
+        <span class="x">X</span><span><s>I don't know why to study English.</s></span>
+        <span class="o">O</span><span>I don't know <b>why I should study</b> English. (간접의문문으로!)</span>
+      </div>
+    </div>
+
+    <div class="build" data-answer="I|don't know|what to do.">
+      <div class="ttl" style="color:var(--c4)">문장 조립하기</div>
+      <p class="q">"나는 무엇을 할지 모르겠다."</p>
+      <div class="slot"></div><div class="bank"></div>
+      <div class="btns"><button class="btn go chk" type="button">확인</button><button class="btn rst" type="button">다시 섞기</button><button class="btn lsn" type="button">정답 문장 듣기</button><span class="result" aria-live="polite"></span></div>
+    </div>
+
+    <div class="quiz" data-quiz="whto"></div>
+  </div>
+</section>
+
+<!-- 성적표 -->
+<section class="report" id="report">
+  <h2>나의 문제 풀이 결과</h2>
+  <div class="bars">
+    <div class="bar"><span style="color:var(--c1)">so~that</span><span class="track"><span class="fill" id="bar-sothat" style="background:var(--c1)"></span></span><span class="num" id="num-sothat">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c2)">분사</span><span class="track"><span class="fill" id="bar-participle" style="background:var(--c2)"></span></span><span class="num" id="num-participle">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c3)">간접의문문</span><span class="track"><span class="fill" id="bar-indirect" style="background:var(--c3)"></span></span><span class="num" id="num-indirect">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c4)">의문사+to V</span><span class="track"><span class="fill" id="bar-whto" style="background:var(--c4)"></span></span><span class="num" id="num-whto">0 / 0</span></div>
+  </div>
+  <div class="total" id="total">전체 0문제 중 0문제 정답</div>
+  <p class="msg" id="msg">문제를 풀면 여기에 점수가 쌓여요. 막대가 짧은 문법은 위로 올라가 설명을 다시 읽어 보세요.</p>
+</section>
+
+<footer>중2 영어 Grammar Study · Unit 7 · Unit 8</footer>
+</main>
+
+<script>
+var QUIZ={
+  sothat:[
+    {q:"He ran so fast ______ I couldn't follow him.",o:["than","that","then"],a:1,why:"so + 형용사/부사 + that + 결과 문장",say:"He ran so fast that I couldn't follow him."},
+    {q:"The movie was ______ scary that I closed my eyes.",o:["very","so","such"],a:1,why:"형용사 앞에는 so를 써요. such는 명사 앞에!",say:"The movie was so scary that I closed my eyes."},
+    {q:"It was ______ a cold day that we stayed home.",o:["so","such","very"],a:1,why:"a cold day는 명사구이므로 such를 써요.",say:"It was such a cold day that we stayed home."},
+    {q:"She was so tired ______ she fell asleep on the bus.",o:["so","than","that"],a:2,why:"so ~ that 구문에서 결과를 이끄는 that이에요.",say:"She was so tired that she fell asleep on the bus."},
+    {q:"다음 중 올바른 문장은?",o:["It was so a good movie.","It was such a good movie.","It was such good a movie."],a:1,why:"such + a/an + 형용사 + 명사 순서예요.",say:"It was such a good movie that I watched it twice."},
+    {q:"The soup was so hot that I couldn't ______ it.",o:["eat","ate","eating"],a:0,why:"that 뒤에는 주어 + 동사(원형) 형태가 와요. couldn't 뒤이므로 동사원형!",say:"The soup was so hot that I couldn't eat it."}
+  ],
+  participle:[
+    {q:"Look at the ______ baby. (자고 있는)",o:["slept","sleeping","sleep"],a:1,why:"아기가 스스로 자고 있으므로 능동 = 현재분사 V-ing",say:"Look at the sleeping baby."},
+    {q:"He found a ______ window. (깨진)",o:["breaking","broken","broke"],a:1,why:"창문이 깨져 있는 상태(수동) = 과거분사 p.p.",say:"He found a broken window."},
+    {q:"The game was ______. (흥미진진한)",o:["excited","exciting","excite"],a:1,why:"게임이 흥분을 일으키므로 V-ing. 사물 = -ing!",say:"The game was exciting."},
+    {q:"The students were ______ at the news. (놀란)",o:["surprising","surprised","surprise"],a:1,why:"학생들이 놀라움을 느끼므로 p.p. 사람 = p.p.!",say:"The students were surprised at the news."},
+    {q:"The girl ______ on the bench is my sister.",o:["sit","sat","sitting"],a:2,why:"소녀가 벤치에 앉아 있는 것(능동) = 현재분사. 명사 뒤에서 꾸며요.",say:"The girl sitting on the bench is my sister."},
+    {q:"다음 중 틀린 문장을 고르세요.",o:["The movie was exciting.","I was excited.","The movie was excited."],a:2,why:"영화가 감정을 느낄 수 없어요! 사물 = -ing, 사람 = p.p.",say:"The movie was exciting."}
+  ],
+  indirect:[
+    {q:"Do you know where ______?",o:["does she live","she lives","she does live"],a:1,why:"간접의문문은 '의문사 + 주어 + 동사' 어순이에요. does가 사라지고 lives!",say:"Do you know where she lives?"},
+    {q:"I wonder why he ______ late yesterday.",o:["was","did","does"],a:0,why:"간접의문문: why + 주어(he) + 동사(was)",say:"I wonder why he was late yesterday."},
+    {q:"Can you tell me what time ______?",o:["it is","is it","it does"],a:0,why:"간접의문문에서는 주어 + 동사 어순! what time it is",say:"Can you tell me what time it is?"},
+    {q:"다음 중 올바른 문장은?",o:["I don't know where is the library.","I don't know where the library is.","I don't know where does the library."],a:1,why:"간접의문문: 의문사 + 주어(the library) + 동사(is)",say:"I don't know where the library is."},
+    {q:"I wonder what she ______ for lunch.",h:"그녀가 점심으로 무엇을 먹었는지 궁금하다.",o:["did eat","ate","does eat"],a:1,why:"간접의문문: did가 사라지고 동사 과거형 ate가 돌아와요.",say:"I wonder what she ate for lunch."},
+    {q:"Do you know how many students ______ in this class?",o:["are there","there are","there do"],a:1,why:"간접의문문: how many students + 주어(there) + 동사(are)",say:"Do you know how many students there are in this class?"}
+  ],
+  whto:[
+    {q:"I don't know ______ to do.",o:["what","how","why"],a:0,why:"'무엇을 할지' = what to do",say:"I don't know what to do."},
+    {q:"Can you tell me ______ to get to the station?",o:["what","where","how"],a:2,why:"'어떻게 갈지 (가는 방법)' = how to get",say:"Can you tell me how to get to the station?"},
+    {q:"She decided ______ to go for vacation.",o:["where","how","why"],a:0,why:"'어디로 갈지' = where to go",say:"She decided where to go for vacation."},
+    {q:"다음 중 틀린 것을 고르세요.",o:["what to eat","how to swim","why to study"],a:2,why:"why + to부정사는 쓸 수 없어요!",say:""},
+    {q:"Tell me ______ to start the meeting.",o:["what","when","why"],a:1,why:"'언제 시작할지' = when to start",say:"Tell me when to start the meeting."},
+    {q:"I learned how ______ spaghetti.",o:["cook","to cook","cooking"],a:1,why:"의문사 + to + 동사원형! how to cook",say:"I learned how to cook spaghetti."}
+  ]
+};
+</script>
+
+<script>
+(function(){
+  var ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  var synth=window.speechSynthesis, note=document.getElementById("voicenote");
+  var rate=0.9, voice=null, current=null;
+  var canSpeak=!!(synth&&typeof SpeechSynthesisUtterance!=="undefined");
+  if(!canSpeak) note.textContent="이 브라우저에서는 소리 듣기를 쓸 수 없어요. 크롬이나 사파리에서 열어 주세요.";
+  function pickVoice(){
+    try{
+      var vs=synth.getVoices()||[];
+      var en=vs.filter(function(v){return /^en[-_]US/i.test(v.lang);});
+      if(!en.length) en=vs.filter(function(v){return /^en/i.test(v.lang);});
+      var pref=en.filter(function(v){return /Samantha|Google US|Jenny|Aria|Natural/i.test(v.name);});
+      voice=pref[0]||en[0]||null;
+    }catch(e){voice=null;}
+  }
+  if(canSpeak){pickVoice(); try{synth.onvoiceschanged=pickVoice;}catch(e){}}
+  function speak(text,btn){
+    if(!canSpeak||!text) return;
+    try{
+      synth.cancel();
+      if(current) current.classList.remove("on");
+      var u=new SpeechSynthesisUtterance(text);
+      u.lang="en-US"; u.rate=rate; if(voice) u.voice=voice;
+      current=btn||null; if(btn) btn.classList.add("on");
+      u.onend=u.onerror=function(){ if(btn) btn.classList.remove("on"); };
+      synth.speak(u);
+    }catch(e){ note.textContent="소리를 재생하지 못했어요. 다시 눌러 보세요."; }
+  }
+  function makeBtn(text,small){
+    var b=document.createElement("button");
+    b.type="button"; b.className="spk"+(small?" sm":"");
+    b.setAttribute("aria-label","영어 문장 듣기"); b.title="문장 듣기"; b.innerHTML=ICON;
+    b.addEventListener("click",function(){ speak(text,b); });
+    if(!canSpeak) b.disabled=true;
+    return b;
+  }
+  document.querySelectorAll(".puzzle").forEach(function(pz){
+    var text=Array.prototype.map.call(pz.querySelectorAll(".pz"),function(p){
+      return Array.prototype.filter.call(p.childNodes,function(n){return !(n.nodeType===1&&n.classList.contains("r"));})
+        .map(function(n){return n.textContent;}).join("").trim();
+    }).join(" ");
+    var wrap=pz.parentNode.classList.contains("saywrap")?pz.parentNode:null;
+    if(!wrap){ wrap=document.createElement("div"); wrap.className="saywrap"; pz.parentNode.insertBefore(wrap,pz); wrap.appendChild(pz); }
+    wrap.appendChild(makeBtn(text,false));
+  });
+  document.querySelectorAll("[data-say]").forEach(function(el){
+    if(el.closest(".build")) return;
+    var b=makeBtn(el.getAttribute("data-say"),true);
+    var ko=el.querySelector(".ko,.kor,br");
+    if(ko) el.insertBefore(b,ko); else el.appendChild(b);
+  });
+  var slow=document.getElementById("rate-slow"), normal=document.getElementById("rate-normal");
+  slow.addEventListener("click",function(){ rate=0.65; slow.setAttribute("aria-pressed","true"); normal.setAttribute("aria-pressed","false"); });
+  normal.addEventListener("click",function(){ rate=0.9; normal.setAttribute("aria-pressed","true"); slow.setAttribute("aria-pressed","false"); });
+
+  function shuffle(a){
+    var b=a.slice();
+    for(var t=0;t<20;t++){
+      for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=b[i];b[i]=b[j];b[j]=x;}
+      if(b.join("|")!==a.join("|")) break;
+    }
+    return b;
+  }
+  document.querySelectorAll(".build").forEach(function(el){
+    var answer=el.getAttribute("data-answer").split("|");
+    var slot=el.querySelector(".slot"), bank=el.querySelector(".bank"), res=el.querySelector(".result");
+    function chip(w){
+      var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=w;
+      b.addEventListener("click",function(){ (b.parentNode===bank?slot:bank).appendChild(b); res.textContent=""; res.className="result"; });
+      return b;
+    }
+    function reset(){ slot.innerHTML=""; bank.innerHTML=""; res.textContent=""; res.className="result"; shuffle(answer).forEach(function(w){bank.appendChild(chip(w));}); }
+    el.querySelector(".rst").addEventListener("click",reset);
+    el.querySelector(".lsn").addEventListener("click",function(){ speak(answer.join(" "),null); });
+    if(!canSpeak) el.querySelector(".lsn").disabled=true;
+    el.querySelector(".chk").addEventListener("click",function(){
+      var got=Array.prototype.map.call(slot.children,function(c){return c.textContent;});
+      if(got.length<answer.length){res.textContent="조각을 모두 놓아 주세요."; res.className="result no"; return;}
+      if(got.join("|")===answer.join("|")){res.textContent="정답! 잘했어요."; res.className="result ok"; speak(answer.join(" "),null);}
+      else{res.textContent="다시 해 보세요. 조각을 누르면 아래로 돌아가요."; res.className="result no";}
+    });
+    reset();
+  });
+
+  var state={};
+  function updateReport(){
+    var tc=0,tt=0;
+    Object.keys(QUIZ).forEach(function(k){
+      var s=state[k]||{c:0,n:0}, total=QUIZ[k].length;
+      tc+=s.c; tt+=total;
+      document.getElementById("num-"+k).textContent=s.c+" / "+total;
+      document.getElementById("bar-"+k).style.width=(s.c/total*100)+"%";
+    });
+    var done=Object.keys(state).reduce(function(a,k){return a+state[k].n;},0);
+    document.getElementById("total").textContent="전체 "+tt+"문제 중 "+tc+"문제 정답";
+    var msg=document.getElementById("msg");
+    if(done<tt) msg.textContent="아직 "+(tt-done)+"문제가 남았어요. 끝까지 풀어 보세요!";
+    else if(tc===tt) msg.textContent="모두 맞혔어요! 문법 4가지를 완벽하게 이해했어요.";
+    else if(tc>=tt*0.7) msg.textContent="잘했어요! 틀린 문제의 설명을 한 번 더 읽어 보세요.";
+    else msg.textContent="괜찮아요. 막대가 짧은 문법의 '한 줄 요약'과 '공식'부터 다시 보고 '다시 풀기'를 눌러 보세요.";
+  }
+  function renderQuiz(box){
+    var key=box.getAttribute("data-quiz"), qs=QUIZ[key];
+    state[key]={c:0,n:0};
+    box.innerHTML="";
+    var head=document.createElement("div"); head.className="qhead";
+    head.innerHTML='<span class="ttl">문제 풀기</span><span class="score" aria-live="polite">0 / '+qs.length+'</span>';
+    box.appendChild(head);
+    var scoreEl=head.querySelector(".score");
+    qs.forEach(function(item,i){
+      var it=document.createElement("div"); it.className="qitem";
+      var t=document.createElement("div"); t.className="qtext";
+      t.innerHTML='<span class="qn">'+(i+1)+'</span>';
+      var qs_=document.createElement("span"); qs_.textContent=item.q; t.appendChild(qs_);
+      it.appendChild(t);
+      if(item.h){ var h=document.createElement("div"); h.className="qhint"; h.textContent=item.h; it.appendChild(h); }
+      var opts=document.createElement("div"); opts.className="opts"; opts.setAttribute("role","group");
+      var why=document.createElement("div"); why.className="why";
+      item.o.forEach(function(op,j){
+        var b=document.createElement("button"); b.type="button"; b.className="opt"; b.textContent=op;
+        b.addEventListener("click",function(){
+          if(it.classList.contains("done")) return;
+          it.classList.add("done");
+          var ok=(j===item.a);
+          it.classList.add(ok?"right":"wrong");
+          Array.prototype.forEach.call(opts.children,function(x,k){ x.disabled=true; if(k===item.a) x.classList.add("correct"); });
+          if(!ok) b.classList.add("picked-wrong");
+          why.innerHTML='<span class="mark">'+(ok?"정답!":"아쉬워요")+'</span>';
+          var w=document.createElement("span"); w.textContent=item.why; why.appendChild(w);
+          if(item.say) why.appendChild(makeBtn(item.say,true));
+          state[key].n++; if(ok) state[key].c++;
+          scoreEl.textContent=state[key].c+" / "+qs.length;
+          updateReport();
+        });
+        opts.appendChild(b);
+      });
+      it.appendChild(opts); it.appendChild(why);
+      box.appendChild(it);
+    });
+    var btns=document.createElement("div"); btns.className="qbtns";
+    var again=document.createElement("button"); again.type="button"; again.className="btn main"; again.textContent="다시 풀기";
+    again.addEventListener("click",function(){ renderQuiz(box); updateReport(); });
+    btns.appendChild(again);
+    box.appendChild(btns);
+  }
+  document.querySelectorAll(".quiz").forEach(renderQuiz);
+  updateReport();
+})();
+</script>
+</body>
+</html>
