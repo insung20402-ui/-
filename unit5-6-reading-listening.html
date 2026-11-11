@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>중2 영어 듣기·읽기 Unit 5·6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6fb;--paper:#ffffff;--ink:#1f2433;--muted:#5d6478;--line:#e2e6ef;
+  --key:#f37aa0;--key-soft:#fde4ed;--piece:#ffefcf;
+  --c1:#14966a;--c1s:#e1f5ec;
+  --c2:#2f6fdc;--c2s:#e6eefc;
+  --c3:#e0701a;--c3s:#fdeedf;
+  --c4:#8247d1;--c4s:#efe7fb;
+  --bad:#d64545;--good:#14966a;
+  --display:"Jua","Noto Sans KR",system-ui,sans-serif;
+  --body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.65;word-break:keep-all}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;line-height:1.3}
+p{margin:0}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 64px;display:grid;gap:26px}
+.hero{background:var(--paper);border-radius:22px;padding:26px 24px;display:grid;gap:16px;border:2px solid var(--line)}
+.hero .unit{font-family:var(--display);color:var(--key);font-size:20px}
+.hero h1{font-size:clamp(32px,6vw,48px)}
+.hero .sub{color:var(--muted)}
+.howto{display:flex;flex-wrap:wrap;gap:8px}
+.howto span{background:#f2f4f9;border-radius:999px;padding:4px 14px;font-weight:700;font-size:15px;color:var(--muted)}
+.howto b{color:var(--ink)}
+.unitlabel{font-family:var(--display);font-size:18px;color:var(--muted);margin-top:4px}
+.overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.ov{display:grid;gap:4px;padding:16px;border-radius:16px;text-decoration:none;color:var(--ink);border:2px solid transparent;transition:transform .15s}
+.ov:hover,.ov:focus-visible{transform:translateY(-3px);outline:none;border-color:currentColor}
+.ov .n{font-family:var(--display);font-size:15px}
+.ov .t{font-family:var(--display);font-size:22px}
+.ov .f{font-weight:700;font-size:15px}
+.ov .m{font-size:14px;color:var(--muted)}
+.ov1{background:var(--c1s)} .ov1 .n,.ov1 .f{color:var(--c1)}
+.ov2{background:var(--c2s)} .ov2 .n,.ov2 .f{color:var(--c2)}
+.ov3{background:var(--c3s)} .ov3 .n,.ov3 .f{color:var(--c3)}
+.ov4{background:var(--c4s)} .ov4 .n,.ov4 .f{color:var(--c4)}
+.voicebar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--key-soft);border-radius:14px;padding:10px 14px;font-weight:500}
+.voicebar .lbl{font-family:var(--display);font-size:18px;color:#c92e63}
+.seg{display:inline-flex;border-radius:999px;background:#fff;padding:3px}
+.seg button{font:inherit;font-size:14.5px;font-weight:700;border:none;background:transparent;border-radius:999px;padding:4px 14px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--key);color:#fff}
+.voicebar .note{font-size:14px;color:var(--muted)}
+.unitcard{background:var(--paper);border-radius:22px;border:2px solid var(--line);overflow:hidden}
+.unitcard>header{display:flex;align-items:center;gap:14px;padding:16px 22px;color:#fff;flex-wrap:wrap}
+.unitcard>header .badge{flex:none;width:46px;height:46px;border-radius:50%;background:#fff;display:grid;place-items:center;font-family:var(--display);font-size:22px}
+.unitcard>header h2{font-size:clamp(22px,4vw,30px)}
+.unitcard>header .from{margin-left:auto;font-size:14px;opacity:.9;font-weight:700;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 12px}
+.unitcard .body{padding:22px 22px 26px;display:grid;gap:24px}
+.s1>header{background:var(--c1)} .s1 .badge{color:var(--c1)}
+.s2>header{background:var(--c2)} .s2 .badge{color:var(--c2)}
+.s3>header{background:var(--c3)} .s3 .badge{color:var(--c3)}
+.s4>header{background:var(--c4)} .s4 .badge{color:var(--c4)}
+h3{font-size:22px;display:flex;align-items:center;gap:8px}
+h3::before{content:"";width:8px;height:22px;border-radius:4px;background:currentColor;flex:none}
+.s1 h3{color:var(--c1)} .s2 h3{color:var(--c2)} .s3 h3{color:var(--c3)} .s4 h3{color:var(--c4)}
+.blk{display:grid;gap:12px}
+.oneline{display:flex;gap:12px;align-items:flex-start;background:#fffbea;border-radius:14px;padding:12px 16px;border:2px solid #f6e3a2;font-size:18px;font-weight:500}
+.oneline .tag1{flex:none;font-family:var(--display);background:#f5c542;color:#5b4300;border-radius:8px;padding:0 10px;font-size:16px;line-height:30px}
+.kor{margin-top:4px;color:var(--muted);font-size:15.5px}
+em.hl{font-style:normal;font-weight:700;color:#c92e63}
+.lead{font-size:18px}
+.lead b{background:linear-gradient(transparent 58%,var(--key-soft) 58%)}
+
+.dialog{background:#fbfcff;border:2px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:14px}
+.dialog .title{font-family:var(--display);font-size:18px;color:var(--muted)}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:start}
+.dl .who{font-family:var(--display);font-size:16px;border-radius:999px;padding:2px 12px;color:#fff;text-align:center;white-space:nowrap;min-width:52px}
+.dl .who.a{background:var(--c1)} .dl .who.b{background:var(--c2)} .dl .who.c{background:var(--c3)} .dl .who.d{background:var(--c4)}
+.dl .line{font-size:17px;padding:3px 0}
+.dl .line .ko{display:block;color:var(--muted);font-size:14.5px;margin-top:2px}
+
+.vocab{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.vc{background:#fbfcff;border:2px solid var(--line);border-radius:14px;padding:12px 16px;display:grid;gap:2px}
+.vc .en{font-weight:700;font-size:18px}
+.vc .ko{color:var(--muted);font-size:15px}
+.vc .ex{font-size:14.5px;color:var(--muted);font-style:italic;margin-top:4px}
+
+.passage{background:#fbfcff;border:2px solid var(--line);border-radius:16px;padding:20px;line-height:1.85;font-size:17.5px}
+.passage .ptitle{font-family:var(--display);font-size:24px;color:var(--ink);margin-bottom:12px;text-align:center}
+.passage p{margin-bottom:12px}
+.passage p:last-child{margin-bottom:0}
+
+.expr{display:grid;gap:10px}
+.ep{background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px 18px;display:grid;gap:4px}
+.ep .en{font-weight:700;font-size:18px}
+.ep .ko{color:var(--muted);font-size:15px}
+.ep .use{font-size:15px;color:var(--c1);font-weight:500}
+
+.tbl{overflow-x:auto}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:16px;min-width:480px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1.5px solid var(--line);vertical-align:top}
+th{font-size:14.5px;color:var(--muted);font-weight:700;background:#f7f8fc}
+th:first-child{border-top-left-radius:10px} th:last-child{border-top-right-radius:10px}
+
+.quiz{border-radius:18px;border:3px solid #f3e4b8;background:#fffdf5;padding:16px 16px 18px;display:grid;gap:14px}
+.quiz .qhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.quiz .qhead .ttl{font-family:var(--display);font-size:24px;color:#b0780b}
+.quiz .score{margin-left:auto;font-weight:900;font-size:16px;background:#fff;border:2px solid #f3e4b8;border-radius:999px;padding:3px 14px}
+.qitem{background:#fff;border-radius:14px;border:2px solid var(--line);padding:12px 14px;display:grid;gap:10px}
+.qitem.right{border-color:#9edbbf} .qitem.wrong{border-color:#f2b3b3}
+.qtext{font-weight:700;font-size:17.5px;display:flex;gap:8px}
+.qtext .qn{flex:none;font-family:var(--display);width:28px;height:28px;border-radius:50%;background:#f5c542;color:#5b4300;display:grid;place-items:center;font-size:16px;font-weight:400}
+.qhint{color:var(--muted);font-size:15px;margin-top:-4px;padding-left:36px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;padding-left:36px}
+@media (max-width:520px){.opts,.qhint,.why{padding-left:0}}
+.opt{font:inherit;font-size:16px;font-weight:500;border:2px solid #d9dfeb;background:#fff;border-radius:12px;padding:7px 16px;cursor:pointer;color:var(--ink);text-align:left}
+.opt:hover:not(:disabled){border-color:#f5c542;background:#fffbea}
+.opt:focus-visible{outline:3px solid #6d9cf0;outline-offset:2px}
+.opt:disabled{cursor:default}
+.opt.correct{background:#e1f5ec;border-color:var(--good);color:#0b6b4a;font-weight:700}
+.opt.picked-wrong{background:#fdecec;border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.why{padding-left:36px;font-size:15.5px;display:none;gap:8px;align-items:center;flex-wrap:wrap}
+.qitem.done .why{display:flex}
+.why .mark{font-family:var(--display);font-size:18px}
+.right .why .mark{color:var(--good)} .wrong .why .mark{color:var(--bad)}
+.qbtns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:15px;font-weight:700;border-radius:999px;padding:6px 16px;cursor:pointer;border:2px solid currentColor;background:#fff;color:var(--muted)}
+.btn:focus-visible{outline:3px solid #6d9cf0;outline-offset:2px}
+.btn.main{color:#fff;border-color:transparent;background:#b0780b}
+
+.spk{flex:none;display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;background:#fff;color:#c92e63;box-shadow:0 0 0 2px var(--key-soft) inset;vertical-align:middle;transition:transform .12s}
+.spk:hover{transform:scale(1.08);background:var(--key-soft)}
+.spk:focus-visible{outline:3px solid #6d9cf0;outline-offset:2px}
+.spk.sm{width:30px;height:30px;margin-left:6px}
+.spk.on{background:var(--key);color:#fff}
+.spk svg{width:20px;height:20px;display:block}
+.spk.sm svg{width:16px;height:16px}
+.saywrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+.build{border-radius:16px;border:2px solid var(--line);padding:14px 16px;display:grid;gap:10px;background:#fbfcff}
+.build .ttl{font-family:var(--display);font-size:20px}
+.build .q{color:var(--muted)}
+.slot{min-height:54px;border-radius:12px;border:2px dashed #c3c9d8;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#fff}
+.slot:empty::before{content:"아래 조각을 순서대로 누르세요";color:#a2a8b8;font-size:15px;padding-left:6px}
+.bank{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:16px;font-weight:500;border:none;border-radius:9px;padding:8px 14px;cursor:pointer;background:var(--piece);color:var(--ink);box-shadow:0 2px 0 #e3cf9f}
+.chip:focus-visible{outline:3px solid #6d9cf0;outline-offset:2px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.s1 .btn.go{background:var(--c1)} .s2 .btn.go{background:var(--c2)} .s3 .btn.go{background:var(--c3)} .s4 .btn.go{background:var(--c4)}
+.btn.go{color:#fff;border-color:transparent}
+.result{font-weight:700}
+.result.ok{color:var(--good)} .result.no{color:var(--bad)}
+
+.blanks{display:grid;gap:14px}
+.bl{background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px 18px;display:grid;gap:8px}
+.bl .sent{font-size:17.5px;line-height:1.6}
+.bl input[type="text"]{font:inherit;font-size:16px;border:2px solid #d9dfeb;border-radius:10px;padding:6px 12px;width:160px;max-width:100%;outline:none;transition:border-color .15s}
+.bl input:focus{border-color:var(--key)}
+.bl input.ok{border-color:var(--good);background:#e1f5ec}
+.bl input.no{border-color:var(--bad);background:#fdecec}
+.bl .ans{font-size:15px;color:var(--good);font-weight:700;display:none}
+
+.fillbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fillbar .btn.go{min-width:80px}
+
+.report{background:var(--paper);border-radius:22px;border:2px solid var(--line);padding:22px;display:grid;gap:16px}
+.report h2{font-size:30px;color:#c92e63}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:120px 1fr 64px;gap:10px;align-items:center;font-weight:700}
+.bar .track{height:18px;border-radius:999px;background:#eef1f7;overflow:hidden}
+.bar .fill{height:100%;width:0;border-radius:999px;transition:width .4s}
+.bar .num{text-align:right;font-variant-numeric:tabular-nums}
+.total{font-family:var(--display);font-size:24px}
+.msg{font-weight:500;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:14px}
+@media (max-width:720px){.vocab{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<section class="hero">
+  <div class="unit">중학교 2학년 · Listening & Reading</div>
+  <h1>듣기 · 읽기 완전 정복</h1>
+  <p class="sub">각 단원의 핵심 표현, 대화문, 본문을 듣고 읽으면서 익혀요.</p>
+  <div class="howto"><span><b>1</b> 핵심 표현</span><span><b>2</b> 대화문 듣기</span><span><b>3</b> 어휘 정리</span><span><b>4</b> 본문 읽기</span><span><b>5</b> 빈칸 채우기</span><span><b>6</b> 문제 풀기</span></div>
+  <div class="voicebar"><span class="lbl">문장 듣기</span><span>스피커 버튼을 누르면 영어 문장을 읽어 줘요.</span><span class="seg" role="group" aria-label="읽기 속도"><button type="button" id="rate-slow" aria-pressed="false">천천히</button><button type="button" id="rate-normal" aria-pressed="true">보통</button></span><span class="note" id="voicenote"></span></div>
+  <div class="unitlabel">Unit 5 · Discover Korea</div>
+  <nav class="overview" aria-label="Unit 5">
+    <a class="ov ov1" href="#u5listen"><span class="n">Unit 5</span><span class="t">듣기 · 대화문</span><span class="f">경험 · 소감 묻고 답하기</span><span class="m">Have you ever …? / How was it?</span></a>
+    <a class="ov ov2" href="#u5read"><span class="n">Unit 5</span><span class="t">읽기 · 본문</span><span class="f">My Hometown, Chuncheon</span><span class="m">우리 고장을 영어로 소개하기</span></a>
+  </nav>
+  <div class="unitlabel">Unit 6 · Ready, Set, Go!</div>
+  <nav class="overview" aria-label="Unit 6">
+    <a class="ov ov3" href="#u6listen"><span class="n">Unit 6</span><span class="t">듣기 · 대화문</span><span class="f">능력 · 절차 묻고 답하기</span><span class="m">Do you know how to …?</span></a>
+    <a class="ov ov4" href="#u6read"><span class="n">Unit 6</span><span class="t">읽기 · 본문</span><span class="f">My First Skateboarding Lesson</span><span class="m">새로운 운동을 배운 경험</span></a>
+  </nav>
+</section>
+
+<!-- ============================================================ -->
+<!-- ==================== UNIT 5 듣기 ========================== -->
+<!-- ============================================================ -->
+<section class="unitcard s1" id="u5listen">
+  <header><span class="badge">듣기</span><h2>경험·소감 묻고 답하기</h2><span class="from">Unit 5</span></header>
+  <div class="body">
+
+    <div class="oneline"><span class="tag1">핵심</span><span>"~한 적 있니?"는 <b>Have you ever + p.p.?</b>, "어땠어?"는 <b>How was it?</b></span></div>
+
+    <div class="blk">
+      <h3>핵심 표현 정리</h3>
+      <div class="expr">
+        <div class="ep say" data-say="Have you ever been to Chuncheon?"><span class="en">Have you ever been to …?</span><span class="ko">~에 가 본 적 있니?</span><span class="use">경험 유무를 물을 때 (현재완료)</span></div>
+        <div class="ep say" data-say="Have you ever tried dakgalbi?"><span class="en">Have you ever tried …?</span><span class="ko">~을 해 본 / 먹어 본 적 있니?</span><span class="use">경험 유무를 물을 때</span></div>
+        <div class="ep say" data-say="Yes, I have. I went there last summer."><span class="en">Yes, I have. / No, I haven't.</span><span class="ko">응, 있어. / 아니, 없어.</span><span class="use">경험 유무에 답할 때</span></div>
+        <div class="ep say" data-say="How was it?"><span class="en">How was it? / What was it like?</span><span class="ko">어땠어? / 어떤 느낌이었어?</span><span class="use">소감(감상)을 물을 때</span></div>
+        <div class="ep say" data-say="It was amazing! I loved it."><span class="en">It was amazing / wonderful / great!</span><span class="ko">놀라웠어 / 멋졌어 / 좋았어!</span><span class="use">소감에 답할 때</span></div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>대화문 1 — 경험 묻기</h3>
+      <div class="dialog">
+        <div class="title">Communicate A: 여행 경험</div>
+        <div class="dl">
+          <span class="who a">Mina</span><span class="line say" data-say="Have you ever been to Chuncheon?">Have you ever been to Chuncheon?<span class="ko">춘천에 가 본 적 있어?</span></span>
+          <span class="who b">Jake</span><span class="line say" data-say="No, I haven't. Is it a nice place?">No, I haven't. Is it a nice place?<span class="ko">아니, 없어. 좋은 곳이야?</span></span>
+          <span class="who a">Mina</span><span class="line say" data-say="Yes! It's famous for dakgalbi and Nami Island.">Yes! It's famous for dakgalbi and Nami Island.<span class="ko">응! 닭갈비랑 남이섬으로 유명해.</span></span>
+          <span class="who b">Jake</span><span class="line say" data-say="Sounds great. I want to go there someday.">Sounds great. I want to go there someday.<span class="ko">좋겠다. 나도 언젠가 가고 싶어.</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>대화문 2 — 소감 묻기</h3>
+      <div class="dialog">
+        <div class="title">Communicate B: 축제 소감</div>
+        <div class="dl">
+          <span class="who b">Jake</span><span class="line say" data-say="I went to the Andong Mask Dance Festival last weekend.">I went to the Andong Mask Dance Festival last weekend.<span class="ko">나 지난 주말에 안동 하회탈춤 축제에 갔어.</span></span>
+          <span class="who a">Mina</span><span class="line say" data-say="Really? How was it?">Really? How was it?<span class="ko">정말? 어땠어?</span></span>
+          <span class="who b">Jake</span><span class="line say" data-say="It was amazing! The mask dance was so exciting.">It was amazing! The mask dance was so exciting.<span class="ko">놀라웠어! 탈춤이 정말 신나더라.</span></span>
+          <span class="who a">Mina</span><span class="line say" data-say="That sounds wonderful. I've always wanted to see it.">That sounds wonderful. I've always wanted to see it.<span class="ko">멋지다. 나도 항상 보고 싶었어.</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>빈칸 채우기 (듣기 연습)</h3>
+      <div class="blanks" id="fill-u5l">
+        <div class="bl"><p class="sent say" data-say="Have you ever been to Gyeongju?"><b>1.</b> Have you ______ been to Gyeongju?</p><input type="text" data-ans="ever" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent say" data-say="Yes, I have. I visited it last year."><b>2.</b> Yes, I ______. I visited it last year.</p><input type="text" data-ans="have" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent say" data-say="How was the food there?"><b>3.</b> ______ was the food there?</p><input type="text" data-ans="How" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent say" data-say="It was delicious! I tried Gyeongju bread."><b>4.</b> It was ______! I tried Gyeongju bread.</p><input type="text" data-ans="delicious" placeholder="한 단어"><span class="ans"></span></div>
+      </div>
+      <div class="fillbar"><button class="btn go" style="background:var(--c1)" type="button" onclick="checkFill('fill-u5l')">확인</button><button class="btn" type="button" onclick="resetFill('fill-u5l')">다시 하기</button><span class="result" id="fill-u5l-res"></span></div>
+    </div>
+
+    <div class="build" data-answer="Have you|ever been|to Chuncheon?">
+      <div class="ttl" style="color:var(--c1)">문장 조립하기</div>
+      <p class="q">"춘천에 가 본 적 있니?"</p>
+      <div class="slot"></div><div class="bank"></div>
+      <div class="btns"><button class="btn go chk" type="button">확인</button><button class="btn rst" type="button">다시 섞기</button><button class="btn lsn" type="button">정답 문장 듣기</button><span class="result" aria-live="polite"></span></div>
+    </div>
+
+    <div class="quiz" data-quiz="u5listen"></div>
+
+    <div class="blk">
+      <h3>단어 퀴즈</h3>
+      <div class="quiz" data-quiz="u5vocab1"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ==================== UNIT 5 읽기 ========================== -->
+<!-- ============================================================ -->
+<section class="unitcard s2" id="u5read">
+  <header><span class="badge">읽기</span><h2>My Hometown, Chuncheon</h2><span class="from">Unit 5</span></header>
+  <div class="body">
+
+    <div class="oneline"><span class="tag1">주제</span><span>우리 고장(춘천)의 명소, 음식, 문화를 영어로 소개하는 글</span></div>
+
+    <div class="blk">
+      <h3>핵심 어휘</h3>
+      <div class="vocab">
+        <div class="vc say" data-say="hometown"><span class="en">hometown</span><span class="ko">고향</span></div>
+        <div class="vc say" data-say="famous"><span class="en">famous</span><span class="ko">유명한</span></div>
+        <div class="vc say" data-say="traditional"><span class="en">traditional</span><span class="ko">전통적인</span></div>
+        <div class="vc say" data-say="experience"><span class="en">experience</span><span class="ko">경험; 경험하다</span></div>
+        <div class="vc say" data-say="culture"><span class="en">culture</span><span class="ko">문화</span></div>
+        <div class="vc say" data-say="island"><span class="en">island</span><span class="ko">섬</span></div>
+        <div class="vc say" data-say="scenery"><span class="en">scenery</span><span class="ko">경치, 풍경</span></div>
+        <div class="vc say" data-say="recommend"><span class="en">recommend</span><span class="ko">추천하다</span></div>
+        <div class="vc say" data-say="popular"><span class="en">popular</span><span class="ko">인기 있는</span></div>
+        <div class="vc say" data-say="especially"><span class="en">especially</span><span class="ko">특히</span></div>
+        <div class="vc say" data-say="visitor"><span class="en">visitor</span><span class="ko">방문객</span></div>
+        <div class="vc say" data-say="delicious"><span class="en">delicious</span><span class="ko">맛있는</span></div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>본문 읽기</h3>
+      <div class="passage">
+        <div class="ptitle">My Hometown, Chuncheon</div>
+        <p class="say" data-say="Hi, everyone! I'm Sujin and I want to tell you about my hometown, Chuncheon. It's in Gangwon Province, and it's a beautiful city with mountains and lakes.">Hi, everyone! I'm Sujin and I want to tell you about my hometown, Chuncheon. It's in Gangwon Province, and it's a beautiful city with mountains and lakes.</p>
+        <p class="say" data-say="Chuncheon is famous for dakgalbi. Dakgalbi is a spicy chicken dish, and it's one of the most popular foods to try in Chuncheon. There are many restaurants to visit on Dakgalbi Street.">Chuncheon is famous for <em class="hl">dakgalbi</em>. Dakgalbi is a spicy chicken dish, and it's one of the most popular foods <em class="hl">to try</em> in Chuncheon. There are many restaurants <em class="hl">to visit</em> on Dakgalbi Street.</p>
+        <p class="say" data-say="Have you ever been to Nami Island? It's a beautiful place to see, especially in autumn. The trees along the road are so beautiful that many visitors take pictures there."><em class="hl">Have you ever been to</em> Nami Island? It's a beautiful place <em class="hl">to see</em>, especially in autumn. The trees along the road are so beautiful that many visitors take pictures there.</p>
+        <p class="say" data-say="Chuncheon also has a famous puppet festival every summer. I have been to the festival three times. It was wonderful! If you haven't visited Chuncheon yet, I recommend it. You will have a great time!">Chuncheon also has a famous puppet festival every summer. I <em class="hl">have been to</em> the festival three times. It was wonderful! If you <em class="hl">haven't visited</em> Chuncheon yet, I recommend it. You will have a great time!</p>
+      </div>
+      <p class="kor">분홍 표시: to부정사(형용사적 용법) / 현재완료 표현이 본문에 쓰였어요.</p>
+    </div>
+
+    <div class="blk">
+      <h3>빈칸 채우기 (읽기 연습)</h3>
+      <div class="blanks" id="fill-u5r">
+        <div class="bl"><p class="sent"><b>1.</b> Chuncheon is ______ for dakgalbi.</p><input type="text" data-ans="famous" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent"><b>2.</b> Dakgalbi is one of the most popular foods to ______ in Chuncheon.</p><input type="text" data-ans="try" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent"><b>3.</b> Nami Island is a beautiful place to see, ______ in autumn.</p><input type="text" data-ans="especially" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent"><b>4.</b> I have been to the festival three ______.</p><input type="text" data-ans="times" placeholder="한 단어"><span class="ans"></span></div>
+      </div>
+      <div class="fillbar"><button class="btn go" style="background:var(--c2)" type="button" onclick="checkFill('fill-u5r')">확인</button><button class="btn" type="button" onclick="resetFill('fill-u5r')">다시 하기</button><span class="result" id="fill-u5r-res"></span></div>
+    </div>
+
+    <div class="build" data-answer="Chuncheon is|famous for|dakgalbi.">
+      <div class="ttl" style="color:var(--c2)">문장 조립하기</div>
+      <p class="q">"춘천은 닭갈비로 유명하다."</p>
+      <div class="slot"></div><div class="bank"></div>
+      <div class="btns"><button class="btn go chk" type="button">확인</button><button class="btn rst" type="button">다시 섞기</button><button class="btn lsn" type="button">정답 문장 듣기</button><span class="result" aria-live="polite"></span></div>
+    </div>
+
+    <div class="quiz" data-quiz="u5read"></div>
+
+    <div class="blk">
+      <h3>단어 퀴즈</h3>
+      <div class="quiz" data-quiz="u5vocab2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ==================== UNIT 6 듣기 ========================== -->
+<!-- ============================================================ -->
+<section class="unitcard s3" id="u6listen">
+  <header><span class="badge">듣기</span><h2>능력·절차 묻고 답하기</h2><span class="from">Unit 6</span></header>
+  <div class="body">
+
+    <div class="oneline"><span class="tag1">핵심</span><span>"~할 줄 아니?"는 <b>Do you know how to …?</b>, 절차는 <b>First / Then / Finally</b></span></div>
+
+    <div class="blk">
+      <h3>핵심 표현 정리</h3>
+      <div class="expr">
+        <div class="ep say" data-say="Do you know how to ride a skateboard?"><span class="en">Do you know how to …?</span><span class="ko">~하는 방법을 아니? / ~할 줄 아니?</span><span class="use">능력·방법을 물을 때</span></div>
+        <div class="ep say" data-say="Can you teach me how to do it?"><span class="en">Can you teach me how to …?</span><span class="ko">~하는 법 좀 알려 줄래?</span><span class="use">방법을 가르쳐 달라고 할 때</span></div>
+        <div class="ep say" data-say="First, put your front foot on the board."><span class="en">First, … / Then, … / Finally, …</span><span class="ko">먼저, … / 그다음, … / 마지막으로, …</span><span class="use">순서·절차를 설명할 때</span></div>
+        <div class="ep say" data-say="Let me try!"><span class="en">Let me try! / I'll give it a try.</span><span class="ko">나도 해 볼게!</span><span class="use">시도하겠다고 할 때</span></div>
+        <div class="ep say" data-say="You're getting better!"><span class="en">You're getting better!</span><span class="ko">점점 나아지고 있어!</span><span class="use">격려할 때</span></div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>대화문 1 — 능력 묻기</h3>
+      <div class="dialog">
+        <div class="title">Communicate A: 스케이트보드</div>
+        <div class="dl">
+          <span class="who c">Jisu</span><span class="line say" data-say="Wow, you're good at skateboarding! Do you know how to do a kickflip?">Wow, you're good at skateboarding! Do you know how to do a kickflip?<span class="ko">와, 스케이트보드 잘 타네! 킥플립 할 줄 알아?</span></span>
+          <span class="who d">Tom</span><span class="line say" data-say="Yes, but it took me a long time to learn.">Yes, but it took me a long time to learn.<span class="ko">응, 근데 배우는 데 오래 걸렸어.</span></span>
+          <span class="who c">Jisu</span><span class="line say" data-say="Can you teach me how to ride a skateboard?">Can you teach me how to ride a skateboard?<span class="ko">스케이트보드 타는 법 알려 줄 수 있어?</span></span>
+          <span class="who d">Tom</span><span class="line say" data-say="Sure! Let's start with the basics.">Sure! Let's start with the basics.<span class="ko">물론! 기본부터 시작하자.</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>대화문 2 — 절차 설명하기</h3>
+      <div class="dialog">
+        <div class="title">Communicate B: 스케이트보드 타는 법</div>
+        <div class="dl">
+          <span class="who d">Tom</span><span class="line say" data-say="First, put your front foot on the board.">First, put your front foot on the board.<span class="ko">먼저, 앞발을 보드 위에 올려.</span></span>
+          <span class="who c">Jisu</span><span class="line say" data-say="Like this?">Like this?<span class="ko">이렇게?</span></span>
+          <span class="who d">Tom</span><span class="line say" data-say="Yes! Then, push the ground gently with your back foot.">Yes! Then, push the ground gently with your back foot.<span class="ko">응! 그다음, 뒷발로 땅을 살짝 밀어.</span></span>
+          <span class="who d">Tom</span><span class="line say" data-say="Finally, put both feet on the board and keep your balance.">Finally, put both feet on the board and keep your balance.<span class="ko">마지막으로, 두 발을 보드에 올리고 균형을 잡아.</span></span>
+          <span class="who c">Jisu</span><span class="line say" data-say="OK, let me try!">OK, let me try!<span class="ko">좋아, 해 볼게!</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>빈칸 채우기 (듣기 연습)</h3>
+      <div class="blanks" id="fill-u6l">
+        <div class="bl"><p class="sent say" data-say="Do you know how to cook spaghetti?"><b>1.</b> Do you know ______ to cook spaghetti?</p><input type="text" data-ans="how" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent say" data-say="First, boil the water."><b>2.</b> ______, boil the water.</p><input type="text" data-ans="First" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent say" data-say="Then, put the noodles in."><b>3.</b> ______, put the noodles in.</p><input type="text" data-ans="Then" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent say" data-say="Finally, add the sauce and mix it well."><b>4.</b> ______, add the sauce and mix it well.</p><input type="text" data-ans="Finally" placeholder="한 단어"><span class="ans"></span></div>
+      </div>
+      <div class="fillbar"><button class="btn go" style="background:var(--c3)" type="button" onclick="checkFill('fill-u6l')">확인</button><button class="btn" type="button" onclick="resetFill('fill-u6l')">다시 하기</button><span class="result" id="fill-u6l-res"></span></div>
+    </div>
+
+    <div class="build" data-answer="Do you know|how to ride|a skateboard?">
+      <div class="ttl" style="color:var(--c3)">문장 조립하기</div>
+      <p class="q">"스케이트보드 타는 법을 아니?"</p>
+      <div class="slot"></div><div class="bank"></div>
+      <div class="btns"><button class="btn go chk" type="button">확인</button><button class="btn rst" type="button">다시 섞기</button><button class="btn lsn" type="button">정답 문장 듣기</button><span class="result" aria-live="polite"></span></div>
+    </div>
+
+    <div class="quiz" data-quiz="u6listen"></div>
+
+    <div class="blk">
+      <h3>단어 퀴즈</h3>
+      <div class="quiz" data-quiz="u6vocab1"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ==================== UNIT 6 읽기 ========================== -->
+<!-- ============================================================ -->
+<section class="unitcard s4" id="u6read">
+  <header><span class="badge">읽기</span><h2>My First Skateboarding Lesson</h2><span class="from">Unit 6</span></header>
+  <div class="body">
+
+    <div class="oneline"><span class="tag1">주제</span><span>스케이트보드를 처음 배우면서 겪는 이야기 — 도전과 성장</span></div>
+
+    <div class="blk">
+      <h3>핵심 어휘</h3>
+      <div class="vocab">
+        <div class="vc say" data-say="skateboard"><span class="en">skateboard</span><span class="ko">스케이트보드</span></div>
+        <div class="vc say" data-say="balance"><span class="en">balance</span><span class="ko">균형</span></div>
+        <div class="vc say" data-say="practice"><span class="en">practice</span><span class="ko">연습; 연습하다</span></div>
+        <div class="vc say" data-say="nervous"><span class="en">nervous</span><span class="ko">긴장된</span></div>
+        <div class="vc say" data-say="fall down"><span class="en">fall down</span><span class="ko">넘어지다</span></div>
+        <div class="vc say" data-say="beginner"><span class="en">beginner</span><span class="ko">초보자</span></div>
+        <div class="vc say" data-say="patient"><span class="en">patient</span><span class="ko">인내심 있는</span></div>
+        <div class="vc say" data-say="encourage"><span class="en">encourage</span><span class="ko">격려하다</span></div>
+        <div class="vc say" data-say="confidence"><span class="en">confidence</span><span class="ko">자신감</span></div>
+        <div class="vc say" data-say="challenge"><span class="en">challenge</span><span class="ko">도전</span></div>
+        <div class="vc say" data-say="give up"><span class="en">give up</span><span class="ko">포기하다</span></div>
+        <div class="vc say" data-say="proud"><span class="en">proud</span><span class="ko">자랑스러운</span></div>
+      </div>
+    </div>
+
+    <div class="blk">
+      <h3>본문 읽기</h3>
+      <div class="passage">
+        <div class="ptitle">My First Skateboarding Lesson</div>
+        <p class="say" data-say="Last Saturday, my friend Tom gave me a skateboarding lesson. I was so nervous because I had never tried it before. Tom said, Don't worry. I'll make you feel comfortable.">Last Saturday, my friend Tom gave me a skateboarding lesson. I was so nervous because I had never tried it before. Tom said, "Don't worry. I'll <em class="hl">make</em> you <em class="hl">feel</em> comfortable."</p>
+        <p class="say" data-say="First, Tom let me stand on the board. He made me hold his hands for balance. I heard the wheels rolling under my feet, and I felt the board moving slowly.">First, Tom <em class="hl">let</em> me <em class="hl">stand</em> on the board. He <em class="hl">made</em> me <em class="hl">hold</em> his hands for balance. I <em class="hl">heard</em> the wheels <em class="hl">rolling</em> under my feet, and I <em class="hl">felt</em> the board <em class="hl">moving</em> slowly.</p>
+        <p class="say" data-say="Then, I tried to push and ride by myself. I fell down many times, but Tom was very patient. He let me take breaks and encouraged me to try again.">Then, I tried to push and ride by myself. I fell down many times, but Tom was very patient. He <em class="hl">let</em> me <em class="hl">take</em> breaks and encouraged me to try again.</p>
+        <p class="say" data-say="Finally, I could ride the skateboard without falling. I saw Tom smiling at me, and I felt so proud. It was the best day! I learned that trying new things is not easy, but it's always worth it.">Finally, I could ride the skateboard without falling. I <em class="hl">saw</em> Tom <em class="hl">smiling</em> at me, and I felt so proud. It was the best day! I learned that trying new things is not easy, but it's always worth it.</p>
+      </div>
+      <p class="kor">분홍 표시: 지각동사(see, hear, feel) + 목적어 + V/V-ing · 사역동사(make, let) + 목적어 + 동사원형이 본문에 쓰였어요.</p>
+    </div>
+
+    <div class="blk">
+      <h3>빈칸 채우기 (읽기 연습)</h3>
+      <div class="blanks" id="fill-u6r">
+        <div class="bl"><p class="sent"><b>1.</b> I was so ______ because I had never tried it before.</p><input type="text" data-ans="nervous" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent"><b>2.</b> Tom let me ______ on the board. (서다)</p><input type="text" data-ans="stand" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent"><b>3.</b> I fell down many times, but Tom was very ______.</p><input type="text" data-ans="patient" placeholder="한 단어"><span class="ans"></span></div>
+        <div class="bl"><p class="sent"><b>4.</b> I saw Tom ______ at me. (웃고 있는)</p><input type="text" data-ans="smiling" placeholder="한 단어"><span class="ans"></span></div>
+      </div>
+      <div class="fillbar"><button class="btn go" style="background:var(--c4)" type="button" onclick="checkFill('fill-u6r')">확인</button><button class="btn" type="button" onclick="resetFill('fill-u6r')">다시 하기</button><span class="result" id="fill-u6r-res"></span></div>
+    </div>
+
+    <div class="build" data-answer="Tom let me|stand on|the board.">
+      <div class="ttl" style="color:var(--c4)">문장 조립하기</div>
+      <p class="q">"Tom은 내가 보드 위에 서게 해 주었다."</p>
+      <div class="slot"></div><div class="bank"></div>
+      <div class="btns"><button class="btn go chk" type="button">확인</button><button class="btn rst" type="button">다시 섞기</button><button class="btn lsn" type="button">정답 문장 듣기</button><span class="result" aria-live="polite"></span></div>
+    </div>
+
+    <div class="quiz" data-quiz="u6read"></div>
+
+    <div class="blk">
+      <h3>단어 퀴즈</h3>
+      <div class="quiz" data-quiz="u6vocab2"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 성적표 -->
+<section class="report" id="report">
+  <h2>나의 문제 풀이 결과</h2>
+  <div class="bars">
+    <div class="bar"><span style="color:var(--c1)">5과 듣기</span><span class="track"><span class="fill" id="bar-u5listen" style="background:var(--c1)"></span></span><span class="num" id="num-u5listen">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c1)">5과 단어①</span><span class="track"><span class="fill" id="bar-u5vocab1" style="background:var(--c1)"></span></span><span class="num" id="num-u5vocab1">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c2)">5과 읽기</span><span class="track"><span class="fill" id="bar-u5read" style="background:var(--c2)"></span></span><span class="num" id="num-u5read">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c2)">5과 단어②</span><span class="track"><span class="fill" id="bar-u5vocab2" style="background:var(--c2)"></span></span><span class="num" id="num-u5vocab2">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c3)">6과 듣기</span><span class="track"><span class="fill" id="bar-u6listen" style="background:var(--c3)"></span></span><span class="num" id="num-u6listen">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c3)">6과 단어①</span><span class="track"><span class="fill" id="bar-u6vocab1" style="background:var(--c3)"></span></span><span class="num" id="num-u6vocab1">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c4)">6과 읽기</span><span class="track"><span class="fill" id="bar-u6read" style="background:var(--c4)"></span></span><span class="num" id="num-u6read">0 / 0</span></div>
+    <div class="bar"><span style="color:var(--c4)">6과 단어②</span><span class="track"><span class="fill" id="bar-u6vocab2" style="background:var(--c4)"></span></span><span class="num" id="num-u6vocab2">0 / 0</span></div>
+  </div>
+  <div class="total" id="total">전체 0문제 중 0문제 정답</div>
+  <p class="msg" id="msg">문제를 풀면 여기에 점수가 쌓여요.</p>
+</section>
+
+<footer>중2 영어 듣기·읽기 Study · Unit 5 · Unit 6</footer>
+</main>
+
+<script>
+var QUIZ={
+  u5listen:[
+    {q:"\"~한 적 있니?\"를 영어로 하면?",o:["Did you ever …?","Have you ever …?","Are you ever …?"],a:1,why:"경험을 묻는 현재완료 의문문: Have you ever + p.p.?",say:"Have you ever been to Chuncheon?"},
+    {q:"Have you ever ______ to Busan?",o:["go","went","been"],a:2,why:"have been to: ~에 가 본 적이 있다 (현재완료)",say:"Have you ever been to Busan?"},
+    {q:"\"어땠어?\"를 영어로 하면?",o:["How was it?","What is it?","Where was it?"],a:0,why:"소감을 묻는 표현: How was it?",say:"How was it?"},
+    {q:"A: How was the festival? B: It was ______!",o:["amazing","have","ever"],a:0,why:"소감에 답할 때: It was amazing/wonderful/great!",say:"It was amazing!"},
+    {q:"다음 대답으로 알맞은 것은? — Have you ever tried kimchi?",o:["Yes, I did.","Yes, I have.","Yes, I am."],a:1,why:"Have you ever …?에는 Yes, I have. / No, I haven't.으로 답해요.",say:"Yes, I have. It was delicious!"},
+    {q:"빈칸에 알맞은 말은? That sounds ______.",o:["wonderful","have","tried"],a:0,why:"That sounds wonderful. = 멋지게 들린다.",say:"That sounds wonderful."}
+  ],
+  u5read:[
+    {q:"본문에서 춘천이 유명한 음식은?",o:["bibimbap","dakgalbi","tteokbokki"],a:1,why:"Chuncheon is famous for dakgalbi.",say:"Chuncheon is famous for dakgalbi."},
+    {q:"\"~로 유명한\"을 영어로 하면?",o:["famous to","famous for","famous with"],a:1,why:"be famous for = ~로 유명하다",say:"Chuncheon is famous for dakgalbi."},
+    {q:"본문에서 남이섬이 특히 아름다운 계절은?",o:["spring","summer","autumn"],a:2,why:"It's a beautiful place to see, especially in autumn.",say:"Nami Island is beautiful, especially in autumn."},
+    {q:"\"foods to try\"에서 to try는 어떤 역할?",o:["명사 역할","형용사 역할","부사 역할"],a:1,why:"to try가 foods(명사)를 꾸며 주는 형용사 역할 = to부정사의 형용사적 용법",say:""},
+    {q:"I have been to the festival three ______.",o:["time","times","timing"],a:1,why:"횟수를 나타낼 때: once, twice, three times …",say:"I have been to the festival three times."},
+    {q:"본문의 마지막에 수진이가 한 것은?",o:["춘천 방문을 추천했다","닭갈비 레시피를 알려 줬다","남이섬 사진을 보여 줬다"],a:0,why:"I recommend it. = 추천한다.",say:"If you haven't visited Chuncheon yet, I recommend it."}
+  ],
+  u6listen:[
+    {q:"\"~하는 법을 아니?\"를 영어로 하면?",o:["Can you know how …?","Do you know how to …?","Are you knowing how …?"],a:1,why:"Do you know how to + 동사원형? = ~하는 법을 아니?",say:"Do you know how to ride a skateboard?"},
+    {q:"절차를 설명할 때 순서대로 맞는 것은?",o:["Then → First → Finally","First → Finally → Then","First → Then → Finally"],a:2,why:"순서: First(먼저) → Then(그다음) → Finally(마지막으로)",say:"First, put your foot on the board. Then, push the ground. Finally, keep your balance."},
+    {q:"Can you ______ me how to do it?",o:["teach","taught","teaching"],a:0,why:"Can you + 동사원형: teach",say:"Can you teach me how to do it?"},
+    {q:"\"해 볼게!\"를 영어로 하면?",o:["Let me try!","Let me tried!","Let me trying!"],a:0,why:"Let me + 동사원형 = ~하게 해 줘 / ~할게",say:"Let me try!"},
+    {q:"You're ______ better! (점점 나아지고 있어)",o:["get","getting","got"],a:1,why:"be getting + 형용사 = 점점 ~해지고 있다 (현재진행형)",say:"You're getting better!"},
+    {q:"다음 중 올바른 문장은?",o:["Do you know how ride?","Do you know how to ride?","Do you know how riding?"],a:1,why:"how to + 동사원형 = ~하는 방법",say:"Do you know how to ride a skateboard?"}
+  ],
+  u6read:[
+    {q:"본문에서 'I'에게 스케이트보드를 가르쳐 준 사람은?",o:["Jisu","Mina","Tom"],a:2,why:"My friend Tom gave me a skateboarding lesson.",say:"My friend Tom gave me a skateboarding lesson."},
+    {q:"Tom let me stand on the board. 여기서 let은?",o:["지각동사","사역동사","일반동사"],a:1,why:"let + 목적어 + 동사원형 = ~하게 해 주다 (사역동사)",say:"Tom let me stand on the board."},
+    {q:"I heard the wheels ______. (구르는 소리)",o:["roll","rolling","rolled"],a:1,why:"지각동사 hear + 목적어 + V-ing = ~하는 것을 듣다",say:"I heard the wheels rolling under my feet."},
+    {q:"He made me ______ his hands.",o:["hold","holding","to hold"],a:0,why:"사역동사 make + 목적어 + 동사원형",say:"He made me hold his hands for balance."},
+    {q:"I saw Tom ______ at me.",o:["smile","smiling","smiled"],a:1,why:"지각동사 see + 목적어 + V-ing = ~하고 있는 것을 보다",say:"I saw Tom smiling at me."},
+    {q:"본문의 교훈은?",o:["운동은 위험하다","새로운 것에 도전하는 것은 가치 있다","혼자 연습하는 게 좋다"],a:1,why:"Trying new things is not easy, but it's always worth it.",say:"Trying new things is not easy, but it's always worth it."}
+  ],
+  u5vocab1:[
+    {q:"famous의 뜻은?",o:["맛있는","유명한","전통적인"],a:1,why:"famous = 유명한",say:"Chuncheon is famous for dakgalbi."},
+    {q:"'경험'을 영어로 하면?",o:["experience","experiment","expression"],a:0,why:"experience = 경험 / experiment = 실험",say:"It was a great experience."},
+    {q:"traditional의 뜻은?",o:["현대적인","전통적인","인기 있는"],a:1,why:"traditional = 전통적인",say:"We watched a traditional dance."},
+    {q:"'추천하다'를 영어로 하면?",o:["remember","recommend","repeat"],a:1,why:"recommend = 추천하다",say:"I recommend this place."},
+    {q:"scenery의 뜻은?",o:["장면","경치, 풍경","과학"],a:1,why:"scenery = 경치, 풍경",say:"The scenery was beautiful."},
+    {q:"especially의 뜻은?",o:["쉽게","특히","가끔"],a:1,why:"especially = 특히",say:"I like fruits, especially apples."}
+  ],
+  u5vocab2:[
+    {q:"hometown의 뜻은?",o:["고향","집","마을"],a:0,why:"hometown = 고향 (home + town)",say:"This is my hometown."},
+    {q:"'방문객'을 영어로 하면?",o:["volunteer","visitor","villager"],a:1,why:"visitor = 방문객 (visit + -or)",say:"Many visitors come here."},
+    {q:"popular의 뜻은?",o:["인기 있는","가능한","개인적인"],a:0,why:"popular = 인기 있는",say:"This food is very popular."},
+    {q:"delicious의 뜻은?",o:["어려운","위험한","맛있는"],a:2,why:"delicious = 맛있는",say:"The food was delicious."},
+    {q:"island의 뜻은?",o:["호수","산","섬"],a:2,why:"island = 섬 (s는 묵음!)",say:"Nami Island is beautiful."},
+    {q:"culture의 뜻은?",o:["문화","색깔","요리"],a:0,why:"culture = 문화",say:"Korean culture is amazing."}
+  ],
+  u6vocab1:[
+    {q:"skateboard의 뜻은?",o:["스키","스케이트보드","자전거"],a:1,why:"skateboard = 스케이트보드",say:"I want to learn skateboarding."},
+    {q:"'균형'을 영어로 하면?",o:["balance","bounce","base"],a:0,why:"balance = 균형",say:"Keep your balance."},
+    {q:"nervous의 뜻은?",o:["화난","긴장된","졸린"],a:1,why:"nervous = 긴장된",say:"I was so nervous."},
+    {q:"beginner의 뜻은?",o:["선수","초보자","심판"],a:1,why:"beginner = 초보자 (begin + -ner)",say:"I'm just a beginner."},
+    {q:"'격려하다'를 영어로 하면?",o:["encourage","enjoy","enter"],a:0,why:"encourage = 격려하다",say:"He encouraged me to try again."},
+    {q:"patient의 뜻은?",o:["환자; 인내심 있는","화가 난","빠른"],a:0,why:"patient = 인내심 있는 (명사로는 '환자')",say:"Tom was very patient."}
+  ],
+  u6vocab2:[
+    {q:"practice의 뜻은?",o:["연습; 연습하다","약속","가격"],a:0,why:"practice = 연습 / 연습하다",say:"Practice makes perfect."},
+    {q:"'자신감'을 영어로 하면?",o:["confidence","comfortable","challenge"],a:0,why:"confidence = 자신감",say:"I gained confidence."},
+    {q:"challenge의 뜻은?",o:["변화","기회","도전"],a:2,why:"challenge = 도전",say:"It was a great challenge."},
+    {q:"fall down의 뜻은?",o:["일어서다","넘어지다","앉다"],a:1,why:"fall down = 넘어지다",say:"I fell down many times."},
+    {q:"proud의 뜻은?",o:["슬픈","자랑스러운","피곤한"],a:1,why:"proud = 자랑스러운",say:"I felt so proud."},
+    {q:"give up의 뜻은?",o:["포기하다","주다","돌려주다"],a:0,why:"give up = 포기하다",say:"Don't give up!"}
+  ]
+};
+</script>
+
+<script>
+(function(){
+  var ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  var synth=window.speechSynthesis, note=document.getElementById("voicenote");
+  var rate=0.9, voice=null, current=null;
+  var canSpeak=!!(synth&&typeof SpeechSynthesisUtterance!=="undefined");
+  if(!canSpeak) note.textContent="이 브라우저에서는 소리 듣기를 쓸 수 없어요.";
+  function pickVoice(){
+    try{var vs=synth.getVoices()||[];var en=vs.filter(function(v){return /^en[-_]US/i.test(v.lang);});if(!en.length) en=vs.filter(function(v){return /^en/i.test(v.lang);});var pref=en.filter(function(v){return /Samantha|Google US|Jenny|Aria|Natural/i.test(v.name);});voice=pref[0]||en[0]||null;}catch(e){voice=null;}
+  }
+  if(canSpeak){pickVoice(); try{synth.onvoiceschanged=pickVoice;}catch(e){}}
+  function speak(text,btn){
+    if(!canSpeak||!text) return;
+    try{synth.cancel();if(current) current.classList.remove("on");var u=new SpeechSynthesisUtterance(text);u.lang="en-US";u.rate=rate;if(voice) u.voice=voice;current=btn||null;if(btn) btn.classList.add("on");u.onend=u.onerror=function(){if(btn) btn.classList.remove("on");};synth.speak(u);}catch(e){note.textContent="소리를 재생하지 못했어요.";}
+  }
+  function makeBtn(text,small){
+    var b=document.createElement("button");b.type="button";b.className="spk"+(small?" sm":"");b.setAttribute("aria-label","영어 문장 듣기");b.title="문장 듣기";b.innerHTML=ICON;
+    b.addEventListener("click",function(){speak(text,b);});if(!canSpeak) b.disabled=true;return b;
+  }
+  document.querySelectorAll("[data-say]").forEach(function(el){
+    if(el.closest(".build")) return;
+    var b=makeBtn(el.getAttribute("data-say"),true);
+    var ko=el.querySelector(".ko,.kor,br");
+    if(ko) el.insertBefore(b,ko); else el.appendChild(b);
+  });
+  var slow=document.getElementById("rate-slow"), normal=document.getElementById("rate-normal");
+  slow.addEventListener("click",function(){rate=0.65;slow.setAttribute("aria-pressed","true");normal.setAttribute("aria-pressed","false");});
+  normal.addEventListener("click",function(){rate=0.9;normal.setAttribute("aria-pressed","true");slow.setAttribute("aria-pressed","false");});
+
+  // Fill-in-the-blank
+  window.checkFill=function(id){
+    var box=document.getElementById(id), items=box.querySelectorAll(".bl"), c=0;
+    items.forEach(function(bl){
+      var inp=bl.querySelector("input"), ans=bl.querySelector(".ans");
+      var correct=inp.getAttribute("data-ans");
+      if(inp.value.trim().toLowerCase()===correct.toLowerCase()){inp.className="ok";ans.style.display="none";c++;}
+      else{inp.className="no";ans.textContent="정답: "+correct;ans.style.display="inline";}
+    });
+    var res=document.getElementById(id+"-res");
+    res.textContent=c+"/"+items.length+" 정답";
+    res.className="result "+(c===items.length?"ok":"no");
+  };
+  window.resetFill=function(id){
+    var box=document.getElementById(id);
+    box.querySelectorAll("input").forEach(function(i){i.value="";i.className="";});
+    box.querySelectorAll(".ans").forEach(function(a){a.style.display="none";});
+    var res=document.getElementById(id+"-res");res.textContent="";res.className="result";
+  };
+
+  // Sentence build
+  function shuffle(a){var b=a.slice();for(var t=0;t<20;t++){for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=b[i];b[i]=b[j];b[j]=x;}if(b.join("|")!==a.join("|")) break;}return b;}
+  document.querySelectorAll(".build").forEach(function(el){
+    var answer=el.getAttribute("data-answer").split("|");
+    var slot=el.querySelector(".slot"),bank=el.querySelector(".bank"),res=el.querySelector(".result");
+    function chip(w){var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=w;b.addEventListener("click",function(){(b.parentNode===bank?slot:bank).appendChild(b);res.textContent="";res.className="result";});return b;}
+    function reset(){slot.innerHTML="";bank.innerHTML="";res.textContent="";res.className="result";shuffle(answer).forEach(function(w){bank.appendChild(chip(w));});}
+    el.querySelector(".rst").addEventListener("click",reset);
+    el.querySelector(".lsn").addEventListener("click",function(){speak(answer.join(" "),null);});
+    if(!canSpeak) el.querySelector(".lsn").disabled=true;
+    el.querySelector(".chk").addEventListener("click",function(){
+      var got=Array.prototype.map.call(slot.children,function(c){return c.textContent;});
+      if(got.length<answer.length){res.textContent="조각을 모두 놓아 주세요.";res.className="result no";return;}
+      if(got.join("|")===answer.join("|")){res.textContent="정답! 잘했어요.";res.className="result ok";speak(answer.join(" "),null);}
+      else{res.textContent="다시 해 보세요.";res.className="result no";}
+    });
+    reset();
+  });
+
+  // Quiz system
+  var state={};
+  function updateReport(){
+    var tc=0,tt=0;
+    Object.keys(QUIZ).forEach(function(k){
+      var s=state[k]||{c:0,n:0},total=QUIZ[k].length;
+      tc+=s.c;tt+=total;
+      document.getElementById("num-"+k).textContent=s.c+" / "+total;
+      document.getElementById("bar-"+k).style.width=(s.c/total*100)+"%";
+    });
+    var done=Object.keys(state).reduce(function(a,k){return a+state[k].n;},0);
+    document.getElementById("total").textContent="전체 "+tt+"문제 중 "+tc+"문제 정답";
+    var msg=document.getElementById("msg");
+    if(done<tt) msg.textContent="아직 "+(tt-done)+"문제가 남았어요. 끝까지 풀어 보세요!";
+    else if(tc===tt) msg.textContent="모두 맞혔어요! 듣기·읽기를 완벽하게 이해했어요.";
+    else if(tc>=tt*0.7) msg.textContent="잘했어요! 틀린 문제의 설명을 한 번 더 읽어 보세요.";
+    else msg.textContent="괜찮아요. 본문과 대화문을 다시 읽고 '다시 풀기'를 눌러 보세요.";
+  }
+  function renderQuiz(box){
+    var key=box.getAttribute("data-quiz"),qs=QUIZ[key];
+    state[key]={c:0,n:0};box.innerHTML="";
+    var head=document.createElement("div");head.className="qhead";
+    head.innerHTML='<span class="ttl">문제 풀기</span><span class="score" aria-live="polite">0 / '+qs.length+'</span>';
+    box.appendChild(head);
+    var scoreEl=head.querySelector(".score");
+    qs.forEach(function(item,i){
+      var it=document.createElement("div");it.className="qitem";
+      var t=document.createElement("div");t.className="qtext";
+      t.innerHTML='<span class="qn">'+(i+1)+'</span>';
+      var qs_=document.createElement("span");qs_.textContent=item.q;t.appendChild(qs_);
+      it.appendChild(t);
+      if(item.h){var h=document.createElement("div");h.className="qhint";h.textContent=item.h;it.appendChild(h);}
+      var opts=document.createElement("div");opts.className="opts";opts.setAttribute("role","group");
+      var why=document.createElement("div");why.className="why";
+      item.o.forEach(function(op,j){
+        var b=document.createElement("button");b.type="button";b.className="opt";b.textContent=op;
+        b.addEventListener("click",function(){
+          if(it.classList.contains("done")) return;
+          it.classList.add("done");
+          var ok=(j===item.a);
+          it.classList.add(ok?"right":"wrong");
+          Array.prototype.forEach.call(opts.children,function(x,k){x.disabled=true;if(k===item.a) x.classList.add("correct");});
+          if(!ok) b.classList.add("picked-wrong");
+          why.innerHTML='<span class="mark">'+(ok?"정답!":"아쉬워요")+'</span>';
+          var w=document.createElement("span");w.textContent=item.why;why.appendChild(w);
+          if(item.say) why.appendChild(makeBtn(item.say,true));
+          state[key].n++;if(ok) state[key].c++;
+          scoreEl.textContent=state[key].c+" / "+qs.length;
+          updateReport();
+        });
+        opts.appendChild(b);
+      });
+      it.appendChild(opts);it.appendChild(why);
+      box.appendChild(it);
+    });
+    var btns=document.createElement("div");btns.className="qbtns";
+    var again=document.createElement("button");again.type="button";again.className="btn main";again.textContent="다시 풀기";
+    again.addEventListener("click",function(){renderQuiz(box);updateReport();});
+    btns.appendChild(again);box.appendChild(btns);
+  }
+  document.querySelectorAll(".quiz").forEach(renderQuiz);
+  updateReport();
+})();
+</script>
+</body>
+</html>
